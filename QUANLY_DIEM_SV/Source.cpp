@@ -22,7 +22,7 @@ typedef struct mon_hoc MON_HOC;
 
 struct ds_monhoc
 {
-	MON_HOC *ds[MAX_MON_HOC];
+	MON_HOC* ds[MAX_MON_HOC];
 	int n = 0;
 };
 typedef struct ds_monhoc DS_MON_HOC;
@@ -40,14 +40,14 @@ struct sinh_vien
 	string TEN;
 	int NAMNHAPHOC;
 	// pointer
-	sinh_vien *pNext;
+	sinh_vien* pNext;
 };
 typedef struct sinh_vien SINH_VIEN;
 
 struct ds_sinh_vien
 {
-	SINH_VIEN *pHead = NULL;
-	SINH_VIEN *pTail = NULL;
+	SINH_VIEN* pHead = NULL;
+	SINH_VIEN* pTail = NULL;
 };
 typedef struct ds_sinh_vien DS_SINH_VIEN;
 // ===== END SINH VIEN =====
@@ -58,24 +58,23 @@ struct lop_tin_chi
 	// data
 	int MALOPTC;
 	char MAMH[12];
-	char NIEN_KHOA[30];
+	char NIEN_KHOA[20];
 	int HOC_KY;
 	int NHOM;
 	int sv_max;
 	int sv_min;
+	DS_SINH_VIEN ds_sv;
 
 	// pointer
-	lop_tin_chi *pLeft;
-	lop_tin_chi *pRight;
+	lop_tin_chi* pLeft;
+	lop_tin_chi* pRight;
 };
-typedef struct lop_tin_chi *tree;
+typedef struct lop_tin_chi Lop_Tin_Chi;
+typedef Lop_Tin_Chi* TREE;
 
 struct ds_lop_tin_chi
 {
-	tree ds = NULL;
-	int n = 0;
-
-	DS_SINH_VIEN ds_sv;
+	TREE tree = NULL;
 };
 typedef struct ds_lop_tin_chi DS_LOP_TIN_CHI;
 // ===== END LOP TIN CHI =====
@@ -87,13 +86,13 @@ struct dang_ky
 	char MASV[12];
 	float DIEM;
 	// pointer
-	dang_ky *pNext;
+	dang_ky* pNext;
 };
 typedef struct dang_ky DANG_KY;
 
 struct ds_dang_ky
 {
-	DANG_KY *pHead = NULL;
+	DANG_KY* pHead = NULL;
 	int n = 0;
 };
 typedef struct dang_ky DS_DANG_KY;
@@ -103,10 +102,10 @@ typedef struct dang_ky DS_DANG_KY;
 
 void SortString() {}
 
-bool CheckExistMSSV(DS_SINH_VIEN ds_sv, char *massv)
+bool CheckExistMSSV(DS_SINH_VIEN ds_sv, char* massv)
 {
 	bool exist = false;
-	for (SINH_VIEN *k = ds_sv.pHead; k != NULL; k = k->pNext)
+	for (SINH_VIEN* k = ds_sv.pHead; k != NULL; k = k->pNext)
 	{
 		if (_strcmpi(k->MASV, massv) == 0)
 		{
@@ -116,7 +115,7 @@ bool CheckExistMSSV(DS_SINH_VIEN ds_sv, char *massv)
 	}
 	return exist;
 }
-bool CheckExistMaMH(DS_MON_HOC ds_mh, char *maMH)
+bool CheckExistMaMH(DS_MON_HOC ds_mh, char* maMH)
 {
 	bool exist = false;
 	for (int i = 0; i < ds_mh.n; i++)
@@ -129,7 +128,36 @@ bool CheckExistMaMH(DS_MON_HOC ds_mh, char *maMH)
 	}
 	return exist;
 }
-
+bool CheckExistMaLTC(TREE tree, int maLopTc) {
+	if (tree == NULL)return false;
+	if (tree->MALOPTC == maLopTc) {
+		return false;
+	}
+	else if (tree->MALOPTC > maLopTc) {
+		CheckExistMaLTC(tree->pRight, maLopTc);
+	}
+	else if (tree->MALOPTC < maLopTc) {
+		CheckExistMaLTC(tree->pLeft, maLopTc);
+	}
+}
+void Trim(string& str) {
+	cout << str;
+	while (str[0] == ' ')
+	{
+		str.erase(str.begin() + 0);
+	}
+	while (str[str.length() - 1] == ' ')
+	{
+		str.erase(str.begin() + str.length() - 1);
+	}
+	for (int i = 0; i < str.length(); i++)
+	{
+		if ((str[i] == ' ') && (str[i + 1] == ' ')) {
+			str.erase(str.begin() + i);
+			i--;
+		}
+	}
+}
 string RandomID(DS_SINH_VIEN ds_sv)
 {
 	string randomId = "MSSV0000";
@@ -145,7 +173,6 @@ string RandomID(DS_SINH_VIEN ds_sv)
 	} while (CheckExistMSSV(ds_sv, cloned));
 	return randomId;
 }
-
 string RandomIDMH(DS_MON_HOC ds_mon_hoc)
 {
 	string randomId = "MH0000";
@@ -161,11 +188,137 @@ string RandomIDMH(DS_MON_HOC ds_mon_hoc)
 	} while (CheckExistMaMH(ds_mon_hoc, cloned));
 	return randomId;
 }
-
+int RandomIDLTC(TREE tree) {
+	int maLopTc;
+	do
+	{
+		maLopTc = rand() * (999 - 100 + 1) + 100;
+	} while (CheckExistMaLTC(tree, maLopTc));
+	return maLopTc;
+}
 // ===== END HELPER =====
 
+// ===== BEGIN DS LOP TIN CHI =====
+void InitDSLopTinChi(DS_LOP_TIN_CHI& ds_ltc) {
+	ds_ltc.tree = NULL;
+}
+
+Lop_Tin_Chi* InitNodeDSLTC() {
+	Lop_Tin_Chi* p = new Lop_Tin_Chi;
+
+	p->pLeft = NULL;
+	p->pRight = NULL;
+	return p;
+}
+
+void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data) {
+	if (tree == NULL) {
+		tree = data;
+	}
+	else {
+		if (tree->MALOPTC > data->MALOPTC) {
+			InsertNodeIntoTree(tree->pLeft, data);
+		}
+		else if (tree->MALOPTC < data->MALOPTC) {
+			InsertNodeIntoTree(tree->pRight, data);
+		}
+	}
+}
+
+void InportDSLopTC(DS_LOP_TIN_CHI& ds) {
+	// TODO: MALOPTC must be auto generate by integer.
+	for (int i = 0; i < 2; i++)
+	{
+		cout << "\n====== Nhap lop tin chi thu " << i + 1 << " ======" << endl;
+		Lop_Tin_Chi* p = InitNodeDSLTC();
+		p->MALOPTC = RandomIDLTC(ds.tree);
+		cout << "\nNhap ma mon hoc: "; gets_s(p->MAMH);
+		cout << "Nhap nien khoa: "; gets_s(p->NIEN_KHOA);
+		cout << "Nhap hoc ky: "; cin >> p->HOC_KY;
+		cout << "Nhap max sinh vien: "; cin >> p->sv_max;
+		cout << "Nhap min sinh vien: "; cin >> p->sv_min;
+		cout << "Nhap nhom:"; cin >> p->NHOM;
+		InsertNodeIntoTree(ds.tree, p);
+		i++;
+	}
+}
+
+void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
+	if (t != NULL) {
+		ds[n] = new Lop_Tin_Chi;
+		strcpy_s(ds[n]->MAMH, t->MAMH);
+		strcpy_s(ds[n]->NIEN_KHOA, t->NIEN_KHOA);
+		ds[n]->MALOPTC = t->MALOPTC;
+		ds[n]->HOC_KY = t->HOC_KY;
+		ds[n]->NHOM = t->NHOM;
+		ds[n]->sv_max = t->sv_max;
+		ds[n]->sv_min = t->sv_min;
+		// TODO: Ds sinh viên đăng ký vào lớp tín chỉ này
+		n++;
+		ConvertTreeToArray(t->pLeft, ds, n);
+		ConvertTreeToArray(t->pRight, ds, n);
+	}
+}
+// Memory release of ds lopTC when we have finished displaying. Place bellow at ShowDSLopTinChi()
+void MemoryReleaseDSLopTC(Lop_Tin_Chi* ds[], int n) {
+	for (int i = 0; i < n; i++)
+	{
+		delete ds[i];
+	}
+}
+void ShowDSLopTinChi(Lop_Tin_Chi* ds[], int n) {
+	for (int i = 0; i < n; i++)
+	{
+		cout << "\nMa lop tin chi: " << ds[i]->MALOPTC << endl;
+		cout << "Ma mon hoc: " << ds[i]->MAMH << endl;
+		cout << "Nien khoa: " << ds[i]->NIEN_KHOA << endl;
+		cout << "Hoc ky: " << ds[i]->HOC_KY << endl;
+		cout << "Nhom: " << ds[i]->NHOM << endl;
+		cout << "Max sinh vien: " << ds[i]->sv_max << endl;
+		cout << "Min sinh vien: " << ds[i]->sv_min << endl;
+	}
+}
+
+void RemoveLopTinChiById(TREE& t, int maLopTC) {
+	if (t != NULL) {
+		if (t->MALOPTC == maLopTC) {
+			Lop_Tin_Chi* x = t;
+			if (t->pLeft == NULL) {
+				t = t->pRight;
+			}
+			else if (t->pRight == NULL) {
+				t = t->pLeft;
+			}
+			else if (t->pLeft == NULL && t->pRight != NULL) {
+				// Node the mang
+				Node_Replaced_Tree(t->pRight, x);
+			}
+			delete x;
+		}
+		else if (t->MALOPTC > maLopTC) {
+			RemoveLopTinChiById(t->pLeft, maLopTC);
+		}
+		else if (t->MALOPTC < maLopTC) {
+			RemoveLopTinChiById(t->pRight, maLopTC);
+		}
+	}
+}
+
+void Node_Replaced_Tree(TREE& t, Lop_Tin_Chi*& lopTC) {
+	if (t->pLeft != NULL) {
+		Node_Replaced_Tree(t, lopTC);
+	}
+	else {
+		// Swap_Node_Replaced(t, lopTC); TODO:
+		lopTC = t;
+		t = t->pRight;
+	}
+}
+
+// ===== END DS LOP TIN CHI =====
+
 // SINH VIEN
-void Init_DS_Sinh_Vien(DS_SINH_VIEN &ds)
+void Init_DS_Sinh_Vien(DS_SINH_VIEN& ds)
 {
 	ds.pHead = NULL;
 	ds.pTail = NULL;
@@ -179,7 +332,7 @@ bool isEmptyDSSV(DS_SINH_VIEN ds_sv)
 }
 
 // Insert and order by MALOP+MASV
-void InsertLastSv(DS_SINH_VIEN &ds_sinh_vien, SINH_VIEN *sv)
+void InsertLastSv(DS_SINH_VIEN& ds_sinh_vien, SINH_VIEN* sv)
 {
 	if (ds_sinh_vien.pHead == NULL)
 	{
@@ -193,7 +346,7 @@ void InsertLastSv(DS_SINH_VIEN &ds_sinh_vien, SINH_VIEN *sv)
 	}
 }
 
-void InsertFirstSv(DS_SINH_VIEN &ds_sv, SINH_VIEN *sv)
+void InsertFirstSv(DS_SINH_VIEN& ds_sv, SINH_VIEN* sv)
 {
 	if (ds_sv.pHead == NULL)
 	{
@@ -206,9 +359,9 @@ void InsertFirstSv(DS_SINH_VIEN &ds_sv, SINH_VIEN *sv)
 	}
 }
 
-void RemoveFirst(DS_SINH_VIEN &ds_sv)
+void RemoveFirst(DS_SINH_VIEN& ds_sv)
 {
-	SINH_VIEN *p;
+	SINH_VIEN* p;
 	if (ds_sv.pHead == NULL)
 		return;
 
@@ -217,7 +370,7 @@ void RemoveFirst(DS_SINH_VIEN &ds_sv)
 	delete p;
 }
 
-void RemoveLast(DS_SINH_VIEN &ds_sv)
+void RemoveLast(DS_SINH_VIEN& ds_sv)
 {
 	if (ds_sv.pHead == NULL)
 		return;
@@ -227,7 +380,7 @@ void RemoveLast(DS_SINH_VIEN &ds_sv)
 		RemoveFirst(ds_sv);
 		return;
 	}
-	for (SINH_VIEN *k = ds_sv.pHead; k != NULL; k = k->pNext)
+	for (SINH_VIEN* k = ds_sv.pHead; k != NULL; k = k->pNext)
 	{
 		if (k->pNext == ds_sv.pTail)
 		{
@@ -239,7 +392,7 @@ void RemoveLast(DS_SINH_VIEN &ds_sv)
 	}
 }
 
-void RemoveSvByMSSV(DS_SINH_VIEN &ds_sv, char *massv)
+void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv)
 {
 	if (isEmptyDSSV(ds_sv))
 	{
@@ -261,8 +414,8 @@ void RemoveSvByMSSV(DS_SINH_VIEN &ds_sv, char *massv)
 		return;
 	}
 	bool exists = false;
-	SINH_VIEN *g = new SINH_VIEN;
-	for (SINH_VIEN *k = ds_sv.pHead; k != NULL; k = k->pNext)
+	SINH_VIEN* g = new SINH_VIEN;
+	for (SINH_VIEN* k = ds_sv.pHead; k != NULL; k = k->pNext)
 	{
 		if (_strcmpi(k->MASV, massv) == 0)
 		{
@@ -279,7 +432,7 @@ void RemoveSvByMSSV(DS_SINH_VIEN &ds_sv, char *massv)
 		cout << "\nKhong tim thay sinh vien" << endl;
 }
 
-void Input_Sinh_Vien(DS_SINH_VIEN &ds_sinh_vien)
+void Input_Sinh_Vien(DS_SINH_VIEN& ds_sinh_vien)
 {
 	int slsv;
 	int count = 0;
@@ -291,7 +444,7 @@ void Input_Sinh_Vien(DS_SINH_VIEN &ds_sinh_vien)
 	gets_s(maLop);
 	do
 	{
-		SINH_VIEN *sv = new SINH_VIEN;
+		SINH_VIEN* sv = new SINH_VIEN;
 		if (sv == NULL)
 		{
 			cout << "Cap phat vung nho de khoi tao sv that bai." << endl;
@@ -308,9 +461,9 @@ void Input_Sinh_Vien(DS_SINH_VIEN &ds_sinh_vien)
 		gets_s(sv->SDT);
 		cout << "\nNhap nam hoc: ";
 		cin >> sv->NAMNHAPHOC;
-		strcpy_s(sv->MALOP, 14, maLop);
+		strcpy_s(sv->MALOP, 15, maLop);
 		cin.ignore();
-		strcpy_s(sv->MASV, 11, RandomID(ds_sinh_vien).c_str());
+		strcpy_s(sv->MASV, 12, RandomID(ds_sinh_vien).c_str());
 		sv->pNext = NULL;
 		InsertFirstSv(ds_sinh_vien, sv);
 		count++;
@@ -320,7 +473,7 @@ void Input_Sinh_Vien(DS_SINH_VIEN &ds_sinh_vien)
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv)
 {
 	int total = 0;
-	for (SINH_VIEN *p = ds_sv.pHead; p != NULL; p = p->pNext)
+	for (SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
 	{
 		cout << "========== SINH VIEN " << ++total << " ==========" << endl;
 		cout << "Ma lop: " << p->MALOP << endl;
@@ -335,11 +488,11 @@ void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv)
 //  END SINH VIEN
 
 // MON HOC
-void Insert_MonHoc(DS_MON_HOC &ds_mon_hoc)
+void Insert_MonHoc(DS_MON_HOC& ds_mon_hoc)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		MON_HOC *monhoc = new MON_HOC;
+		MON_HOC* monhoc = new MON_HOC;
 		strcpy_s(monhoc->MAMH, 11, RandomIDMH(ds_mon_hoc).c_str());
 		cout << "\nNhap vao ten mon hoc:";
 		gets_s(monhoc->TENMH);
@@ -359,7 +512,7 @@ void Insert_MonHoc(DS_MON_HOC &ds_mon_hoc)
 	}
 }
 
-void RemoveMonHoc(DS_MON_HOC &ds_mon_hoc, char *maMH)
+void RemoveMonHoc(DS_MON_HOC& ds_mon_hoc, char* maMH)
 {
 	if (ds_mon_hoc.n == 0)
 	{
@@ -390,7 +543,7 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc)
 
 // HANDLE FILES
 
-void Read_File_MonHoc(DS_MON_HOC &ds_mon_hoc)
+void Read_File_MonHoc(DS_MON_HOC& ds_mon_hoc)
 {
 	ifstream fileIn;
 	fileIn.open("C:\\Users\\Nguyen Dai\\source\\repos\\QLDIEMSV_HTC\\QLDIEMSV_HTC\\DS_MONHOC.txt", ios_base::in);
@@ -402,7 +555,7 @@ void Read_File_MonHoc(DS_MON_HOC &ds_mon_hoc)
 	while (!fileIn.eof())
 	{
 		char s[1];
-		MON_HOC *data = new MON_HOC;
+		MON_HOC* data = new MON_HOC;
 		fileIn.getline(data->MAMH, 12, ',');
 		fileIn.getline(data->TENMH, 256, ',');
 		fileIn >> data->STCLT;
@@ -421,7 +574,7 @@ void Read_File_MonHoc(DS_MON_HOC &ds_mon_hoc)
 // TODO:
 void WriteFileMonHoc() {}
 
-void ReadFileSinhVien(DS_SINH_VIEN &ds_sv)
+void ReadFileSinhVien(DS_SINH_VIEN& ds_sv)
 {
 	ifstream fileIn;
 	fileIn.open("C:\\Users\\Nguyen Dai\\source\\repos\\QUANLY_DIEM_SV\\QUANLY_DIEM_SV\\DS_SINH_VIEN.txt", ios_base::in);
@@ -433,7 +586,7 @@ void ReadFileSinhVien(DS_SINH_VIEN &ds_sv)
 	while (!fileIn.eof())
 	{
 		char s[1];
-		SINH_VIEN *data = new SINH_VIEN;
+		SINH_VIEN* data = new SINH_VIEN;
 		fileIn.getline(data->MALOP, 15, ',');
 		fileIn.getline(data->MASV, 12, ',');
 		getline(fileIn, data->HO, ',');
@@ -454,6 +607,9 @@ int main()
 	srand(time(NULL));
 	DS_MON_HOC dsMonHoc;
 	DS_SINH_VIEN dsSinhVien;
+	DS_LOP_TIN_CHI dsLTC;
+	Lop_Tin_Chi* ds[100];
+	int n = 0;
 	/*Init_DS_Sinh_Vien(dsSinhVien);
 	Input_Sinh_Vien(dsSinhVien);
 	Show_DS_Sinh_Vien(dsSinhVien);*/
@@ -467,12 +623,15 @@ int main()
 	//Insert_MonHoc(dsMonHoc);
 	/*Read_File_MonHoc(dsMonHoc);*/
 	//Show_DS_MonHoc(dsMonHoc);
-	cout << "\n=======================" << endl;
+	/*cout << "\n=======================" << endl;
 	char mh[12];
 	cout << "\nNhap ma mon hoc can xoa: ";
-	gets_s(mh, 11);
-	RemoveMonHoc(dsMonHoc, mh);
-	Show_DS_MonHoc(dsMonHoc);
+	gets_s(mh, 12);*/
+	/*RemoveMonHoc(dsMonHoc, mh);
+	Show_DS_MonHoc(dsMonHoc);*/
+	InportDSLopTC(dsLTC);
+	ConvertTreeToArray(dsLTC.tree, ds, n);
+	ShowDSLopTinChi(ds, n);
 	system("pause");
 	return 0;
 }
