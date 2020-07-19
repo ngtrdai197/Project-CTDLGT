@@ -7,14 +7,24 @@
 
 using namespace std;
 #define MAX_MON_HOC 300
+#define MAX_MAMH 11
+#define MAX_TENMH 100
+#define MAX_MASV 13
+#define MAX_PHAI 4
+#define MAX_SDT 11
+#define MAX_MALOP 16
+#define MAX_HO 20
+#define MAX_TEN 15
+#define MAX_NIENKHOA 20
+
 #define bk_blue 0x0030
 #define red 0x0004
 
 // ===== BEGIN MON HOC =====
 struct mon_hoc
 {
-	char MAMH[12];
-	char TENMH[100];
+	char MAMH[MAX_MAMH];
+	char TENMH[MAX_TENMH];
 	float STCLT;
 	float STCTH;
 };
@@ -31,12 +41,12 @@ typedef struct ds_monhoc DS_MON_HOC;
 // ===== BEGIN SINH VIEN =====
 struct sinh_vien
 {
-	char MASV[14];
-	char PHAI[4];
-	char SDT[25];
-	char MALOP[17];
-	char HO[20];
-	char TEN[15];
+	char MASV[MAX_MASV];
+	char PHAI[MAX_PHAI];
+	char SDT[MAX_SDT];
+	char MALOP[MAX_MALOP];
+	char HO[MAX_HO];
+	char TEN[MAX_TEN];
 	int NAMNHAPHOC;
 };
 typedef struct sinh_vien SINH_VIEN;
@@ -59,8 +69,8 @@ typedef struct ds_sinh_vien DS_SINH_VIEN;
 struct lop_tin_chi
 {
 	int MALOPTC;
-	char MAMH[14];
-	char NIEN_KHOA[20];
+	char MAMH[MAX_MAMH];
+	char NIEN_KHOA[MAX_NIENKHOA];
 	int HOC_KY;
 	int NHOM;
 	int sv_max;
@@ -82,7 +92,7 @@ typedef NODE_LOP_TIN_CHI* TREE;
 struct dang_ky
 {
 	// data
-	char MASV[14];
+	char MASV[MAX_MASV];
 	float DIEM;
 	// pointer
 	dang_ky* pNext;
@@ -157,7 +167,7 @@ void Trim(string& str) {
 }
 string RandomID(DS_SINH_VIEN ds_sv)
 {
-	string randomId = "MSSV0000";
+	string randomId = "MSSV00000000";
 	char cloned[12];
 	// max 11 ki tu, con lai chua ki tu ket thuc chuoi.
 	strcpy_s(cloned, 11, randomId.c_str());
@@ -172,8 +182,8 @@ string RandomID(DS_SINH_VIEN ds_sv)
 }
 string RandomIDMH(DS_MON_HOC ds_mon_hoc)
 {
-	string randomId = "MH0000";
-	char cloned[12];
+	string randomId = "MSMH000000";
+	char cloned[11];
 	// max 11 ki tu, con lai chua ki tu ket thuc chuoi.
 	strcpy_s(cloned, 11, randomId.c_str());
 	do
@@ -262,8 +272,8 @@ void Read_File_MonHoc(DS_MON_HOC& ds_mon_hoc)
 	{
 		char s[1];
 		MON_HOC* data = new MON_HOC;
-		fileIn.getline(data->MAMH, 12, ',');
-		fileIn.getline(data->TENMH, 256, ',');
+		fileIn.getline(data->MAMH, MAX_MAMH, ',');
+		fileIn.getline(data->TENMH, MAX_TENMH, ',');
 		fileIn >> data->STCLT;
 		fileIn >> data->STCTH;
 		fileIn.ignore(); // bỏ qua một ký tự
@@ -406,7 +416,7 @@ void ReadFileDS_DANG_KY(DS_DANG_KY& ds_dk)
 	while (fileIn.peek() != EOF)
 	{
 		DANG_KY* node = new DANG_KY;
-		fileIn.getline(node->MASV, 14, ',');
+		fileIn.getline(node->MASV, MAX_MASV, ',');
 		fileIn >> node->DIEM;
 		fileIn.ignore();
 		InsertLastDSDKY(ds_dk, node);
@@ -481,8 +491,8 @@ void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
 			<< ",[" << "MSV123" << "," << "MSV234" << "]" << "\n";*/
 		fileIn >> data->MALOPTC;
 		fileIn.ignore(1);
-		fileIn.getline(data->MAMH, 14, ',');
-		fileIn.getline(data->NIEN_KHOA, 20, ',');
+		fileIn.getline(data->MAMH, MAX_MAMH, ',');
+		fileIn.getline(data->NIEN_KHOA, MAX_NIENKHOA, ',');
 		fileIn >> data->HOC_KY;
 		fileIn.ignore(1);
 		fileIn >> data->NHOM;
@@ -499,16 +509,16 @@ void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
 		data->ds_sv = ds_sv;
 		int totalSv = 0;
 		fileIn >> totalSv;
-		char** massv = CreateArray(14, totalSv);
+		char** massv = CreateArray(MAX_MASV, totalSv);
 		char temp[1];
 		fileIn.ignore(2);
 		for (int i = 0; i < totalSv; i++)
 		{
 			if (i < totalSv - 1) {
-				fileIn.getline(massv[i], 14, ',');
+				fileIn.getline(massv[i], MAX_MASV, ',');
 			}
 			else {
-				fileIn.getline(massv[i], 14, ']');
+				fileIn.getline(massv[i], MAX_MASV, ']');
 				fileIn.getline(temp, 1);
 			}
 			for (NODE_SINH_VIEN* p = ds_sv_original.pHead; p != NULL; p = p->pNext) {
@@ -955,6 +965,6 @@ int main()
 	ShowDSLopTinChi(ds, n);*/
 
 	//delete[]ds;
-	system("pause");
+	//system("pause");
 	return 0;
 }

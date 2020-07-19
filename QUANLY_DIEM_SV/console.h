@@ -7,24 +7,39 @@
 #include <conio.h>
 
 
-#define ColorCode_Back			0
-#define ColorCode_DarkBlue		1
-#define ColorCode_DarkGreen		2
-#define ColorCode_DarkCyan		3
-#define ColorCode_DarkRed		4
-#define ColorCode_DarkPink		5
-#define ColorCode_DarkYellow	6
-#define ColorCode_DarkWhite		7
-#define ColorCode_Grey			8
-#define ColorCode_Blue			9
-#define ColorCode_Green			10
-#define ColorCode_Cyan			11
-#define ColorCode_Red			12
-#define ColorCode_Pink			13
-#define ColorCode_Yellow		14
-#define ColorCode_White			15
+#define color_black 0x0000
+#define color_darkblue 0x0001
+#define color_darkgreen 0x0002
+#define color_darkcyan 0x0003
+#define color_darkred 0x0004
+#define color_darkpink 0x0005
+#define color_darkyellow 0x0006
+#define color_darkwhite 0x0007
+#define color_grey 0x0008
+#define color_blue 0x0009
+#define color_green 0x000a
+#define color_cyan 0x000b
+#define color_red 0x000c
+#define color_pink 0x000d
+#define color_yellow 0x000e
+#define color_white 0x000f
 
-#define default_ColorCode		7
+#define colorbk_black 0x0000
+#define colorbk_darkblue 0x0010
+#define colorbk_darkgreen 0x0020
+#define colorbk_darkcyan 0x0030
+#define colorbk_darkred 0x0040
+#define colorbk_darkpink 0x0050
+#define colorbk_darkyellow 0x0060
+#define colorbk_darkwhite 0x0070
+#define colorbk_grey 0x0080
+#define colorbk_blue 0x0090
+#define colorbk_green 0x00a0
+#define colorbk_cyan 0x00b0
+#define colorbk_red 0x00c0
+#define colorbk_pink 0x00d0
+#define colorbk_yellow 0x00e0
+#define colorbk_white 0x00f0
 
 
 #define key_Up		1072
@@ -35,9 +50,59 @@
 #define key_none	-1
 #define key_bkspace 8
 #define key_tab		9
+#define key_esc     27
 
 using namespace std;
+auto whandConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
+int gettxtColor()
+{
+	CONSOLE_SCREEN_BUFFER_INFO cisb;
+	GetConsoleScreenBufferInfo(whandConsole, &cisb);
+	return cisb.wAttributes;
+}
+void SetColor(int color) {
+	HANDLE stdhandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	SetConsoleTextAttribute(stdhandle, color);
+}
+void WriteBlockChar(CHAR_INFO* charater,
+	SHORT row, SHORT col,
+	SHORT x, SHORT y)
+{
+	COORD sizebuff = { col,row };
+	COORD pos = { 0,0 };
+	SMALL_RECT earea = { x,y,x + col ,y + row };
+	WriteConsoleOutput(whandConsole, charater, sizebuff, pos, &earea);
+	delete[] charater;
+}
+
+void clrscr(int x, int y,int col, int row, CHAR ch,int color = color_black) {
+	int size = col * row;
+	CHAR_INFO* charater = new CHAR_INFO[size];
+	for (int i = 0; i < size; i++)
+	{
+		charater[i].Attributes = color;
+		charater[i].Char.UnicodeChar = ch;
+		charater[i].Char.AsciiChar = ch;
+	}
+	SetColor(color);
+	WriteBlockChar(charater, row, col, x, y);
+}
+
+
+
+void ReadBlockChar(CHAR_INFO* &Arraych,
+	SHORT row, SHORT col,
+	SHORT x, SHORT y)
+{
+	CHAR_INFO* charater = new CHAR_INFO[row * col];
+	COORD sizebuff = { col,row };
+	COORD pos = { 0,0 };
+	SMALL_RECT earea = { x,y,x + col - 1,y + row - 1 };
+	ReadConsoleOutput(whandConsole, charater, sizebuff, pos, &earea);
+	Arraych = charater;
+}
 
 void DisableMaxiMize() {
 	char title[] = "Dai Nguyen";
@@ -71,11 +136,6 @@ void gotoXY(short x, short y) {
 		x = x,y = y
 	};
 	SetConsoleCursorPosition(stdhandle, info);
-}
-void SetColor(int color) {
-	HANDLE stdhandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	SetConsoleTextAttribute(stdhandle, color);
 }
 
 int getX()//lay toa do x hien tai cua con tro console.

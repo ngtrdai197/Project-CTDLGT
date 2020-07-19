@@ -79,7 +79,7 @@ string openLogin() {
 			}
 			break;
 		}
-	} while (key != 27 || masv.length() > 0);
+	} while (key != key_esc || masv.length() > 0);
 	cout << "Thoat";
 	return masv;
 }
@@ -89,23 +89,67 @@ struct MenuItem {
 	RECT rect;
 	std::string name;
 };
-
-MenuItem MenuFeatures[] = {
+struct MenuContent {
+	MenuItem* menus = NULL;
+	int n = 0;
+	int posStatus = 0;
+};
+MenuContent MenuFeatures = {
+	new MenuItem[4] {
 	{{3,3,20,2},"Lop Tin Chi"},
 	{{3,6,20,2},"SinhVien"},
 	{{3,9,20,2},"Mon Hoc"},
-	{{3,12,20,2},"Diem"},
+	{{3,12,20,2},"Diem"}
+	},
+	 4
 };
 
-MenuItem MenuCRUD[] = {
-	{{3,18,20,2},"Them"},
-	{{3,21,20,2},"Xoa"},
-	{{3,24,20,2},"Sua"},
+MenuContent MenuMonHoc = {
+	new MenuItem[3] {
+		{{3,18,20,2},"Them MH"},
+		{{3,21,20,2},"Xoa or Sua (MH)"},
+		{{3,24,20,2},"In danh sach MH"}
+	},
+	 3
 };
 
-void DrawEachButtonOfAction(MenuItem& item) {
+MenuContent MenuSinhVien = {
+	new MenuItem[3] {
+		{{3,18,20,2},"Nhap Sinh Vien"},
+		{{3,21,20,2},"Xoa or Sua (SV)"},
+		{{3,24,20,2},"In danh sach SV"},
+	},
+	 3
+};
+
+MenuContent MenuLopTinChi = {
+	new MenuItem[3] {
+	{{3,18,20,2},"Them Lop TC"},
+	{{3,21,20,2},"Xoa or Sua (TC)"},
+	{{3,24,20,2},"In danh sach TC"},
+	},
+	 3
+};
+MenuContent MenuDiem = {
+	new MenuItem[2] {
+	{{3,18,20,2},"Nhap diem"},
+	{{3,21,20,2},"Xem diem"},
+	},
+	 2
+};
+
+MenuContent ActionQuit = {
+	new MenuItem[2] {
+		{{55, 12, 10, 2},"Ok"},
+	{{68, 12, 10, 2},"Cancel"},
+	},
+	 2
+};
+
+void DrawEachButtonOfAction(MenuItem& item, int color = color_darkwhite) {
+	SetColor(color);
 	rectagle(item.rect.left, item.rect.top, item.rect.right, item.rect.bottom);
-	gotoXY((item.rect.right / 2) - 1, item.rect.top + 1);
+	gotoXY(item.rect.left + (item.rect.right - item.name.length()) / 2, item.rect.top + 1);
 	cout << item.name;
 }
 
@@ -124,13 +168,19 @@ void SetCurrentAction(int actionIndex) {
 	cout << nameAction;
 }
 
-
-
-void DrawListMenu(MenuItem menus[], int size) {
-	for (int i = 0; i < size; i++)
+void DrawListMenu(MenuContent& menucontent, int color = color_darkwhite) {
+	for (int i = 0; i < menucontent.n; i++)
 	{
-		DrawEachButtonOfAction(menus[i]); // +3
+		DrawEachButtonOfAction(menucontent.menus[i], color); // +3
 	}
+}
+
+void ConfirmQuit() {
+	rectagle(50, 5, 40, 13);
+	gotoXY(55, 8);
+	cout << "Ban co muon thoat chuong trinh";
+	DrawListMenu(ActionQuit);
+
 }
 
 void HideCursor()
@@ -153,11 +203,11 @@ void ShowGuide() {
 	cout << "ESC de thoat";
 }
 
-int ControlMenu(MenuItem menuitems[], int& posStatus,int indexlast) {
-	int pos = posStatus;
+int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, int activateColor = color_green) {
+	int pos = menucontent->posStatus;
 	int key = -1;
-	SetColor(FOREGROUND_RED);
-	DrawEachButtonOfAction(menuitems[posStatus]);
+	DrawListMenu(*menucontent, defaultColor);
+	DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
 
 	do
 	{
@@ -166,36 +216,39 @@ int ControlMenu(MenuItem menuitems[], int& posStatus,int indexlast) {
 		{
 		case key_Up: {
 			if (pos == 0) {
-				pos = indexlast+1;
+				pos = menucontent->n;
 			}
 			pos -= 1;
 			goto paint;
 		}
+		case key_tab:
 		case key_Down: {
-			if (pos == indexlast) {
+			if (pos == menucontent->n - 1) {
 				pos = -1;
 			}
 			pos += 1;
 			goto paint;
 		}
-
+		case key_Enter: {
+			if (pos == 0) {
+				DrawListMenu(MenuMonHoc, 3);
+				//DrawLo
+			}
+		}
 		default:
-			//SetColor(0x0030 | 0x0004);
 			break;
 		paint: {
-			SetColor(7);
-			DrawEachButtonOfAction(menuitems[posStatus]);
-			SetColor(FOREGROUND_RED);
-			DrawEachButtonOfAction(menuitems[pos]);
-			posStatus = pos;
+			DrawEachButtonOfAction(menucontent->menus[menucontent->posStatus]);
+			DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
+			menucontent->posStatus = pos;
 			}
 		}
 
-	} while (key != 27 && key != key_Enter && key != key_tab);
+	} while (key != key_esc && key != key_Enter);
 	return key;
 }
 
-void DrawContentRight() {
+void DrawContentLopTC() {
 	rectagle(28, 10, 6, 2); // show currently pointer
 	gotoXY(29, 11);
 	cout << "STT";
@@ -227,28 +280,146 @@ void DrawContentRight() {
 	gotoXY(128, 11);
 	cout << "SL con lai";
 }
+void DrawContentMonHoc() {
+	rectagle(28, 10, 6, 2);
+	gotoXY(29, 11);
+	cout << "STT";
+
+	rectagle(34, 10, 12, 2); // ma mon hoc
+	gotoXY(35, 11);
+	cout << "Ma mon hoc";
+
+	rectagle(46, 10, 35, 2); // ten mon hoc
+	gotoXY(47, 11);
+	cout << "Ten mon hoc";
+
+	rectagle(81, 10, 15, 2); // so tin chi ly thuyet
+	gotoXY(82, 11);
+	cout << "So tin LT";
+
+	rectagle(96, 10, 15, 2); // so tin chi ly thuyet
+	gotoXY(97, 11);
+	cout << "So tin TH";
+}
+
 void ProcessConrtol() {
-	MenuItem* menus[] = {
-		MenuFeatures,
-		MenuCRUD
-	};
 
-	int StatusPos[] = { 0,0 };
-	int indexlast[] = { 3,2 };
-
-	int posMenu = 0;
-
-
+	MenuContent* meunuCurrent = &MenuFeatures;
 
 	do {
-		int key = ControlMenu(menus[posMenu], StatusPos[posMenu],indexlast[posMenu]);
-		if (key == key_Enter && posMenu == 0) {
-			posMenu = 1;
+		int key = ControlMenu(meunuCurrent);
+
+		if (meunuCurrent == &MenuFeatures) {
+			if (key == key_Enter)
+				switch (meunuCurrent->posStatus)
+				{
+				case 0://menu lop  tin chi
+				{
+					meunuCurrent = &MenuLopTinChi;
+					break;
+				}
+				case 1: {
+					meunuCurrent = &MenuSinhVien;
+					break;
+				}
+				case 2: {
+					meunuCurrent = &MenuMonHoc;
+					break;
+				}
+				case 3: {
+					meunuCurrent = &MenuDiem;
+					break;
+				}
+				default:
+					break;
+				}
 		}
-		else
-		{
-			posMenu = (posMenu + 1) % 2;
+
+		if (meunuCurrent == &MenuLopTinChi) {
+			if (key == key_esc) {
+				meunuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+			}
+			else {
+				switch (meunuCurrent->posStatus) {
+				case 0: {
+					DrawContentLopTC();
+				}
+				default:
+					break;
+				}
+			}
 		}
+		else if (meunuCurrent == &MenuSinhVien) {
+			if (key == key_esc) {
+				meunuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+			}
+			else switch (meunuCurrent->posStatus)
+			{
+			default:
+				break;
+			}
+		}
+		else if (meunuCurrent == &MenuMonHoc) {
+			if (key == key_esc) {
+				meunuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+			}
+			else switch (meunuCurrent->posStatus)
+			{
+			default:
+				break;
+			}
+		}
+		else if (meunuCurrent == &MenuDiem) {
+			if (key == key_esc) {
+				meunuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+			}
+			else switch (meunuCurrent->posStatus)
+			{
+			default:
+				break;
+			}
+		}
+		else {
+			meunuCurrent = &ActionQuit;
+			ConfirmQuit();
+			key = ControlMenu(meunuCurrent);
+			if (key == key_Enter && meunuCurrent->posStatus == 0) {
+				return;
+			}
+			else {
+				meunuCurrent = &MenuFeatures;
+				clrscr(50, 5, 40, 14, ' ');
+			}
+		}
+
+
+		/*	if (key == key_esc && posMenu == 0) {
+				SetColor(color_darkgreen);
+				CHAR_INFO* ch = NULL;
+				ReadBlockChar(ch, 13, 41, 50, 5);
+				ConfirmQuit();
+				key = ControlMenu(menus[2], statusPos[2], indexLast[2]);
+				if (key == key_Enter && statusPos[2] == 0) {
+					return;
+				}
+				WriteBlockChar(ch, 13, 41, 50, 5);
+			}
+			else if (key == key_Enter && posMenu == 0) {
+				if (statusPos[posMenu] == 0) {
+					posMenu = 1;
+
+				}
+				DrawListMenu(menus[posMenu], indexLast[posMenu] + 1);
+			}
+			else if (key == key_esc && posMenu == 1)
+			{
+				posMenu = 0;
+				clrscr(3, 18, 20, 3 * 3, ' ');
+			}*/
 	} while (true);
 }
 void DrawMainLayout(string currentUser) {
@@ -257,15 +428,12 @@ void DrawMainLayout(string currentUser) {
 	rectagle(1, 1, 25, 40);
 	// where is place content when have a action
 	rectagle(26, 1, 120, 40);
-	DrawListMenu(MenuFeatures,4);
-	DrawListMenu(MenuCRUD,3);
-	DrawContentRight();
+	DrawListMenu(MenuFeatures, 4);
 
+	//DrawContentLopTC();
+
+	//DrawContentMonHoc();
 	ShowGuide();
-
-
 	gotoXY(4, 2);
 	cout << "CHUC NANG CHINH";
-
-
 }
