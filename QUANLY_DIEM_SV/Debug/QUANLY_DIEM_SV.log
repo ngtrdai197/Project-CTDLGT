@@ -17,16 +17,14 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(68,40): wa
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(152,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(152,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(161,57): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(362,4): warning C4065: switch statement contains 'default' but no 'case' labels
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(373,4): warning C4065: switch statement contains 'default' but no 'case' labels
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(384,4): warning C4065: switch statement contains 'default' but no 'case' labels
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(404,4): warning C4065: switch statement contains 'default' but no 'case' labels
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(160,20): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(176,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(191,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(389,8): warning C4101: 's': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(487,8): warning C4101: 's': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(634,6): warning C4101: 'slsv': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(930,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(494,8): warning C4101: 's': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(635,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(983,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(996,10): warning C4129: 'm': unrecognized character escape sequence
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(149): warning C4715: 'CheckExistMaLTC': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(753): warning C4715: 'TravelTree': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(751): warning C4715: 'TravelTree': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe

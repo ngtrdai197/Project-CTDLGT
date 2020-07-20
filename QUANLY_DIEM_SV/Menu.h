@@ -304,30 +304,30 @@ void DrawContentMonHoc() {
 
 void ProcessConrtol() {
 
-	MenuContent* meunuCurrent = &MenuFeatures;
+	MenuContent* menuCurrent = &MenuFeatures;
 
 	do {
-		int key = ControlMenu(meunuCurrent);
+		int key = ControlMenu(menuCurrent);
 
-		if (meunuCurrent == &MenuFeatures) {
+		if (menuCurrent == &MenuFeatures) {
 			if (key == key_Enter)
-				switch (meunuCurrent->posStatus)
+				switch (menuCurrent->posStatus)
 				{
 				case 0://menu lop  tin chi
 				{
-					meunuCurrent = &MenuLopTinChi;
+					menuCurrent = &MenuLopTinChi;
 					break;
 				}
 				case 1: {
-					meunuCurrent = &MenuSinhVien;
+					menuCurrent = &MenuSinhVien;
 					break;
 				}
 				case 2: {
-					meunuCurrent = &MenuMonHoc;
+					menuCurrent = &MenuMonHoc;
 					break;
 				}
 				case 3: {
-					meunuCurrent = &MenuDiem;
+					menuCurrent = &MenuDiem;
 					break;
 				}
 				default:
@@ -335,91 +335,86 @@ void ProcessConrtol() {
 				}
 		}
 
-		if (meunuCurrent == &MenuLopTinChi) {
+		if (menuCurrent == &MenuLopTinChi) {
 			if (key == key_esc) {
-				meunuCurrent = &MenuFeatures;
-				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
 			}
 			else {
-				switch (meunuCurrent->posStatus) {
+				switch (menuCurrent->posStatus) {
 				case 0: {
-					DrawContentLopTC();
+
+					break;
+				}
+				case 2: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						DrawContentLopTC();
+					}
+					break;
 				}
 				default:
 					break;
 				}
 			}
 		}
-		else if (meunuCurrent == &MenuSinhVien) {
+		else if (menuCurrent == &MenuSinhVien) {
 			if (key == key_esc) {
-				meunuCurrent = &MenuFeatures;
-				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
 			}
-			else switch (meunuCurrent->posStatus)
-			{
-			default:
-				break;
+			else {
+				switch (menuCurrent->posStatus) {
+				case 0: {break; }
+				default: {
+					break;
+				}
+				}
 			}
 		}
-		else if (meunuCurrent == &MenuMonHoc) {
+		else if (menuCurrent == &MenuMonHoc) {
 			if (key == key_esc) {
-				meunuCurrent = &MenuFeatures;
-				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
 			}
-			else switch (meunuCurrent->posStatus)
-			{
-			default:
-				break;
+			else {
+				switch (menuCurrent->posStatus) {
+
+				case 2: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						DrawContentMonHoc();
+					}
+					break;
+				default:
+					break;
+				}
+				}
 			}
 		}
-		else if (meunuCurrent == &MenuDiem) {
+		else if (menuCurrent == &MenuDiem) {
 			if (key == key_esc) {
-				meunuCurrent = &MenuFeatures;
-				clrscr(3, 18, 20, 3 * meunuCurrent->n, ' ');
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
 			}
-			else switch (meunuCurrent->posStatus)
+			else switch (menuCurrent->posStatus)
 			{
 			default:
 				break;
 			}
 		}
 		else {
-			meunuCurrent = &ActionQuit;
+			menuCurrent = &ActionQuit;
 			ConfirmQuit();
-			key = ControlMenu(meunuCurrent);
-			if (key == key_Enter && meunuCurrent->posStatus == 0) {
+			key = ControlMenu(menuCurrent);
+			if (key == key_Enter && menuCurrent->posStatus == 0) {
 				return;
 			}
 			else {
-				meunuCurrent = &MenuFeatures;
+				menuCurrent = &MenuFeatures;
 				clrscr(50, 5, 40, 14, ' ');
 			}
 		}
-
-
-		/*	if (key == key_esc && posMenu == 0) {
-				SetColor(color_darkgreen);
-				CHAR_INFO* ch = NULL;
-				ReadBlockChar(ch, 13, 41, 50, 5);
-				ConfirmQuit();
-				key = ControlMenu(menus[2], statusPos[2], indexLast[2]);
-				if (key == key_Enter && statusPos[2] == 0) {
-					return;
-				}
-				WriteBlockChar(ch, 13, 41, 50, 5);
-			}
-			else if (key == key_Enter && posMenu == 0) {
-				if (statusPos[posMenu] == 0) {
-					posMenu = 1;
-
-				}
-				DrawListMenu(menus[posMenu], indexLast[posMenu] + 1);
-			}
-			else if (key == key_esc && posMenu == 1)
-			{
-				posMenu = 0;
-				clrscr(3, 18, 20, 3 * 3, ' ');
-			}*/
 	} while (true);
 }
 void DrawMainLayout(string currentUser) {
@@ -433,7 +428,9 @@ void DrawMainLayout(string currentUser) {
 	//DrawContentLopTC();
 
 	//DrawContentMonHoc();
+	SetColor(color_darkwhite);
 	ShowGuide();
-	gotoXY(4, 2);
+	gotoXY(6, 2);
+	SetColor(color_darkwhite | colorbk_darkred);
 	cout << "CHUC NANG CHINH";
 }
