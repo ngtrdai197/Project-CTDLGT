@@ -3,7 +3,7 @@
 #include <fstream>;
 #include <ctime>;
 #include "console.h";
-#include "Menu.h";
+//#include "Menu.h";
 
 using namespace std;
 #define MAX_MON_HOC 300
@@ -203,9 +203,6 @@ int RandomIDLTC(TREE tree) {
 	} while (CheckExistMaLTC(tree, maLopTc));
 	return maLopTc;
 }
-int StringComparisions(char* a, char* b) {
-	return _strcmpi(a, b);
-}
 bool IsNumber(char* s)
 {
 	int i = 0;
@@ -231,23 +228,25 @@ bool CheckExistLop(char* malop)
 	bool exist = false;
 	while (fileIn.peek() != EOF)
 	{
-		char temp[15];
-		fileIn.getline(temp, 15, ',');
+		char temp[MAX_MALOP];
+		fileIn.getline(temp, MAX_MALOP, ',');
 		if (_strcmpi(temp, malop) == 0) {
 			exist = true;
-			break;
 		}
 	}
 	fileIn.close();
 	return exist;
 }
-//template<class T>
-
-class sv_test {
-	char id[100];
-
-	sv_test();
-};
+void InsertLopIntoDSLop(string lop) {
+	ofstream fileOut;
+	fileOut.open("DS_LOP.txt", ios_base::app);
+	if (fileOut.fail())
+	{
+		cout << "Open file (DS_LOP.txt) failed. Please check and update path of file again !!!" << endl;
+	};
+	fileOut << "," << lop;
+	fileOut.close();
+}
 char** CreateArray(int x, int y) {
 	char** a = new char* [y];
 	for (int i = 0; i < y; i++)
@@ -262,41 +261,39 @@ char** CreateArray(int x, int y) {
 void Read_File_MonHoc(DS_MON_HOC& ds_mon_hoc)
 {
 	fstream fileIn;
-	fileIn.open("C:\\Users\\Nguyen Dai\\source\\repos\\QLDIEMSV_HTC\\QLDIEMSV_HTC\\DS_MONHOC.txt", ios_base::in);
+	fileIn.open("DS_MONHOC.txt", ios_base::in);
 	if (fileIn.fail())
 	{
 		cout << "Open file (DS_MONHOC.txt) failed. Please check and update path of file again !!!" << endl;
 		return;
 	};
-	while (!fileIn.eof())
+	while (fileIn.peek() != EOF)
 	{
-		char s[1];
 		MON_HOC* data = new MON_HOC;
 		fileIn.getline(data->MAMH, MAX_MAMH, ',');
 		fileIn.getline(data->TENMH, MAX_TENMH, ',');
 		fileIn >> data->STCLT;
+		fileIn.ignore(1);
 		fileIn >> data->STCTH;
-		fileIn.ignore(); // bỏ qua một ký tự
-		fileIn.getline(s, 1, '\n');
-		/*cout << "Ma MH:" << data->MAMH << " -> Ten MH:"
-			<< data->TENMH << " -> So TCLT:"
-			<< data->STCLT << " -> So TCTH:"<< data->STCTH << endl;*/
+		fileIn.ignore(1);
 		ds_mon_hoc.ds[ds_mon_hoc.n] = data;
 		ds_mon_hoc.n++;
 	}
 	fileIn.close();
 }
-void WriteAStudentToFile(NODE_SINH_VIEN* sv) {
+void UpdateFileDSMonHoc(DS_MON_HOC ds_mh) {
 	ofstream fileOut;
-	fileOut.open("DS_SINH_VIEN.txt", ios::out | ios::app);
+	fileOut.open("DS_MONHOC.txt", ios_base::out);
 	if (fileOut.fail())
 	{
-		cout << "Open file (DS_SINH_VIEN.txt) to write failed."
-			<< "Please check and update path of file again !!!" << endl;
+		cout << "Open file (DS_MONHOC.txt) failed. Please check and update path of file again !!!" << endl;
 		return;
 	};
-	fileOut << endl << sv->data.MALOP << "," << sv->data.MASV << "," << sv->data.HO << ","
-		<< sv->data.TEN << "," << sv->data.PHAI << "," << sv->data.SDT << "," << sv->data.NAMNHAPHOC;
+	for (int i = 0; i < ds_mh.n; i++)
+	{
+		fileOut << ds_mh.ds[i]->MAMH << "," << ds_mh.ds[i]->TENMH
+			<< "," << ds_mh.ds[i]->STCLT << "," << ds_mh.ds[i]->STCTH << endl;
+	}
 	fileOut.close();
 }
 void UpdateListStudentToFile(DS_SINH_VIEN& ds_sv) {
@@ -477,7 +474,6 @@ void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 	fileOut.close();
 }
 void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data);
-
 void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
 	ifstream fileIn;
 	ReadFileSinhVien(ds_sv_original);
@@ -899,26 +895,23 @@ void ShowDSSVDangKyLTC(Lop_Tin_Chi* ds[], int n) {
 // MON HOC
 void Insert_MonHoc(DS_MON_HOC& ds_mon_hoc)
 {
-	for (int i = 0; i < 2; i++)
+	MON_HOC* monhoc = new MON_HOC;
+	strcpy_s(monhoc->MAMH, MAX_MAMH, RandomIDMH(ds_mon_hoc).c_str());
+	cout << "\nNhap vao ten mon hoc:";
+	cin.getline(monhoc->TENMH, MAX_TENMH);
+	if (strcmp(monhoc->TENMH, "") == 0)
 	{
-		MON_HOC* monhoc = new MON_HOC;
-		strcpy_s(monhoc->MAMH, 11, RandomIDMH(ds_mon_hoc).c_str());
-		cout << "\nNhap vao ten mon hoc:";
-		cin.getline(monhoc->TENMH, 256);
-		if (strcmp(monhoc->TENMH, "") == 0)
-		{
-			cout << "\nLoi. Ten mon hoc khong hop le." << endl;
-			system("pause");
-		}
-		cout << "\nNhap vao so tin chi ly thuyet:";
-		cin >> monhoc->STCLT;
-
-		cout << "\nNhap vao so tin chi thuc hanh:";
-		cin >> monhoc->STCTH;
-		cin.ignore();
-		ds_mon_hoc.ds[ds_mon_hoc.n] = monhoc;
-		ds_mon_hoc.n++;
+		cout << "\nLoi. Ten mon hoc khong hop le." << endl;
+		system("pause");
 	}
+	cout << "\nNhap vao so tin chi ly thuyet:";
+	cin >> monhoc->STCLT;
+
+	cout << "\nNhap vao so tin chi thuc hanh:";
+	cin >> monhoc->STCTH;
+	cin.ignore();
+	ds_mon_hoc.ds[ds_mon_hoc.n] = monhoc;
+	ds_mon_hoc.n++;
 }
 void RemoveMonHoc(DS_MON_HOC& ds_mon_hoc, char* maMH)
 {
@@ -978,24 +971,455 @@ void Show_DS_Dang_Ky(DS_DANG_KY ds_dk) {
 }
 // END DS DANG KY
 
+// BEGIN MENU
+
+#pragma once
+string mainActions[4] = { "CHUC NANG LOP TIN CHI", "CHUC NANG SINH VIEN", "CHUC NANG MON HOC", "CHUC NANG DIEM" };
+string nameAction = "";
+string openLogin() {
+	rectagle(40, 10, 50, 15);
+	gotoXY(45, 13);
+	cout << "Username";
+	rectagle(45, 14, 25, 2); // width of input
+
+	gotoXY(45, 18);
+	cout << "Password";
+	rectagle(45, 19, 25, 2);
+	gotoXY(47, 15);
+
+	string auth[2];
+	int pos = 0;
+	int key = -1;
+	string masv = "";
+	do {
+		key = inputKey();
+		switch (key)
+		{
+		case key_Up: {
+			pos = 0;
+			gotoXY(47 + auth[pos].length(), 15);
+			break;
+		}
+		case key_Down: {
+			pos = 1;
+			gotoXY(47 + auth[pos].length(), 20);
+			break;
+		};
+		case key_tab: {
+			pos = (pos + 1) % 2;
+			if (pos == 0) {
+				gotoXY(47 + auth[pos].length(), 15);
+			}
+			else {
+				gotoXY(47 + auth[pos].length(), 20);
+			}
+			break;
+		}
+		case key_bkspace: {
+			if (auth[pos].length() < 1) break;
+
+			cout << "\b \b";
+			auth[pos].erase(auth[pos].length() - 1, 1);
+			break;
+		}
+		case key_Enter: {
+			if (auth[0] == "sv" && auth[1] == "sv") {
+				masv = auth[0];
+				return masv;
+			}
+			else {
+				gotoXY(47, 24);
+				cout << "Thong tin dang nhap khong dung!";
+				gotoXY(47 + auth[pos].length(), pos == 0 ? 15 : 20);
+				break;
+			}
+		}
+		default:
+			if (key > 31 && key < 127) {
+				if (pos == 0) {
+					gotoXY(47 + auth[pos].length(), 15);
+				}
+				else {
+					gotoXY(47 + auth[pos].length(), 20);
+				}
+				if (auth[pos].length() < 20) {
+					auth[pos] += key;
+					if (pos == 0) {
+						cout << char(key);
+					}
+					else {
+						cout << "*";
+					}
+				}
+			}
+			break;
+		}
+	} while (key != key_esc || masv.length() > 0);
+	cout << "Thoat";
+	return masv;
+}
+
+struct MenuItem {
+	RECT rect;
+	std::string name;
+};
+struct MenuContent {
+	MenuItem* menus = NULL;
+	int n = 0;
+	int posStatus = 0;
+};
+MenuContent MenuFeatures = {
+	new MenuItem[4] {
+	{{3,3,20,2},"Lop Tin Chi"},
+	{{3,6,20,2},"SinhVien"},
+	{{3,9,20,2},"Mon Hoc"},
+	{{3,12,20,2},"Diem"}
+	},
+	 4
+};
+MenuContent MenuMonHoc = {
+	new MenuItem[3] {
+		{{3,18,20,2},"Them MH"},
+		{{3,21,20,2},"Xoa or Sua (MH)"},
+		{{3,24,20,2},"In danh sach MH"}
+	},
+	 3
+};
+MenuContent MenuSinhVien = {
+	new MenuItem[3] {
+		{{3,18,20,2},"Nhap Sinh Vien"},
+		{{3,21,20,2},"Xoa or Sua (SV)"},
+		{{3,24,20,2},"In danh sach SV"},
+	},
+	 3
+};
+MenuContent MenuLopTinChi = {
+	new MenuItem[3] {
+	{{3,18,20,2},"Them Lop TC"},
+	{{3,21,20,2},"Xoa or Sua (TC)"},
+	{{3,24,20,2},"In danh sach TC"},
+	},
+	 3
+};
+MenuContent MenuDiem = {
+	new MenuItem[2] {
+	{{3,18,20,2},"Nhap diem"},
+	{{3,21,20,2},"Xem diem"},
+	},
+	 2
+};
+MenuContent ActionQuit = {
+	new MenuItem[2] {
+		{{55, 12, 10, 2},"Ok"},
+	{{68, 12, 10, 2},"Cancel"},
+	},
+	 2
+};
+void DrawEachButtonOfAction(MenuItem& item, int color = color_darkwhite) {
+	SetColor(color);
+	rectagle(item.rect.left, item.rect.top, item.rect.right, item.rect.bottom);
+	gotoXY(item.rect.left + (item.rect.right - item.name.length()) / 2, item.rect.top + 1);
+	cout << item.name;
+}
+void SetCurrentAction(int actionIndex) {
+	int location = 80;
+	for (int i = mainActions[actionIndex].length() - 1; mainActions[actionIndex].length() < 0; i--)
+	{
+		cout << 1;
+		gotoXY(location + mainActions[actionIndex].length(), 2);
+		cout << "\b \b";
+		mainActions->erase(mainActions[actionIndex].length() - 1, 1);
+	}
+	nameAction = "";
+	nameAction = mainActions[actionIndex];
+	gotoXY(80, 2);
+	cout << nameAction;
+}
+void DrawListMenu(MenuContent& menucontent, int color = color_darkwhite) {
+	for (int i = 0; i < menucontent.n; i++)
+	{
+		DrawEachButtonOfAction(menucontent.menus[i], color); // +3
+	}
+}
+void ConfirmQuit() {
+	rectagle(50, 5, 40, 13);
+	gotoXY(55, 8);
+	cout << "Ban co muon thoat chuong trinh";
+	DrawListMenu(ActionQuit);
+
+}
+void HideCursor()
+{
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO info;
+	info.dwSize = 100;
+	info.bVisible = FALSE;
+	SetConsoleCursorInfo(consoleHandle, &info);
+}
+void ShowGuide() {
+	gotoXY(3, 33);
+	cout << char(24) << " Di chuyen len";
+	gotoXY(3, 35);
+	cout << char(25) << " Di chuyen xuong";
+	gotoXY(3, 37);
+	cout << "Enter de chon";
+	gotoXY(3, 39);
+	cout << "ESC de thoat";
+}
+int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, int activateColor = color_green) {
+	int pos = menucontent->posStatus;
+	int key = -1;
+	DrawListMenu(*menucontent, defaultColor);
+	DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
+
+	do
+	{
+		key = inputKey();
+		switch (key)
+		{
+		case key_Up: {
+			if (pos == 0) {
+				pos = menucontent->n;
+			}
+			pos -= 1;
+			goto paint;
+		}
+		case key_tab:
+		case key_Down: {
+			if (pos == menucontent->n - 1) {
+				pos = -1;
+			}
+			pos += 1;
+			goto paint;
+		}
+		case key_Enter: {
+			if (pos == 0) {
+				DrawListMenu(MenuMonHoc, 3);
+				//DrawLo
+			}
+		}
+		default:
+			break;
+		paint: {
+			DrawEachButtonOfAction(menucontent->menus[menucontent->posStatus]);
+			DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
+			menucontent->posStatus = pos;
+			}
+		}
+
+	} while (key != key_esc && key != key_Enter);
+	return key;
+}
+void DrawContentLopTC() {
+	rectagle(28, 10, 6, 2); // show currently pointer
+	gotoXY(29, 11);
+	cout << "STT";
+	rectagle(34, 10, 12, 2); // ma lop
+	gotoXY(35, 11);
+	cout << "Ma lop TC";
+	rectagle(46, 10, 12, 2); // ma mon hoc
+	gotoXY(47, 11);
+	cout << "Ma mon hoc";
+	rectagle(58, 10, 25, 2); // ten mon hoc
+	gotoXY(59, 11);
+	cout << "Ten mon hoc";
+	rectagle(83, 10, 10, 2); // nien khoa
+	gotoXY(84, 11);
+	cout << "N-Khoa";
+	rectagle(93, 10, 9, 2); // hoc ky
+	gotoXY(94, 11);
+	cout << "Hoc ky";
+	rectagle(102, 10, 9, 2); // nhom
+	gotoXY(103, 11);
+	cout << "Nhom";
+	rectagle(111, 10, 8, 2); // sv max
+	gotoXY(112, 11);
+	cout << "Max sv";
+	rectagle(119, 10, 8, 2); // sv min
+	gotoXY(120, 11);
+	cout << "Min sv";
+	rectagle(127, 10, 12, 2); // so luong con lai
+	gotoXY(128, 11);
+	cout << "SL con lai";
+}
+void DrawContentMonHoc() {
+	rectagle(28, 10, 6, 2);
+	gotoXY(29, 11);
+	cout << "STT";
+
+	rectagle(34, 10, 12, 2); // ma mon hoc
+	gotoXY(35, 11);
+	cout << "Ma mon hoc";
+
+	rectagle(46, 10, 35, 2); // ten mon hoc
+	gotoXY(47, 11);
+	cout << "Ten mon hoc";
+
+	rectagle(81, 10, 15, 2); // so tin chi ly thuyet
+	gotoXY(82, 11);
+	cout << "So tin LT";
+
+	rectagle(96, 10, 15, 2); // so tin chi ly thuyet
+	gotoXY(97, 11);
+	cout << "So tin TH";
+}
+void ProcessConrtol() {
+
+	MenuContent* menuCurrent = &MenuFeatures;
+
+	do {
+		int key = ControlMenu(menuCurrent);
+
+		if (menuCurrent == &MenuFeatures) {
+			if (key == key_Enter)
+				switch (menuCurrent->posStatus)
+				{
+				case 0://menu lop  tin chi
+				{
+					menuCurrent = &MenuLopTinChi;
+					break;
+				}
+				case 1: {
+					menuCurrent = &MenuSinhVien;
+					break;
+				}
+				case 2: {
+					menuCurrent = &MenuMonHoc;
+					break;
+				}
+				case 3: {
+					menuCurrent = &MenuDiem;
+					break;
+				}
+				default:
+					break;
+				}
+		}
+
+		if (menuCurrent == &MenuLopTinChi) {
+			if (key == key_esc) {
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
+			}
+			else {
+				switch (menuCurrent->posStatus) {
+				case 0: {
+
+					break;
+				}
+				case 2: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						DrawContentLopTC();
+					}
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+		else if (menuCurrent == &MenuSinhVien) {
+			if (key == key_esc) {
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
+			}
+			else {
+				switch (menuCurrent->posStatus) {
+				case 0: {break; }
+				default: {
+					break;
+				}
+				}
+			}
+		}
+		else if (menuCurrent == &MenuMonHoc) {
+			if (key == key_esc) {
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
+			}
+			else {
+				switch (menuCurrent->posStatus) {
+
+				case 2: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						DrawContentMonHoc();
+					}
+					break;
+				default:
+					break;
+				}
+				}
+			}
+		}
+		else if (menuCurrent == &MenuDiem) {
+			if (key == key_esc) {
+				menuCurrent = &MenuFeatures;
+				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
+			}
+			else switch (menuCurrent->posStatus)
+			{
+			default:
+				break;
+			}
+		}
+		else {
+			menuCurrent = &ActionQuit;
+			ConfirmQuit();
+			key = ControlMenu(menuCurrent);
+			if (key == key_Enter && menuCurrent->posStatus == 0) {
+				return;
+			}
+			else {
+				menuCurrent = &MenuFeatures;
+				clrscr(50, 5, 40, 14, ' ');
+			}
+		}
+	} while (true);
+}
+void DrawMainLayout(string currentUser) {
+	HideCursor(); // hide cursor
+	// main actions
+	rectagle(1, 1, 25, 40);
+	// where is place content when have a action
+	rectagle(26, 1, 120, 40);
+	DrawListMenu(MenuFeatures, 4);
+
+	//DrawContentLopTC();
+
+	//DrawContentMonHoc();
+	SetColor(color_darkwhite);
+	ShowGuide();
+	gotoXY(6, 2);
+	SetColor(color_darkwhite | colorbk_darkred);
+	cout << "CHUC NANG CHINH";
+}
+// END MENU
+
 int main()
 {
 	srand(time(NULL));
 	//SetColor(bk_blue | red);
 	//string a = openLogin();
 	//if (a.length() > 0) {
-		/*DrawMainLayout("");
-		ProcessConrtol();*/
-		//}
-	DS_SINH_VIEN ds_sv;
+	/*DrawMainLayout("");
+	ProcessConrtol();*/
+	//}
+	/*DS_SINH_VIEN ds_sv;
 	Init_DS_Sinh_Vien(ds_sv);
 	ReadFileSinhVien(ds_sv);
 	Show_DS_Sinh_Vien(ds_sv);
 	NODE_SINH_VIEN* newSv = Input_Sinh_Vien(ds_sv);
-	InsertAndSortSvIntoDS(ds_sv, newSv);
+	bool exist = CheckExistLop(newSv->data.MALOP);
+	if (!exist) {
+		cout << "Insert new class into list";
+		InsertLopIntoDSLop(newSv->data.MALOP);
+	}
 	cout << "\m ========== DS AFTER UPDATED ==============\n";
+	InsertAndSortSvIntoDS(ds_sv, newSv);
 	UpdateListStudentToFile(ds_sv);
-	Show_DS_Sinh_Vien(ds_sv);
+	Show_DS_Sinh_Vien(ds_sv);*/
 	/*DS_DANG_KY ds_dangky;
 	int n = 0;
 	Init_DS_Dang_Ky(ds_dangky);
@@ -1022,15 +1446,16 @@ int main()
 	ConvertTreeToArray(tree, ds, n);
 	UpdateListLopTinChiToFile(ds, n);
 	ShowDSLopTinChi(ds, n);*/
-	//int x;
-	//cout << "Nhap ma lop tin chi can xoa:"; cin >> x;
-	//RemoveNodeOfTree(tree, x);
-	//n = 0;
-	//ConvertTreeToArray(tree, ds, n);
+	/*int x;
+	cout << "Nhap ma lop tin chi can xoa:"; cin >> x;
+	RemoveNodeOfTree(tree, x);
+	n = 0;
+	ConvertTreeToArray(tree, ds, n);*/
 	//ShowDSLopTinChi(ds, n);
-
+	//cout << "=========== DS LOP TIN CHI SAU KHI XOA =============\n";
 	//Show_DS_Sinh_Vien(ds_sv);
-	//UpdateListLopTinChiToFile(ds, n);
+	/*UpdateListLopTinChiToFile(ds, n);
+	ShowDSLopTinChi(ds, n);*/
 	/*int x;
 	cout << "Nhap ma lop tin chi can xoa:"; cin >> x;
 	RemoveNodeOfTree(tree, x);
@@ -1044,6 +1469,14 @@ int main()
 	ShowDSLopTinChi(ds, n);*/
 
 	//delete[]ds;
+	DS_MON_HOC ds_mh;
+	ds_mh.n = 0;
+	Read_File_MonHoc(ds_mh);
+	Show_DS_MonHoc(ds_mh);
+	Insert_MonHoc(ds_mh);
+	UpdateFileDSMonHoc(ds_mh);
+	cout << "\n=========== List after insert =============\n";
+	Show_DS_MonHoc(ds_mh);
 	system("pause");
 	return 0;
 }

@@ -84,7 +84,6 @@ string openLogin() {
 	return masv;
 }
 
-
 struct MenuItem {
 	RECT rect;
 	std::string name;

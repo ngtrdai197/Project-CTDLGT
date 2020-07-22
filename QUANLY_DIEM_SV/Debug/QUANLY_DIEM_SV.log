@@ -6,25 +6,23 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(4,10):
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(5,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\console.h(190,22): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\console.h(195,2): warning C4065: switch statement contains 'default' but no 'case' labels
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(25,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(30,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(36,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(39,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(58,55): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(65,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(68,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(152,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(152,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(161,57): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(404,4): warning C4065: switch statement contains 'default' but no 'case' labels
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(160,20): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(176,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(191,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(494,8): warning C4101: 's': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(635,6): warning C4101: 'slsv': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(983,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(996,10): warning C4129: 'm': unrecognized character escape sequence
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(490,8): warning C4101: 's': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(631,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1000,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1005,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1011,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1014,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1033,55): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1040,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1043,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1121,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1121,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1129,57): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1365,4): warning C4065: switch statement contains 'default' but no 'case' labels
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(1402,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(149): warning C4715: 'CheckExistMaLTC': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(751): warning C4715: 'TravelTree': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(747): warning C4715: 'TravelTree': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe
