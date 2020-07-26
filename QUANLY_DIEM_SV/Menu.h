@@ -1,6 +1,9 @@
-#pragma once
-string mainActions[4] = { "CHUC NANG LOP TIN CHI", "CHUC NANG SINH VIEN", "CHUC NANG MON HOC", "CHUC NANG DIEM" };
-string nameAction = "";
+#ifndef MENU_H
+#define MENU_H
+
+#include "Structure.h"
+
+
 string openLogin() {
 	rectagle(40, 10, 50, 15);
 	gotoXY(45, 13);
@@ -84,67 +87,6 @@ string openLogin() {
 	return masv;
 }
 
-struct MenuItem {
-	RECT rect;
-	std::string name;
-};
-struct MenuContent {
-	MenuItem* menus = NULL;
-	int n = 0;
-	int posStatus = 0;
-};
-MenuContent MenuFeatures = {
-	new MenuItem[4] {
-	{{3,3,20,2},"Lop Tin Chi"},
-	{{3,6,20,2},"SinhVien"},
-	{{3,9,20,2},"Mon Hoc"},
-	{{3,12,20,2},"Diem"}
-	},
-	 4
-};
-
-MenuContent MenuMonHoc = {
-	new MenuItem[3] {
-		{{3,18,20,2},"Them MH"},
-		{{3,21,20,2},"Xoa or Sua (MH)"},
-		{{3,24,20,2},"In danh sach MH"}
-	},
-	 3
-};
-
-MenuContent MenuSinhVien = {
-	new MenuItem[3] {
-		{{3,18,20,2},"Nhap Sinh Vien"},
-		{{3,21,20,2},"Xoa or Sua (SV)"},
-		{{3,24,20,2},"In danh sach SV"},
-	},
-	 3
-};
-
-MenuContent MenuLopTinChi = {
-	new MenuItem[3] {
-	{{3,18,20,2},"Them Lop TC"},
-	{{3,21,20,2},"Xoa or Sua (TC)"},
-	{{3,24,20,2},"In danh sach TC"},
-	},
-	 3
-};
-MenuContent MenuDiem = {
-	new MenuItem[2] {
-	{{3,18,20,2},"Nhap diem"},
-	{{3,21,20,2},"Xem diem"},
-	},
-	 2
-};
-
-MenuContent ActionQuit = {
-	new MenuItem[2] {
-		{{55, 12, 10, 2},"Ok"},
-	{{68, 12, 10, 2},"Cancel"},
-	},
-	 2
-};
-
 void DrawEachButtonOfAction(MenuItem& item, int color = color_darkwhite) {
 	SetColor(color);
 	rectagle(item.rect.left, item.rect.top, item.rect.right, item.rect.bottom);
@@ -182,12 +124,12 @@ void ConfirmQuit() {
 
 }
 
-void HideCursor()
+void HideCursor(bool ishide = true)
 {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO info;
 	info.dwSize = 100;
-	info.bVisible = FALSE;
+	info.bVisible = !ishide;
 	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
@@ -228,12 +170,12 @@ int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, in
 			pos += 1;
 			goto paint;
 		}
-		case key_Enter: {
-			if (pos == 0) {
-				DrawListMenu(MenuMonHoc, 3);
-				//DrawLo
-			}
-		}
+					 //case key_Enter: {
+					 //	if (pos == 0) {
+					 //		DrawListMenu(MenuMonHoc, 3);
+					 //		//DrawLo
+					 //	}
+					 //}
 		default:
 			break;
 		paint: {
@@ -300,8 +242,69 @@ void DrawContentMonHoc() {
 	gotoXY(97, 11);
 	cout << "So tin TH";
 }
+char InputBox(string& str, int x, int y, int width, int maxText, bool isDraw = false, bool isText = true) {
+	string text = str;
+	SetColor(color_darkwhite);
+	rectagle(x, y, width, 2);
 
-void ProcessConrtol() {
+	if (isDraw) return -1;
+
+	char key = -1;
+	gotoXY(x + 1, y + 1);
+	cout << text;
+	HideCursor(false);
+
+	do {
+		key = inputKey();
+
+		if (isText ?
+			(((
+				(key > 47 && key < 58) || (key > 64 && key < 91) || (key > 96 && key < 123)) || key == 45) && text.length() < maxText)
+			: ((key > 47 && key < 58) && text.length() < maxText)) {
+			text += key;
+			cout << key;
+		}
+		else if (key == key_bkspace)
+		{
+			if (text.length() <= 0) continue;
+
+			cout << "\b \b";
+			text.erase(text.length() - 1, 1);
+		}
+
+	} while (key != key_esc && key != key_tab && key != key_Enter);
+
+	HideCursor();
+	str = text;
+	return key;
+}
+
+char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		// index > 2 enter number else enter string
+		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < 2 ? true : false);
+	}
+
+	int indexCurrent = 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false, indexCurrent < 2 ? true : false);
+		if (key == key_tab) {
+			indexCurrent = (indexCurrent + 1) % n;
+		}
+
+	} while (key != key_esc && key != key_Enter);
+	return key;
+}
+
+void ProcessConrtol(AppContext& context) {
 
 	MenuContent* menuCurrent = &MenuFeatures;
 
@@ -332,9 +335,20 @@ void ProcessConrtol() {
 				default:
 					break;
 				}
+			else if (key == key_esc) {
+				menuCurrent = &ActionQuit;
+				ConfirmQuit();
+				key = ControlMenu(menuCurrent);
+				if (key == key_Enter && menuCurrent->posStatus == 0) {
+					return;
+				}
+				else {
+					menuCurrent = &MenuFeatures;
+					clrscr(50, 5, 40, 14, ' ');
+				}
+			}
 		}
-
-		if (menuCurrent == &MenuLopTinChi) {
+		else if (menuCurrent == &MenuLopTinChi) {
 			if (key == key_esc) {
 				menuCurrent = &MenuFeatures;
 				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
@@ -342,14 +356,55 @@ void ProcessConrtol() {
 			else {
 				switch (menuCurrent->posStatus) {
 				case 0: {
-
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+						InDanhSachLopTinChi(context.ds, context.nLTC, 28, 10);
+						//delete[] context.ds;
+						context.nLTC = 0;
+					}
 					break;
 				}
 				case 2: {
-					if (key == key_Enter) {
-						SetColor(color_darkwhite);
-						DrawContentLopTC();
+					string Texts[6] = { "" };
+					int maxTexts[6] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3,3,3 };
+					int key = -1;
+					while (key != key_esc)
+					{
+						key = DrawFormInput(98, 10, 40, Texts, maxTexts, 6);
+						if (key == key_Enter) {
+							if (!CheckInputBoxNull(Texts, 6)) {
+								// validate data
+								Lop_Tin_Chi* p = new Lop_Tin_Chi;
+								strcpy_s(p->MAMH, MAX_MAMH, Texts[0].c_str());
+								strcpy_s(p->NIEN_KHOA, MAX_NIENKHOA, Texts[1].c_str());
+								p->HOC_KY = stoi(Texts[2]);
+								p->NHOM = stoi(Texts[3]);
+								p->sv_max = stoi(Texts[4]);
+								p->sv_min = stoi(Texts[5]);
+								p->MALOPTC = RandomIDLTC(context.tree);
+								p->ds_sv = NULL;
+								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
+									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
+									if (!exist) {
+										InsertNodeIntoTree(context.tree, p);
+										context.nLTC = 0;
+										ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+										UpdateListLopTinChiToFile(context.ds, context.nLTC);
+										menuCurrent->posStatus = 0;
+									}
+								}
+								delete p;
+							}
+							else {
+								gotoXY(99, 11);
+								cout << "Du lieu nhap khong duoc de trong!";
+							}
+							break;
+						}
 					}
+
 					break;
 				}
 				default:
@@ -402,18 +457,6 @@ void ProcessConrtol() {
 				break;
 			}
 		}
-		else {
-			menuCurrent = &ActionQuit;
-			ConfirmQuit();
-			key = ControlMenu(menuCurrent);
-			if (key == key_Enter && menuCurrent->posStatus == 0) {
-				return;
-			}
-			else {
-				menuCurrent = &MenuFeatures;
-				clrscr(50, 5, 40, 14, ' ');
-			}
-		}
 	} while (true);
 }
 void DrawMainLayout(string currentUser) {
@@ -433,3 +476,7 @@ void DrawMainLayout(string currentUser) {
 	SetColor(color_darkwhite | colorbk_darkred);
 	cout << "CHUC NANG CHINH";
 }
+
+
+
+#endif // !MENU_H
