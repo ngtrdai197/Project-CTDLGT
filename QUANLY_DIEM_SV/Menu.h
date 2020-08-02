@@ -144,11 +144,11 @@ void ShowGuide() {
 	cout << "ESC de thoat";
 }
 
-int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, int activateColor = color_green) {
-	int pos = menucontent->posStatus;
+int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, int activateColor = color_green) {
+	int pos = menuContent->posStatus;
 	int key = -1;
-	DrawListMenu(*menucontent, defaultColor);
-	DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
+	DrawListMenu(*menuContent, defaultColor);
+	DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
 
 	do
 	{
@@ -157,14 +157,14 @@ int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, in
 		{
 		case key_Up: {
 			if (pos == 0) {
-				pos = menucontent->n;
+				pos = menuContent->n;
 			}
 			pos -= 1;
 			goto paint;
 		}
 		case key_tab:
 		case key_Down: {
-			if (pos == menucontent->n - 1) {
+			if (pos == menuContent->n - 1) {
 				pos = -1;
 			}
 			pos += 1;
@@ -179,9 +179,9 @@ int ControlMenu(MenuContent* menucontent, int defaultColor = color_darkwhite, in
 		default:
 			break;
 		paint: {
-			DrawEachButtonOfAction(menucontent->menus[menucontent->posStatus]);
-			DrawEachButtonOfAction(menucontent->menus[pos], activateColor);
-			menucontent->posStatus = pos;
+			DrawEachButtonOfAction(menuContent->menus[menuContent->posStatus]);
+			DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
+			menuContent->posStatus = pos;
 			}
 		}
 
@@ -359,7 +359,7 @@ void ProcessConrtol(AppContext& context) {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						InDanhSachLopTinChi(context.ds, context.nLTC, 28, 10);
+						InDanhSachLopTinChi(context.ds, context.nLTC, 30, 10);
 						//delete[] context.ds;
 						context.nLTC = 0;
 					}
@@ -371,7 +371,7 @@ void ProcessConrtol(AppContext& context) {
 					int key = -1;
 					while (key != key_esc)
 					{
-						key = DrawFormInput(98, 10, 40, Texts, maxTexts, 6);
+						key = DrawFormInput(115, 10, 30, Texts, maxTexts, 6);
 						if (key == key_Enter) {
 							if (!CheckInputBoxNull(Texts, 6)) {
 								// validate data
@@ -419,7 +419,16 @@ void ProcessConrtol(AppContext& context) {
 			}
 			else {
 				switch (menuCurrent->posStatus) {
-				case 0: {break; }
+				case 0: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						int total = context.ds_sv_original.totalSv;
+						SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
+						ConvertLinkedListSV(context.ds_sv_original, ds_sv);
+						InDanhSachSinhVien(ds_sv, total, 30, 10);
+					}
+					break;
+				}
 				default: {
 					break;
 				}
@@ -434,10 +443,10 @@ void ProcessConrtol(AppContext& context) {
 			else {
 				switch (menuCurrent->posStatus) {
 
-				case 2: {
+				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
-						DrawContentMonHoc();
+						InDanhSachMonHoc(context.ds_mh, context.ds_mh.n, 30, 10);
 					}
 					break;
 				default:

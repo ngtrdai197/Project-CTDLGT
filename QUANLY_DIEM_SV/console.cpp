@@ -125,7 +125,7 @@ void rectagle(int x, int y, int width, int height) {
 int inputKey()
 {
 	int key = _getch();
-	if (key == 224)	// special key
+	if (key == 224 || key == 0)	// special key
 	{
 		key = _getch();
 		return key + 1000;

@@ -94,29 +94,24 @@ typedef NODE_LOP_TIN_CHI* TREE;
 
 // ===== END LOP TIN CHI =====
 
-// ===== BEGIN DS DANG KY =====
-struct dang_ky
+// ===== BEGIN DS SV DANG KY =====
+struct sv_dang_ky
 {
 	// data
 	char MASV[MAX_MASV];
 	float DIEM;
 	// pointer
-	dang_ky* pNext;
+	sv_dang_ky* pNext;
 };
-typedef struct dang_ky DANG_KY;
+typedef struct sv_dang_ky SV_DANG_KY;
 struct ds_dang_ky
 {
-	DANG_KY* pHead = NULL;
-	DANG_KY* pTail = NULL;
+	SV_DANG_KY* pHead = NULL;
+	SV_DANG_KY* pTail = NULL;
 	int n;
 };
-typedef struct ds_dang_ky DS_DANG_KY;
-// ===== END DS DANG KY =====
-
-
-
-
-
+typedef struct ds_dang_ky DS_SV_DANG_KY;
+// ===== END DS SV DANG KY =====
 
 
 
@@ -146,17 +141,17 @@ static MenuContent MenuFeatures = {
 
 static MenuContent MenuMonHoc = {
 	new MenuItem[3] {
-		{{3,18,20,2},"Them MH"},
+		{{3,18,20,2},"In danh sach MH"},
 		{{3,21,20,2},"Xoa or Sua (MH)"},
-		{{3,24,20,2},"In danh sach MH"}
+		{{3,24,20,2},"Them MH"}
 	},
 	 3
 };
 static MenuContent MenuSinhVien = {
 	new MenuItem[3] {
-		{{3,18,20,2},"Nhap Sinh Vien"},
+		{{3,18,20,2},"In danh sach SV"},
 		{{3,21,20,2},"Xoa or Sua (SV)"},
-		{{3,24,20,2},"In danh sach SV"},
+		{{3,24,20,2},"Nhap DS Sinh Vien"},
 	},
 	 3
 };
@@ -190,6 +185,7 @@ struct AppContext {
 		tree = NULL;
 		nLTC = 0;
 		ds_mh.n = 0;
+		ds_sv_original.totalSv = 0;
 	}
 	TREE tree;
 	DS_SINH_VIEN ds_sv_original;
@@ -211,6 +207,7 @@ bool IsNumber(char* s);
 bool CheckExistLop(char* malop);
 void InsertLopIntoDSLop(string lop);
 char** CreateArray(int x, int y);
+SINH_VIEN** CreateArraySV(int x, int y);
 bool CheckInputBoxNull(string str[], int n);
 // ===== END HELPER =====
 
@@ -224,8 +221,8 @@ void InsertAndSortSvIntoDS(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV);
 void ReadFileSinhVien(DS_SINH_VIEN& ds_sv);
 
 // DANH SACH DANG KY
-void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk);
-void ReadFileDS_DANG_KY(DS_DANG_KY& ds_dk);
+void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
+void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk);
 
 // END DANH SACH DANG KY
 
@@ -245,6 +242,7 @@ void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv);
 NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv);
 bool UpdateSinhVien(DS_SINH_VIEN& ds_sv);
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv);
+void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]);
 //  END SINH VIEN
 
 // ===== BEGIN DS LOP TIN CHI =====
@@ -269,12 +267,13 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc);
 // END MON HOC
 
 // BEGIN DS DANG KY
-void Init_DS_Dang_Ky(DS_DANG_KY& ds_dangky);
-void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk);
-void Show_DS_Dang_Ky(DS_DANG_KY ds_dk);
+void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
+void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
+void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 // END DS DANG KY
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
-
+void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y);
+void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y);
 
 
 

@@ -156,6 +156,16 @@ char** CreateArray(int x, int y) {
 	}
 	return a;
 }
+
+SINH_VIEN** CreateArraySV(int x, int y) {
+	SINH_VIEN** sv = new SINH_VIEN* [y];
+	for (int i = 0; i < y; i++)
+	{
+		sv[i] = new SINH_VIEN[x];
+	}
+	return sv;
+}
+
 bool CheckInputBoxNull(string str[], int n) {
 	int i = 0;
 	bool exist = false;
@@ -314,7 +324,7 @@ void ReadFileSinhVien(DS_SINH_VIEN& ds_sv)
 
 // DANH SACH DANG KY
 //void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk);
-void ReadFileDS_DANG_KY(DS_DANG_KY& ds_dk)
+void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk)
 {
 	ifstream fileIn;
 	fileIn.open("DS_DANG_KY.txt", ios_base::in);
@@ -325,7 +335,7 @@ void ReadFileDS_DANG_KY(DS_DANG_KY& ds_dk)
 	};
 	while (fileIn.peek() != EOF)
 	{
-		DANG_KY* node = new DANG_KY;
+		SV_DANG_KY* node = new SV_DANG_KY;
 		fileIn.getline(node->MASV, MAX_MASV, ',');
 		fileIn >> node->DIEM;
 		fileIn.ignore();
@@ -680,6 +690,14 @@ void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
 		ConvertTreeToArray(t->pRight, ds, n);
 	}
 }
+void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]) {
+	int i = 0;
+	for (NODE_SINH_VIEN*  p = ds_sv.pHead; p!=NULL; p = p->pNext)
+	{
+		dsSV[i] = &p->data;
+		i++;
+	}
+}
 void ShowDSLopTinChi(Lop_Tin_Chi* ds[], int n) {
 	int total = 0;
 	for (int i = 0; i < n; i++)
@@ -868,13 +886,13 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc)
 // END MON HOC
 
 // BEGIN DS DANG KY
-void Init_DS_Dang_Ky(DS_DANG_KY& ds_dangky)
+void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dk)
 {
-	ds_dangky.pHead = NULL;
-	ds_dangky.pTail = NULL;
-	ds_dangky.n = 0;
+	ds_dk.pHead = NULL;
+	ds_dk.pTail = NULL;
+	ds_dk.n = 0;
 }
-void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk)
+void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk)
 {
 	if (ds_dk.pHead == NULL)
 	{
@@ -889,82 +907,386 @@ void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk)
 	}
 	ds_dk.n++;
 }
-void Show_DS_Dang_Ky(DS_DANG_KY ds_dk) {
-	for (DANG_KY* p = ds_dk.pHead; p != NULL; p = p->pNext) {
+void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk) {
+	for (SV_DANG_KY* p = ds_dk.pHead; p != NULL; p = p->pNext) {
 		cout << "Ma sv:" << p->MASV << endl;
 		cout << "Diem:" << p->DIEM << endl;
 	}
 }
+void ShowSingleLTC(Lop_Tin_Chi* ltc, int index) {
+	cout << setw(3) << index + 1 << char(179) << setw(10) << ltc->MALOPTC
+		<< char(179) << setw(11) << ltc->MAMH << char(179)
+		<< setw(4) << ltc->NHOM << char(179) << setw(20)
+		<< ltc->NIEN_KHOA << char(179)
+		<< setw(7) << ltc->sv_max << char(179)
+		<< setw(7) << ltc->sv_min << char(179)
+		<< setw(7) << ltc->sv_max - ltc->ds_sv->totalSv << char(179);
+}void ShowSingleSV(SINH_VIEN* sv, int index) {
+	cout << setw(3) << index + 1 << char(179) << setw(15) << sv->MALOP << char(179) 
+		<< setw(13) << sv->MASV << char(179)
+		<< setw(20) << sv->HO << char(179) << setw(15) << sv->TEN << char(179)
+		<< setw(5) << sv->PHAI << char(179) << setw(11) << sv->SDT << char(179);
+}
+void ShowSingleMonHoc(MON_HOC* mh, int index) {
+	cout << setw(3) << index + 1 << char(179) << setw(15) << mh->MAMH << char(179)
+		<< setw(30) << mh->TENMH << char(179)
+		<< setw(15) << mh->STCLT << char(179) << setw(15) << mh->STCTH << char(179);
+}
 // END DS DANG KY
+void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
+	cout << setfill(' ');
+
+	SetColor(color_black | colorbk_white);
+	gotoXY(x, y);
+	cout << setw(3) << "STT" << char(179) << setw(15) << "MaMH" << char(179) << setw(30) << "Ten MH" << char(179)
+		<< setw(15) << "So tin chi LT" << char(179) << setw(15) << "So tin chi TH" << char(179);
+
+	int currentPage = 0, posActive = -1;
+	int posPrint = 0;
+	int perPage = 5;
+	int totalPage = n / perPage;
+
+	if (n % perPage != 0) {
+		totalPage += 1;
+	}
+
+	int key = -1;
+
+	perPage = perPage > n ? n : perPage;
+	do {
+		switch (key)
+		{
+		case 1060: {
+
+			//todo ::
+
+
+			goto paint;
+		}
+
+		case key_Up: {
+			if (posActive > 0) {
+
+				SetColor(color_darkwhite);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleMonHoc(ds_mh.ds[posActive + posPrint], posActive + posPrint);
+
+				--posActive;
+
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleMonHoc(ds_mh.ds[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				--currentPage;
+				posActive = perPage - 1;
+			}
+			goto paint;
+		}
+		case key_Down: {
+			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
+				if (posActive >= 0) {
+					SetColor(color_darkwhite);
+					gotoXY(x, y + posActive + 1);
+					ShowSingleMonHoc(ds_mh.ds[posActive + posPrint], posActive + posPrint);
+				}
+				++posActive;
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleMonHoc(ds_mh.ds[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Right: {
+			if (posPrint + perPage < n) {
+				posPrint += perPage;
+				++currentPage;
+				posActive = 0;
+			}
+			goto paint;
+		}
+		default: {
+			goto paint;
+		}
+		   paint: {
+			   int index = 0;
+			   int indexitem;
+
+			   SetColor(color_darkwhite);
+			   for (; index < perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+
+				   if (indexitem >= n) break;
+				   ShowSingleMonHoc(ds_mh.ds[indexitem], indexitem);
+			   }
+
+			   for (; index <= perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+				   cout << setw(90) << " ";
+			   }
+
+			   gotoXY(x, y + perPage + 1);
+			   cout << currentPage + 1 << "/" << totalPage;
+			   if (posActive >= 0) {
+				   SetColor(color_green);
+				   gotoXY(x, y + posActive + 1);
+				   int index = posActive + posPrint;
+				   ShowSingleMonHoc(ds_mh.ds[index], index);
+			   }
+			   break;
+		}
+		}
+		key = inputKey();
+	} while (key != key_esc);
+	clrscr(30, 10, 90, 10, ' ');
+}
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y) {
 	cout << setfill(' ');
 
-	SetColor(4 | colorbk_cyan);
+	SetColor(color_black | colorbk_white);
 	gotoXY(x, y);
 	cout << setw(3) << "STT" << char(179) << setw(10) << "MaLopTC" << char(179) << setw(11) << "MaMH" << char(179)
 		<< setw(4) << "NHOM" << char(179) << setw(20) << "NIEN KHOA" << char(179)
 		<< setw(7) << "SV MAX" << char(179) << setw(7) << "SV MIN" << char(179) << setw(7) << "CON LAI" << char(179);
 
-	int page = 0;
+	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int amount = 5;
-	int amountpage = n / amount;
+	int perPage = 5;
+	int totalPage = n / perPage;
 
-	if (n % amount != 0) {
-		amountpage += 1;
+	if (n % perPage != 0) {
+		totalPage += 1;
 	}
 
 	int key = -1;
 
-	amount = amount > n ? n : amount;
-
+	perPage = perPage > n ? n : perPage;
 	do {
-
-		SetColor(color_darkwhite);
-		int index = 0;
-		int indexitem;
-		for (; index < amount; index++)
+		switch (key)
 		{
-			gotoXY(x, y + index + 1);
-			indexitem = index + posPrint;
+		case 1060: {
 
-			if (indexitem >= n) break;
-			cout << setw(3) << indexitem + 1 << char(179) << setw(10) << ltc[indexitem]->MALOPTC
-				<< char(179) << setw(11) << ltc[indexitem]->MAMH << char(179)
-				<< setw(4) << ltc[indexitem]->NHOM << char(179) << setw(20)
-				<< ltc[indexitem]->NIEN_KHOA << char(179)
-				<< setw(7) << ltc[indexitem]->sv_max << char(179)
-				<< setw(7) << ltc[indexitem]->sv_min << char(179)
-				<< setw(7) << ltc[indexitem]->sv_max - ltc[indexitem]->ds_sv->totalSv << char(179);
+			//todo ::
+
+
+			goto paint;
 		}
 
-		for (; index <= amount; index++)
-		{
-			gotoXY(x, y + index + 1);
-			indexitem = index + posPrint;
-			cout << setw(3) << indexitem << setw(73) << " ";
+		case key_Up: {
+			if (posActive > 0) {
+
+				SetColor(color_darkwhite);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
+
+				--posActive;
+
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
+				break;
+			}
 		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				--currentPage;
+				posActive = perPage - 1;
+			}
+			goto paint;
+		}
+		case key_Down: {
+			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
+				if (posActive >= 0) {
+					SetColor(color_darkwhite);
+					gotoXY(x, y + posActive + 1);
+					ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
+				}
+				++posActive;
 
-		gotoXY(x, y + amount + 1);
-		cout << page + 1 << "/" << amountpage;
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Right: {
+			if (posPrint + perPage < n) {
+				posPrint += perPage;
+				++currentPage;
+				posActive = 0;
+			}
+			goto paint;
+		}
+		default: {
+			goto paint;
+		}
+		   paint: {
+			   int index = 0;
+			   int indexitem;
 
+			   SetColor(color_darkwhite);
+			   for (; index < perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+
+				   if (indexitem >= n) break;
+				   ShowSingleLTC(ltc[indexitem], indexitem);
+			   }
+
+			   for (; index <= perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+				   cout << setw(90) << " ";
+			   }
+
+			   gotoXY(x, y + perPage + 1);
+			   cout << currentPage + 1 << "/" << totalPage;
+			   if (posActive >= 0) {
+				   SetColor(color_green);
+				   gotoXY(x, y + posActive + 1);
+				   ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
+			   }
+			   break;
+		}
+		}
 		key = inputKey();
-		if (key == key_F11) {
-			if (posPrint - amount >= 0) {
-				posPrint -= amount;
-				--page;
-			}
-		}
-		else if (key == key_F12)
-		{
-			if (posPrint + amount < n) {
-				posPrint += amount;
-				++page;
-			}
-		}
 
 
 	} while (key != key_esc);
+	clrscr(30, 10, 90, 10, ' ');
 
+}
+void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
+	cout << setfill(' ');
+
+	SetColor(color_black | colorbk_white);
+	gotoXY(x, y);
+	cout << setw(3) << "STT" << char(179) << setw(15) << "Ma Lop" << char(179) << setw(13) << "Ma SV" << char(179)
+		<< setw(20) << "Ho" << char(179) << setw(15) << "Ten" << char(179)
+		<< setw(5) << "Phai" << char(179) << setw(11) << "SDT" << char(179);
+
+	int currentPage = 0, posActive = -1;
+	int posPrint = 0;
+	int perPage = 5;
+	int totalPage = n / perPage;
+
+	if (n % perPage != 0) {
+		totalPage += 1;
+	}
+
+	int key = -1;
+
+	perPage = perPage > n ? n : perPage;
+	do {
+		switch (key)
+		{
+		case 1060: {
+
+			//todo ::
+
+
+			goto paint;
+		}
+
+		case key_Up: {
+			if (posActive > 0) {
+
+				SetColor(color_darkwhite);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+
+				--posActive;
+
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				--currentPage;
+				posActive = perPage - 1;
+			}
+			goto paint;
+		}
+		case key_Down: {
+			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
+				if (posActive >= 0) {
+					SetColor(color_darkwhite);
+					gotoXY(x, y + posActive + 1);
+					ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+				}
+				++posActive;
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Right: {
+			if (posPrint + perPage < n) {
+				posPrint += perPage;
+				++currentPage;
+				posActive = 0;
+			}
+			goto paint;
+		}
+		default: {
+			goto paint;
+		}
+		   paint: {
+			   int index = 0;
+			   int indexitem;
+
+			   SetColor(color_darkwhite);
+			   for (; index < perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+
+				   if (indexitem >= n) break;
+				   ShowSingleSV(ds_sv[indexitem], indexitem);
+			   }
+
+			   for (; index <= perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+				   cout << setw(90) << " ";
+			   }
+
+			   gotoXY(x, y + perPage + 1);
+			   cout << currentPage + 1 << "/" << totalPage;
+			   if (posActive >= 0) {
+				   SetColor(color_green);
+				   gotoXY(x, y + posActive + 1);
+				   ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+			   }
+			   break;
+		}
+		}
+		key = inputKey();
+
+
+	} while (key != key_esc);
+	clrscr(30, 10, 90, 10, ' ');
 }
 #endif // !STRUCTURE_CPP

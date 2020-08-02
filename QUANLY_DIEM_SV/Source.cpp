@@ -7,6 +7,13 @@ using namespace std;
 
 int main()
 {
+	/*DS_SINH_VIEN ds_sv;
+	ReadFileSinhVien(ds_sv);
+	Show_DS_Sinh_Vien(ds_sv);
+	NODE_SINH_VIEN* p = Input_Sinh_Vien(ds_sv);
+	InsertAndSortSvIntoDS(ds_sv, p);
+	Show_DS_Sinh_Vien(ds_sv);*/
+
 	//string h[4];
 
 	//DrawFormInput(0, 0, 60, h, 4);
@@ -87,5 +94,6 @@ int main()
 	cout << "\n=========== List after insert =============\n";
 	Show_DS_MonHoc(ds_mh);
 	system("pause");*/
+	//system("pause");
 	return 0;
 }
