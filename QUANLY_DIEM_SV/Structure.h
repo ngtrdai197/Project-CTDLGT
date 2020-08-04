@@ -115,7 +115,13 @@ typedef struct ds_dang_ky DS_SV_DANG_KY;
 
 
 
-static string mainActions[4] = { "CHUC NANG LOP TIN CHI", "CHUC NANG SINH VIEN", "CHUC NANG MON HOC", "CHUC NANG DIEM" };
+static string mainActions[4] = { "CHUC NANG LOP TIN CHI",
+"CHUC NANG SINH VIEN", "CHUC NANG MON HOC", "CHUC NANG DIEM" };
+
+static string propertySinhVien[7] = {
+	"Ma Sinh Vien", "Ma Lop", "Ho SV", "Ten SV", "Phai", "So Dien Thoai", "Nam Nhap Hoc"
+};
+
 static string nameAction = "";
 
 
@@ -180,6 +186,8 @@ static MenuContent ActionQuit = {
 	 2
 };
 
+
+
 struct AppContext {
 	AppContext() {
 		tree = NULL;
@@ -208,7 +216,7 @@ bool CheckExistLop(char* malop);
 void InsertLopIntoDSLop(string lop);
 char** CreateArray(int x, int y);
 SINH_VIEN** CreateArraySV(int x, int y);
-bool CheckInputBoxNull(string str[], int n);
+bool CheckInputBoxIsNull(string str[], int n);
 // ===== END HELPER =====
 
 // HANDLE FILES
@@ -270,6 +278,8 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc);
 void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
+
+void CommonShowSvList(AppContext context);
 // END DS DANG KY
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
 void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y);

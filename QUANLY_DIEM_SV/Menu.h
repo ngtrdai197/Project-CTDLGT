@@ -242,7 +242,8 @@ void DrawContentMonHoc() {
 	gotoXY(97, 11);
 	cout << "So tin TH";
 }
-char InputBox(string& str, int x, int y, int width, int maxText, bool isDraw = false, bool isText = true) {
+char InputBox(string& str, int x, int y, int width,
+	int maxText, bool isDraw = false, bool isText = true, bool isPhone = false) {
 	string text = str;
 	SetColor(color_darkwhite);
 	rectagle(x, y, width, 2);
@@ -256,10 +257,14 @@ char InputBox(string& str, int x, int y, int width, int maxText, bool isDraw = f
 
 	do {
 		key = inputKey();
-
-		if (isText ?
+		if (isPhone && key > 47 && key < 58 && text.length() < maxText) {
+			text += key;
+			cout << key;
+		}
+		else if (isText ?
 			(((
-				(key > 47 && key < 58) || (key > 64 && key < 91) || (key > 96 && key < 123)) || key == 45) && text.length() < maxText)
+				(key > 47 && key < 58) || (key > 64 && key < 91)
+				|| (key > 96 && key < 123)) || key == 45 || key == 32) && text.length() < maxText)
 			: ((key > 47 && key < 58) && text.length() < maxText)) {
 			text += key;
 			cout << key;
@@ -301,6 +306,36 @@ char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n
 		}
 
 	} while (key != key_esc && key != key_Enter);
+	return key;
+}
+char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[], int n) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		// n - 1 => nam sinh
+		if (n == 7) {
+			gotoXY(50, y + (i * offset + 1));
+			cout << propertySinhVien[i];
+		}
+		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
+	}
+
+	int indexCurrent = 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false,
+			((n == 7 && indexCurrent < n - 1 && indexCurrent != n - 2) || n == 1) ? true : false,
+			(n == 7 && indexCurrent == n - 2) ? true : false);
+		if (key == key_tab && n ==7) {
+			indexCurrent = (indexCurrent + 1) % n;
+		}
+
+	} while (key != key_Enter);
 	return key;
 }
 
@@ -373,7 +408,7 @@ void ProcessConrtol(AppContext& context) {
 					{
 						key = DrawFormInput(115, 10, 30, Texts, maxTexts, 6);
 						if (key == key_Enter) {
-							if (!CheckInputBoxNull(Texts, 6)) {
+							if (!CheckInputBoxIsNull(Texts, 6)) {
 								// validate data
 								Lop_Tin_Chi* p = new Lop_Tin_Chi;
 								strcpy_s(p->MAMH, MAX_MAMH, Texts[0].c_str());
@@ -422,12 +457,75 @@ void ProcessConrtol(AppContext& context) {
 				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
-						int total = context.ds_sv_original.totalSv;
-						SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
-						ConvertLinkedListSV(context.ds_sv_original, ds_sv);
-						InDanhSachSinhVien(ds_sv, total, 30, 10);
+						string maLop[1] = { "" };
+						int maxTexts[1] = { MAX_MALOP - 1 };
+						int key = -1;
+						key = DrawFormInputSinhVien(40, 5, 30, maLop, maxTexts, 1);
+						char* cloned[MAX_MALOP];
+						// TODO: occur bug here.
+						strcpy_s(*cloned, MAX_MALOP, maLop[0].c_str());
+						bool exist = CheckExistLop(*cloned);
+						if (!exist) {
+							gotoXY(40, 10);
+							SetColor(color_darkwhite | colorbk_green);
+							cout << "Lop khong ton tai !";
+						}
+						else {
+							CommonShowSvList(context);
+						}
 					}
 					break;
+				}
+				case 2: { // Nhap ds sinh vien
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						//CommonShowSvList(context);
+						bool masv_null = false;
+						do
+						{
+							string textFields[7] = { "" };
+							int maxTexts[7] = { MAX_MALOP - 1, MAX_MASV - 1,
+								MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
+							int key = -1;
+							key = DrawFormInputSinhVien(70, 10, 30, textFields, maxTexts, 7);
+							if (key == key_Enter) {
+								if (textFields[0].empty()) {
+									masv_null = true;
+									break;
+								}
+								if (!CheckInputBoxIsNull(textFields, 7)) {
+									// validate data
+									NODE_SINH_VIEN* sv = new NODE_SINH_VIEN;
+									strcpy_s(sv->data.MASV, MAX_MASV, textFields[0].c_str());
+									strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
+									strcpy_s(sv->data.HO, MAX_HO, textFields[2].c_str());
+									strcpy_s(sv->data.TEN, MAX_TEN, textFields[3].c_str());
+									strcpy_s(sv->data.PHAI, MAX_PHAI, textFields[4].c_str());
+									strcpy_s(sv->data.SDT, MAX_SDT, textFields[5].c_str());
+									sv->data.NAMNHAPHOC = atoi(textFields[6].c_str());
+									sv->pNext = NULL;
+									bool exist = CheckExistLop(sv->data.MALOP);
+									if (!exist) {
+										InsertLopIntoDSLop(sv->data.MALOP);
+									}
+									InsertAndSortSvIntoDS(context.ds_sv_original, sv);
+									UpdateListStudentToFile(context.ds_sv_original);
+									delete sv;
+									gotoXY(60, 36);
+									cout << "Ghi sinh vien thanh cong!";
+									// TODO: need to check again !
+									// TODO: appear bug when add new sv, after go back to show ds => BUG
+								}
+								else {
+									gotoXY(60, 36);
+									cout << "Du lieu nhap khong duoc de trong!";
+									continue;
+								}
+							}
+						} while (masv_null == false);
+						clrscr(50, 10, 90, 30, ' ');
+						break;
+					}
 				}
 				default: {
 					break;

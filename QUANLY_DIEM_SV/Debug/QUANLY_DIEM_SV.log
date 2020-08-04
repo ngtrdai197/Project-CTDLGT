@@ -14,8 +14,9 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(71,40): wa
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(93,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(93,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(102,57): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(262,113): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(263,47): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(467,4): warning C4065: switch statement contains 'default' but no 'case' labels
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(260,56): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(267,77): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(268,47): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(563,4): warning C4065: switch statement contains 'default' but no 'case' labels
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(24,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe

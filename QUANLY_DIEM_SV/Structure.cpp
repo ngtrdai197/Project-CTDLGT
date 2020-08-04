@@ -166,7 +166,7 @@ SINH_VIEN** CreateArraySV(int x, int y) {
 	return sv;
 }
 
-bool CheckInputBoxNull(string str[], int n) {
+bool CheckInputBoxIsNull(string str[], int n) {
 	int i = 0;
 	bool exist = false;
 	while (i < n)
@@ -933,6 +933,14 @@ void ShowSingleMonHoc(MON_HOC* mh, int index) {
 		<< setw(15) << mh->STCLT << char(179) << setw(15) << mh->STCTH << char(179);
 }
 // END DS DANG KY
+void CommonShowSvList(AppContext context) {
+	int total = context.ds_sv_original.totalSv;
+	SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
+	ConvertLinkedListSV(context.ds_sv_original, ds_sv);
+	InDanhSachSinhVien(ds_sv, total, 40, 10);
+}
+
+
 void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 	cout << setfill(' ');
 
@@ -1181,7 +1189,7 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 
 	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int perPage = 5;
+	int perPage = 10;
 	int totalPage = n / perPage;
 
 	if (n % perPage != 0) {
@@ -1273,8 +1281,8 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 				   cout << setw(90) << " ";
 			   }
 
-			   gotoXY(x, y + perPage + 1);
-			   cout << currentPage + 1 << "/" << totalPage;
+			   gotoXY(x, y + perPage + 3);
+			   cout << "Page " << currentPage + 1 << "/" << totalPage;
 			   if (posActive >= 0) {
 				   SetColor(color_green);
 				   gotoXY(x, y + posActive + 1);
@@ -1287,6 +1295,6 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 
 
 	} while (key != key_esc);
-	clrscr(30, 10, 90, 10, ' ');
+	clrscr(40, 10, 90, 15, ' ');
 }
 #endif // !STRUCTURE_CPP
