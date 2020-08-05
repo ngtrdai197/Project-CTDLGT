@@ -323,6 +323,10 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 			gotoXY(50, y + (i * offset + 1));
 			cout << propertySinhVien[i];
 		}
+		else if (n == 1) {
+			gotoXY(45, y + (i * offset + 1));
+			cout << "Nhap ma lop: ";
+		}
 		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
 	}
 
@@ -337,6 +341,9 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 			(n == 7 && indexCurrent == n - 2) ? true : false);
 		if (key == key_tab && n == 7) {
 			indexCurrent = (indexCurrent + 1) % n;
+		}
+		else if (key == key_esc && n == 1) {
+			return key;
 		}
 
 	} while (key != key_Enter);
@@ -466,21 +473,28 @@ void ProcessConrtol(AppContext& context) {
 						int key = -1;
 						char cloned[MAX_MALOP];
 						bool exist = false;
-						CommonShowSvList(context);
-						/*while (key != key_esc && !exist)
+						//CommonShowSvList(context);
+						do
 						{
-							key = DrawFormInputSinhVien(40, 5, 30, maLop, maxTexts, 1);
+							SetColor(color_darkwhite);
+							key = DrawFormInputSinhVien(60, 5, 30, maLop, maxTexts, 1);
+							if (key == key_esc) break;
 							strcpy_s(cloned, MAX_MALOP, maLop[0].c_str());
 							exist = CheckExistLop(cloned);
-							if (!exist) {
-								gotoXY(40, 10);
-								SetColor(color_darkwhite | colorbk_green);
+							if (!exist || maLop[0].empty()) {
+								gotoXY(60, 10);
+								SetColor(color_darkwhite | colorbk_red);
 								cout << "Lop khong ton tai !";
 							}
-						}
-						if (key == key_Enter) {
-							CommonShowSvList(context);
-						}*/
+							else {
+								if (key == key_Enter) {
+									CommonShowSvList(context, cloned);
+									maLop[0].clear();
+								}
+							}
+
+						} while (key != key_esc || !exist);
+						clrscr(40, 5, 90, 20, ' '); // bao gom form nhap ma lop 
 					}
 					break;
 				}
@@ -503,31 +517,42 @@ void ProcessConrtol(AppContext& context) {
 									break;
 								}
 								if (!CheckInputBoxIsNull(textFields, 7)) {
+
 									// validate data
 									NODE_SINH_VIEN* sv = new NODE_SINH_VIEN;
 									strcpy_s(sv->data.MASV, MAX_MASV, textFields[0].c_str());
-									strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
-									strcpy_s(sv->data.HO, MAX_HO, textFields[2].c_str());
-									strcpy_s(sv->data.TEN, MAX_TEN, textFields[3].c_str());
-									strcpy_s(sv->data.PHAI, MAX_PHAI, textFields[4].c_str());
-									strcpy_s(sv->data.SDT, MAX_SDT, textFields[5].c_str());
-									sv->data.NAMNHAPHOC = atoi(textFields[6].c_str());
-									sv->pNext = NULL;
-									bool exist = CheckExistLop(sv->data.MALOP);
-									if (!exist) {
-										InsertLopIntoDSLop(sv->data.MALOP);
+									if (CheckExistMSSV(context.ds_sv_original, sv->data.MASV)) {
+										gotoXY(60, 36);
+										cout << "Ma sinh vien da ton tai. Kiem tra lai !";
 									}
-									InsertAndSortSvIntoDS(context.ds_sv_original, sv);
-									UpdateListStudentToFile(context.ds_sv_original);
-									gotoXY(60, 36);
-									cout << "Ghi sinh vien thanh cong!";
-									// TODO: need to check again !
-									// TODO: appear bug when add new sv, after go back to show ds => BUG
+									else {
+										strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
+										strcpy_s(sv->data.HO, MAX_HO, textFields[2].c_str());
+										strcpy_s(sv->data.TEN, MAX_TEN, textFields[3].c_str());
+										strcpy_s(sv->data.PHAI, MAX_PHAI, textFields[4].c_str());
+										strcpy_s(sv->data.SDT, MAX_SDT, textFields[5].c_str());
+										sv->data.NAMNHAPHOC = atoi(textFields[6].c_str());
+										sv->pNext = NULL;
+										bool exist = CheckExistLop(sv->data.MALOP);
+										if (!exist) {
+											InsertLopIntoDSLop(sv->data.MALOP);
+										}
+										InsertAndSortSvIntoDS(context.ds_sv_original, sv);
+										UpdateListStudentToFile(context.ds_sv_original);
+
+										gotoXY(60, 36);
+										cout << "Ghi sinh vien thanh cong!";
+										for (int i = 0; i < 7; i++)
+										{
+											textFields[i].clear();
+										}
+									}
 								}
 								else {
 									gotoXY(60, 36);
 									cout << "Du lieu nhap khong duoc de trong!";
-									continue;
+									/*Sleep(3000);
+									clrscr(60, 36, 40, 3, ' ');*/
 								}
 							}
 						} while (masv_null == false);

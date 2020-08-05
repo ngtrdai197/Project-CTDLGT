@@ -156,7 +156,16 @@ char** CreateArray(int x, int y) {
 	}
 	return a;
 }
-
+int countTotalSvByLop(DS_SINH_VIEN ds_sv, char* maLop) {
+	int total = 0;
+	for (NODE_SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
+	{
+		if (_strcmpi(p->data.MALOP, maLop) == 0) {
+			total++;
+		}
+	}
+	return total;
+}
 SINH_VIEN** CreateArraySV(int x, int y) {
 	SINH_VIEN** sv = new SINH_VIEN * [y];
 	for (int i = 0; i < y; i++)
@@ -702,6 +711,16 @@ void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]) {
 		i++;
 	}
 }
+void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop) {
+	int i = 0;
+	for (NODE_SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
+	{
+		if (_strcmpi(p->data.MALOP, maLop) == 0) {
+			dsSV[i] = &p->data;
+			i++;
+		}
+	}
+}
 void ShowDSLopTinChi(Lop_Tin_Chi* ds[], int n) {
 	int total = 0;
 	for (int i = 0; i < n; i++)
@@ -937,13 +956,17 @@ void ShowSingleMonHoc(MON_HOC* mh, int index) {
 		<< setw(15) << mh->STCLT << char(179) << setw(15) << mh->STCTH << char(179);
 }
 // END DS DANG KY
-void CommonShowSvList(AppContext context) {
-	int total = context.ds_sv_original.totalSv;
+void CommonShowSvList(AppContext context, char* maLop = NULL) {
+	int total = maLop ? countTotalSvByLop(context.ds_sv_original, maLop) : context.ds_sv_original.totalSv;
 	SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
-	ConvertLinkedListSV(context.ds_sv_original, ds_sv);
+	if (maLop != NULL) {
+		ConvertLinkedListSVBylop(context.ds_sv_original, ds_sv, maLop);
+	}
+	else {
+		ConvertLinkedListSV(context.ds_sv_original, ds_sv);
+	}
 	InDanhSachSinhVien(ds_sv, total, 40, 10);
 }
-
 
 void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 	cout << setfill(' ');
@@ -1296,9 +1319,7 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 		}
 		}
 		key = inputKey();
-
-
 	} while (key != key_esc);
-	clrscr(40, 10, 90, 15, ' ');
+	clrscr(40, 10, 90, 20, ' ');
 }
 #endif // !STRUCTURE_CPP

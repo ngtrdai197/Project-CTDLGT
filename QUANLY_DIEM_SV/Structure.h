@@ -215,6 +215,7 @@ bool IsNumber(char* s);
 bool CheckExistLop(char* malop);
 void InsertLopIntoDSLop(string lop);
 char** CreateArray(int x, int y);
+int countTotalSvByLop(DS_SINH_VIEN ds_sv, char* maLop);
 SINH_VIEN** CreateArraySV(int x, int y);
 bool CheckInputBoxIsNull(string str[], int n);
 // ===== END HELPER =====
@@ -251,6 +252,7 @@ NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv);
 bool UpdateSinhVien(DS_SINH_VIEN& ds_sv);
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv);
 void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]);
+void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop);
 //  END SINH VIEN
 
 // ===== BEGIN DS LOP TIN CHI =====
@@ -279,7 +281,7 @@ void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 
-void CommonShowSvList(AppContext context);
+void CommonShowSvList(AppContext context, char* maLop);
 // END DS DANG KY
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
 void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y);
