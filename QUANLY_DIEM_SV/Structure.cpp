@@ -158,7 +158,7 @@ char** CreateArray(int x, int y) {
 }
 
 SINH_VIEN** CreateArraySV(int x, int y) {
-	SINH_VIEN** sv = new SINH_VIEN* [y];
+	SINH_VIEN** sv = new SINH_VIEN * [y];
 	for (int i = 0; i < y; i++)
 	{
 		sv[i] = new SINH_VIEN[x];
@@ -276,9 +276,13 @@ void InsertAndSortSvIntoDS(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV)
 		ds_sv.pTail->pNext = nodeSV;
 		NODE_SINH_VIEN* trav = ds_sv.pHead, * prev = NULL;
 
-		while (_strcmpi(trav->data.MALOP, nodeSV->data.MALOP) < 0 || _strcmpi(trav->data.MASV, nodeSV->data.MASV) < 0) {
+		int cmp = _strcmpi(trav->data.MALOP, nodeSV->data.MALOP);
+
+
+		while (cmp < 0 || (cmp == 0 && _strcmpi(trav->data.MASV, nodeSV->data.MASV) < 0)) {
 			prev = trav;
 			trav = trav->pNext;
+			cmp = _strcmpi(trav->data.MALOP, nodeSV->data.MALOP);
 		}
 
 		if (trav == nodeSV) {//het ds
@@ -692,7 +696,7 @@ void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
 }
 void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]) {
 	int i = 0;
-	for (NODE_SINH_VIEN*  p = ds_sv.pHead; p!=NULL; p = p->pNext)
+	for (NODE_SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
 	{
 		dsSV[i] = &p->data;
 		i++;
@@ -922,7 +926,7 @@ void ShowSingleLTC(Lop_Tin_Chi* ltc, int index) {
 		<< setw(7) << ltc->sv_min << char(179)
 		<< setw(7) << ltc->sv_max - ltc->ds_sv->totalSv << char(179);
 }void ShowSingleSV(SINH_VIEN* sv, int index) {
-	cout << setw(3) << index + 1 << char(179) << setw(15) << sv->MALOP << char(179) 
+	cout << setw(3) << index + 1 << char(179) << setw(15) << sv->MALOP << char(179)
 		<< setw(13) << sv->MASV << char(179)
 		<< setw(20) << sv->HO << char(179) << setw(15) << sv->TEN << char(179)
 		<< setw(5) << sv->PHAI << char(179) << setw(11) << sv->SDT << char(179);

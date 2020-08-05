@@ -248,11 +248,15 @@ char InputBox(string& str, int x, int y, int width,
 	SetColor(color_darkwhite);
 	rectagle(x, y, width, 2);
 
-	if (isDraw) return -1;
 
 	char key = -1;
 	gotoXY(x + 1, y + 1);
 	cout << text;
+
+	if (isDraw) return -1;
+
+
+
 	HideCursor(false);
 
 	do {
@@ -331,7 +335,7 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 			width, maxText[indexCurrent], false,
 			((n == 7 && indexCurrent < n - 1 && indexCurrent != n - 2) || n == 1) ? true : false,
 			(n == 7 && indexCurrent == n - 2) ? true : false);
-		if (key == key_tab && n ==7) {
+		if (key == key_tab && n == 7) {
 			indexCurrent = (indexCurrent + 1) % n;
 		}
 
@@ -460,19 +464,23 @@ void ProcessConrtol(AppContext& context) {
 						string maLop[1] = { "" };
 						int maxTexts[1] = { MAX_MALOP - 1 };
 						int key = -1;
-						key = DrawFormInputSinhVien(40, 5, 30, maLop, maxTexts, 1);
-						char* cloned[MAX_MALOP];
-						// TODO: occur bug here.
-						strcpy_s(*cloned, MAX_MALOP, maLop[0].c_str());
-						bool exist = CheckExistLop(*cloned);
-						if (!exist) {
-							gotoXY(40, 10);
-							SetColor(color_darkwhite | colorbk_green);
-							cout << "Lop khong ton tai !";
+						char cloned[MAX_MALOP];
+						bool exist = false;
+						CommonShowSvList(context);
+						/*while (key != key_esc && !exist)
+						{
+							key = DrawFormInputSinhVien(40, 5, 30, maLop, maxTexts, 1);
+							strcpy_s(cloned, MAX_MALOP, maLop[0].c_str());
+							exist = CheckExistLop(cloned);
+							if (!exist) {
+								gotoXY(40, 10);
+								SetColor(color_darkwhite | colorbk_green);
+								cout << "Lop khong ton tai !";
+							}
 						}
-						else {
+						if (key == key_Enter) {
 							CommonShowSvList(context);
-						}
+						}*/
 					}
 					break;
 				}
@@ -481,11 +489,12 @@ void ProcessConrtol(AppContext& context) {
 						SetColor(color_darkwhite);
 						//CommonShowSvList(context);
 						bool masv_null = false;
+
+						string textFields[7] = { "" };
+						int maxTexts[7] = { MAX_MALOP - 1, MAX_MASV - 1,
+							MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
 						do
 						{
-							string textFields[7] = { "" };
-							int maxTexts[7] = { MAX_MALOP - 1, MAX_MASV - 1,
-								MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
 							int key = -1;
 							key = DrawFormInputSinhVien(70, 10, 30, textFields, maxTexts, 7);
 							if (key == key_Enter) {
@@ -510,7 +519,6 @@ void ProcessConrtol(AppContext& context) {
 									}
 									InsertAndSortSvIntoDS(context.ds_sv_original, sv);
 									UpdateListStudentToFile(context.ds_sv_original);
-									delete sv;
 									gotoXY(60, 36);
 									cout << "Ghi sinh vien thanh cong!";
 									// TODO: need to check again !
