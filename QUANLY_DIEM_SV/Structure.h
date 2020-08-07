@@ -5,11 +5,12 @@
 #include <string>;
 #include <fstream>;
 #include <ctime>;
+#include <sstream>;
 #include "console.h";
 
 #define MAX_MON_HOC 300
 #define MAX_MAMH 11
-#define MAX_TENMH 100
+#define MAX_TENMH 30
 #define MAX_MASV 13
 #define MAX_PHAI 4
 #define MAX_SDT 11
@@ -20,8 +21,6 @@
 
 #define bk_blue 0x0030
 #define red 0x0004
-
-
 
 using namespace std;
 
@@ -71,28 +70,6 @@ struct ds_sinh_vien
 typedef struct ds_sinh_vien DS_SINH_VIEN;
 // ===== END SINH VIEN =====
 
-// ===== BEGIN LOP TIN CHI =====
-struct lop_tin_chi
-{
-	int MALOPTC;
-	char MAMH[MAX_MAMH];
-	char NIEN_KHOA[MAX_NIENKHOA];
-	int HOC_KY;
-	int NHOM;
-	int sv_max;
-	int sv_min;
-	DS_SINH_VIEN* ds_sv;
-};
-typedef struct lop_tin_chi Lop_Tin_Chi;
-struct node_lop_tin_chi {
-	Lop_Tin_Chi data;
-	node_lop_tin_chi* pLeft;
-	node_lop_tin_chi* pRight;
-};
-typedef struct node_lop_tin_chi NODE_LOP_TIN_CHI;
-typedef NODE_LOP_TIN_CHI* TREE;
-
-// ===== END LOP TIN CHI =====
 
 // ===== BEGIN DS SV DANG KY =====
 struct sv_dang_ky
@@ -108,11 +85,34 @@ struct ds_dang_ky
 {
 	SV_DANG_KY* pHead = NULL;
 	SV_DANG_KY* pTail = NULL;
-	int n;
 };
 typedef struct ds_dang_ky DS_SV_DANG_KY;
 // ===== END DS SV DANG KY =====
 
+
+// ===== BEGIN LOP TIN CHI =====
+struct lop_tin_chi
+{
+	int MALOPTC;
+	char MAMH[MAX_MAMH];
+	char NIEN_KHOA[MAX_NIENKHOA];
+	int HOC_KY;
+	int NHOM;
+	int sv_max;
+	int sv_min;
+	int totalSvDK = 0;
+	DS_SV_DANG_KY* ds_sv_dky;
+};
+typedef struct lop_tin_chi Lop_Tin_Chi;
+struct node_lop_tin_chi {
+	Lop_Tin_Chi data;
+	node_lop_tin_chi* pLeft;
+	node_lop_tin_chi* pRight;
+};
+typedef struct node_lop_tin_chi NODE_LOP_TIN_CHI;
+typedef NODE_LOP_TIN_CHI* TREE;
+
+// ===== END LOP TIN CHI =====
 
 
 static string mainActions[4] = { "CHUC NANG LOP TIN CHI",
@@ -121,6 +121,8 @@ static string mainActions[4] = { "CHUC NANG LOP TIN CHI",
 static string propertySinhVien[7] = {
 	"Ma Sinh Vien", "Ma Lop", "Ho SV", "Ten SV", "Phai", "So Dien Thoai", "Nam Nhap Hoc"
 };
+static string propertyMonHoc[4] = {
+	"Ma Mon Hoc", "Ten Mon Hoc", "TC Thuc Hanh", "TC Ly Thuyet"};
 
 static string nameAction = "";
 
@@ -193,13 +195,14 @@ struct AppContext {
 		tree = NULL;
 		nLTC = 0;
 		ds_mh.n = 0;
-		ds_sv_original.totalSv = 0;
+		ds_sv.totalSv = 0;
 	}
 	TREE tree;
-	DS_SINH_VIEN ds_sv_original;
+	DS_SINH_VIEN ds_sv;
 	Lop_Tin_Chi* ds[100];
 	int nLTC;
 	DS_MON_HOC ds_mh;
+	DS_SV_DANG_KY ds_sv_dky;
 };
 
 
@@ -218,6 +221,11 @@ char** CreateArray(int x, int y);
 int countTotalSvByLop(DS_SINH_VIEN ds_sv, char* maLop);
 SINH_VIEN** CreateArraySV(int x, int y);
 bool CheckInputBoxIsNull(string str[], int n);
+void DrawEachButtonOfAction(MenuItem& item, int color);
+void DrawListMenu(MenuContent& menucontent, int color);
+void ConfirmRemove();
+void ConfirmQuit();
+int ControlMenu(MenuContent* menuContent, int defaultColor, int activateColor);
 // ===== END HELPER =====
 
 // HANDLE FILES
@@ -239,7 +247,7 @@ void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk);
 void UpdateListSvToLopTC(Lop_Tin_Chi*& ds, int totalLopTc, DS_SINH_VIEN& ds_sv_original, char* masvDKLTC[]);
 void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n);
 void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data);
-void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original);
+void ReadListLopTinChi(TREE& tree);
 // END HANDLE FILES
 
 // SINH VIEN
@@ -261,12 +269,10 @@ void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data);
 NODE_LOP_TIN_CHI* TravelTree(TREE t, int maLop);
 void InsertLopTCIntoTree(TREE& tree);
 void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n);
-void ShowDSLopTinChi(Lop_Tin_Chi* ds[], int n);
 void Node_The_Mang(TREE& t, TREE& x);
 void RemoveNodeOfTree(TREE& t, int ma);
 void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data);
 Lop_Tin_Chi* InputUpdateTree();
-void ShowDSSVDangKyLTC(Lop_Tin_Chi* ds[], int n);
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
 // ===== END DS LOP TIN CHI =====
 
@@ -278,13 +284,13 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc);
 
 // BEGIN DS DANG KY
 void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
-void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
+void InsertLastDSDKY(DS_SV_DANG_KY& ds_sv_dk, SV_DANG_KY* sv_dky);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 
-void CommonShowSvList(AppContext context, char* maLop);
+int CommonShowSvList(AppContext context, char* maLop);
 // END DS DANG KY
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
-void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y);
+int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv,SINH_VIEN* ds_sv[], int n, int x, int y);
 void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y);
 
 

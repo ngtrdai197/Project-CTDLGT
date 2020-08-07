@@ -87,13 +87,6 @@ string openLogin() {
 	return masv;
 }
 
-void DrawEachButtonOfAction(MenuItem& item, int color = color_darkwhite) {
-	SetColor(color);
-	rectagle(item.rect.left, item.rect.top, item.rect.right, item.rect.bottom);
-	gotoXY(item.rect.left + (item.rect.right - item.name.length()) / 2, item.rect.top + 1);
-	cout << item.name;
-}
-
 void SetCurrentAction(int actionIndex) {
 	int location = 80;
 	for (int i = mainActions[actionIndex].length() - 1; mainActions[actionIndex].length() < 0; i--)
@@ -107,21 +100,6 @@ void SetCurrentAction(int actionIndex) {
 	nameAction = mainActions[actionIndex];
 	gotoXY(80, 2);
 	cout << nameAction;
-}
-
-void DrawListMenu(MenuContent& menucontent, int color = color_darkwhite) {
-	for (int i = 0; i < menucontent.n; i++)
-	{
-		DrawEachButtonOfAction(menucontent.menus[i], color); // +3
-	}
-}
-
-void ConfirmQuit() {
-	rectagle(50, 5, 40, 13);
-	gotoXY(55, 8);
-	cout << "Ban co muon thoat chuong trinh";
-	DrawListMenu(ActionQuit);
-
 }
 
 void HideCursor(bool ishide = true)
@@ -142,51 +120,6 @@ void ShowGuide() {
 	cout << "Enter de chon";
 	gotoXY(3, 39);
 	cout << "ESC de thoat";
-}
-
-int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, int activateColor = color_green) {
-	int pos = menuContent->posStatus;
-	int key = -1;
-	DrawListMenu(*menuContent, defaultColor);
-	DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
-
-	do
-	{
-		key = inputKey();
-		switch (key)
-		{
-		case key_Up: {
-			if (pos == 0) {
-				pos = menuContent->n;
-			}
-			pos -= 1;
-			goto paint;
-		}
-		case key_tab:
-		case key_Down: {
-			if (pos == menuContent->n - 1) {
-				pos = -1;
-			}
-			pos += 1;
-			goto paint;
-		}
-					 //case key_Enter: {
-					 //	if (pos == 0) {
-					 //		DrawListMenu(MenuMonHoc, 3);
-					 //		//DrawLo
-					 //	}
-					 //}
-		default:
-			break;
-		paint: {
-			DrawEachButtonOfAction(menuContent->menus[menuContent->posStatus]);
-			DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
-			menuContent->posStatus = pos;
-			}
-		}
-
-	} while (key != key_esc && key != key_Enter);
-	return key;
 }
 
 void DrawContentLopTC() {
@@ -243,7 +176,7 @@ void DrawContentMonHoc() {
 	cout << "So tin TH";
 }
 char InputBox(string& str, int x, int y, int width,
-	int maxText, bool isDraw = false, bool isText = true, bool isPhone = false) {
+	int maxText, bool isDraw = false, bool isText = true, bool isPhone = false, bool isFloat = false) {
 	string text = str;
 	SetColor(color_darkwhite);
 	rectagle(x, y, width, 2);
@@ -254,8 +187,6 @@ char InputBox(string& str, int x, int y, int width,
 	cout << text;
 
 	if (isDraw) return -1;
-
-
 
 	HideCursor(false);
 
@@ -270,6 +201,10 @@ char InputBox(string& str, int x, int y, int width,
 				(key > 47 && key < 58) || (key > 64 && key < 91)
 				|| (key > 96 && key < 123)) || key == 45 || key == 32) && text.length() < maxText)
 			: ((key > 47 && key < 58) && text.length() < maxText)) {
+			text += key;
+			cout << key;
+		}
+		else if (isFloat && ((key > 47 && key < 58) || key == 46) && text.length() < maxText) {
 			text += key;
 			cout << key;
 		}
@@ -349,13 +284,40 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 	} while (key != key_Enter);
 	return key;
 }
+char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[], int n) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		gotoXY(50, y + (i * offset + 1));
+		cout << propertyMonHoc[i];
+		InputBox(Texts[i], x, y + (i * offset), width,
+			maxText[i], true, i < 2 ? true : false, false, i>1 ? true : false);
+	}
+
+	int indexCurrent = 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false,
+			indexCurrent < 2 ? true : false, false, indexCurrent>1 ? true : false);
+		if (key == key_tab) {
+			indexCurrent = (indexCurrent + 1) % n;
+		}
+
+	} while (key != key_Enter);
+	return key;
+}
 
 void ProcessConrtol(AppContext& context) {
 
 	MenuContent* menuCurrent = &MenuFeatures;
 
 	do {
-		int key = ControlMenu(menuCurrent);
+		int key = ControlMenu(menuCurrent, color_darkwhite, color_green);
 
 		if (menuCurrent == &MenuFeatures) {
 			if (key == key_Enter)
@@ -384,7 +346,7 @@ void ProcessConrtol(AppContext& context) {
 			else if (key == key_esc) {
 				menuCurrent = &ActionQuit;
 				ConfirmQuit();
-				key = ControlMenu(menuCurrent);
+				key = ControlMenu(menuCurrent, color_darkwhite, color_green);
 				if (key == key_Enter && menuCurrent->posStatus == 0) {
 					return;
 				}
@@ -407,7 +369,7 @@ void ProcessConrtol(AppContext& context) {
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 						InDanhSachLopTinChi(context.ds, context.nLTC, 30, 10);
 						//delete[] context.ds;
-						context.nLTC = 0;
+						//context.nLTC = 0;
 					}
 					break;
 				}
@@ -429,7 +391,7 @@ void ProcessConrtol(AppContext& context) {
 								p->sv_max = stoi(Texts[4]);
 								p->sv_min = stoi(Texts[5]);
 								p->MALOPTC = RandomIDLTC(context.tree);
-								p->ds_sv = NULL;
+								p->ds_sv_dky = NULL;
 								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
@@ -498,6 +460,42 @@ void ProcessConrtol(AppContext& context) {
 					}
 					break;
 				}
+				case 1: {
+					SetColor(color_darkwhite);
+					string maLop[1] = { "" };
+					int maxTexts[1] = { MAX_MALOP - 1 };
+					int key = -1;
+					char cloned[MAX_MALOP];
+					bool exist = false;
+					do
+					{
+						//key = CommonShowSvList(context, cloned);
+						key = CommonShowSvList(context, NULL);
+					} while (key != key_esc);
+					//CommonShowSvList(context);
+					//do
+					//{
+					//	SetColor(color_darkwhite);
+					//	key = DrawFormInputSinhVien(60, 5, 30, maLop, maxTexts, 1);
+					//	if (key == key_esc) break;
+					//	strcpy_s(cloned, MAX_MALOP, maLop[0].c_str());
+					//	exist = CheckExistLop(cloned);
+					//	if (!exist || maLop[0].empty()) {
+					//		gotoXY(60, 10);
+					//		SetColor(color_darkwhite | colorbk_red);
+					//		cout << "Lop khong ton tai !";
+					//	}
+					//	else {
+					//		if (key == key_Enter) {
+					//			CommonShowSvList(context, cloned);
+					//			maLop[0].clear();
+					//		}
+					//	}
+
+					//} while (key != key_esc || !exist);
+					//clrscr(40, 5, 90, 20, ' '); // bao gom form nhap ma lop 
+					break;
+				}
 				case 2: { // Nhap ds sinh vien
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
@@ -521,7 +519,7 @@ void ProcessConrtol(AppContext& context) {
 									// validate data
 									NODE_SINH_VIEN* sv = new NODE_SINH_VIEN;
 									strcpy_s(sv->data.MASV, MAX_MASV, textFields[0].c_str());
-									if (CheckExistMSSV(context.ds_sv_original, sv->data.MASV)) {
+									if (CheckExistMSSV(context.ds_sv, sv->data.MASV)) {
 										gotoXY(60, 36);
 										cout << "Ma sinh vien da ton tai. Kiem tra lai !";
 									}
@@ -537,8 +535,8 @@ void ProcessConrtol(AppContext& context) {
 										if (!exist) {
 											InsertLopIntoDSLop(sv->data.MALOP);
 										}
-										InsertAndSortSvIntoDS(context.ds_sv_original, sv);
-										UpdateListStudentToFile(context.ds_sv_original);
+										InsertAndSortSvIntoDS(context.ds_sv, sv);
+										UpdateListStudentToFile(context.ds_sv);
 
 										gotoXY(60, 36);
 										cout << "Ghi sinh vien thanh cong!";
@@ -577,9 +575,61 @@ void ProcessConrtol(AppContext& context) {
 				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
-						InDanhSachMonHoc(context.ds_mh, context.ds_mh.n, 30, 10);
+						InDanhSachMonHoc(context.ds_mh, context.ds_mh.n, 40, 10);
 					}
 					break;
+				case 2: {
+					if (key == key_Enter) {
+						SetColor(color_darkwhite);
+						bool mamh_null = false;
+
+						string textFields[4] = { "" };
+						int maxTexts[4] = { MAX_MAMH - 1, MAX_TENMH - 1, 4, 4 };
+						do
+						{
+							int key = -1;
+							key = DrawFormInputMonHoc(70, 10, 30, textFields, maxTexts, 4);
+							if (key == key_Enter) {
+								if (textFields[0].empty()) {
+									mamh_null = true;
+									break;
+								}
+								if (!CheckInputBoxIsNull(textFields, 4)) {
+									// validate data
+									MON_HOC* mh = new MON_HOC;
+									strcpy_s(mh->MAMH, MAX_MAMH, textFields[0].c_str());
+									if (CheckExistMaMH(context.ds_mh, mh->MAMH)) {
+										gotoXY(60, 36);
+										cout << "Ma mon hoc da ton tai. Kiem tra lai !";
+									}
+									else {
+										strcpy_s(mh->TENMH, MAX_TENMH, textFields[1].c_str());
+										mh->STCTH = atoi(textFields[2].c_str());
+										mh->STCLT = atoi(textFields[3].c_str());
+										context.ds_mh.ds[context.ds_mh.n] = mh;
+										context.ds_mh.n++;
+										UpdateFileDSMonHoc(context.ds_mh);
+
+										gotoXY(60, 36);
+										cout << "Ghi mon hoc thanh cong!";
+										for (int i = 0; i < 4; i++)
+										{
+											textFields[i].clear();
+										}
+									}
+								}
+								else {
+									gotoXY(60, 36);
+									cout << "Du lieu nhap khong duoc de trong!";
+									/*Sleep(3000);
+									clrscr(60, 36, 40, 3, ' ');*/
+								}
+							}
+						} while (mamh_null == false);
+						clrscr(50, 10, 90, 30, ' ');
+						break;
+					}
+				}
 				default:
 					break;
 				}

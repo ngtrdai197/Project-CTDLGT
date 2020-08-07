@@ -19,7 +19,8 @@ int main()
 	//DrawFormInput(0, 0, 60, h, 4);
 	AppContext context;
 	InitTree(context.tree);
-	ReadListLopTinChi(context.tree, context.ds_sv_original);
+	ReadListLopTinChi(context.tree);
+	ReadFileSinhVien(context.ds_sv);
 	Read_File_MonHoc(context.ds_mh);
 	srand(time(NULL));
 	//SetColor(bk_blue | red);

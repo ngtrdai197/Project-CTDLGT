@@ -54,6 +54,8 @@
 #define key_esc     27
 #define key_F11		1133
 #define key_F12		1134
+#define key_F2		1060
+#define key_F3		1061
 
 
 int gettxtColor();

@@ -188,6 +188,68 @@ bool CheckInputBoxIsNull(string str[], int n) {
 	}
 	return exist;
 }
+void DrawEachButtonOfAction(MenuItem& item, int color = color_darkwhite) {
+	SetColor(color);
+	rectagle(item.rect.left, item.rect.top, item.rect.right, item.rect.bottom);
+	gotoXY(item.rect.left + (item.rect.right - item.name.length()) / 2, item.rect.top + 1);
+	cout << item.name;
+}
+void DrawListMenu(MenuContent& menucontent, int color = color_darkwhite) {
+	for (int i = 0; i < menucontent.n; i++)
+	{
+		DrawEachButtonOfAction(menucontent.menus[i], color); // +3
+	}
+}
+void ConfirmRemove() {
+	rectagle(50, 5, 40, 13);
+	gotoXY(55, 8);
+	cout << "Xac nhan xoa ban ghi";
+	DrawListMenu(ActionQuit);
+}
+void ConfirmQuit() {
+	rectagle(50, 5, 40, 13);
+	gotoXY(55, 8);
+	cout << "Ban co muon thoat chuong trinh";
+	DrawListMenu(ActionQuit);
+}
+int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, int activateColor = color_green) {
+	int pos = menuContent->posStatus;
+	int key = -1;
+	DrawListMenu(*menuContent, defaultColor);
+	DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
+
+	do
+	{
+		key = inputKey();
+		switch (key)
+		{
+		case key_Up: {
+			if (pos == 0) {
+				pos = menuContent->n;
+			}
+			pos -= 1;
+			goto paint;
+		}
+		case key_tab:
+		case key_Down: {
+			if (pos == menuContent->n - 1) {
+				pos = -1;
+			}
+			pos += 1;
+			goto paint;
+		}
+		default:
+			break;
+		paint: {
+			DrawEachButtonOfAction(menuContent->menus[menuContent->posStatus], color_darkwhite);
+			DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
+			menuContent->posStatus = pos;
+			}
+		}
+
+	} while (key != key_esc && key != key_Enter);
+	return key;
+}
 // ===== END HELPER =====
 
 // HANDLE FILES
@@ -360,22 +422,22 @@ void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk)
 // END DANH SACH DANG KY
 
 // TODO:
-void UpdateListSvToLopTC(Lop_Tin_Chi*& ds, int totalLopTc, DS_SINH_VIEN& ds_sv_original, char* masvDKLTC[]) {
-	for (int i = 0; i < totalLopTc; i++)
-	{
-		DS_SINH_VIEN* ds_sv = new DS_SINH_VIEN;
-		for (NODE_SINH_VIEN* p = ds_sv_original.pHead; p != NULL; p = p->pNext)
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				if (_strcmpi(p->data.MASV, masvDKLTC[i]) == 0) {
-					InsertAndSortSvIntoDS(*ds_sv, p);
-				}
-			}
-		}
-		ds[i].ds_sv = ds_sv;
-	}
-}
+//void UpdateListSvToLopTC(Lop_Tin_Chi*& ds, int totalLopTc, DS_SINH_VIEN& ds_sv_original, char* masvDKLTC[]) {
+//	for (int i = 0; i < totalLopTc; i++)
+//	{
+//		DS_SINH_VIEN* ds_sv = new DS_SINH_VIEN;
+//		for (NODE_SINH_VIEN* p = ds_sv_original.pHead; p != NULL; p = p->pNext)
+//		{
+//			for (int i = 0; i < 2; i++)
+//			{
+//				if (_strcmpi(p->data.MASV, masvDKLTC[i]) == 0) {
+//					InsertAndSortSvIntoDS(*ds_sv, p);
+//				}
+//			}
+//		}
+//		ds[i].ds_sv = ds_sv;
+//	}
+//}
 void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 	ofstream fileOut;
 	fileOut.open("DS_LOP_TIN_CHI.txt", ios::out | ios::binary);
@@ -388,18 +450,20 @@ void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 
 	for (int i = 0; i < n; i++)
 	{
-		if (ds[i]->ds_sv != NULL && ds[i]->ds_sv->totalSv != 0) {
+		if (ds[i]->ds_sv_dky != NULL && ds[i]->totalSvDK != 0) {
 
-			string masvDKLTC;
-			for (NODE_SINH_VIEN* p = ds[i]->ds_sv->pHead; p != NULL; p = p->pNext) {
-				masvDKLTC += (string)p->data.MASV;
+			string masvDKLTC = "";
+			for (SV_DANG_KY* p = ds[i]->ds_sv_dky->pHead; p != NULL; p = p->pNext) {
+				std::ostringstream ss; // conver float to string
+				ss << p->DIEM;
+				masvDKLTC = masvDKLTC + "{" + (string)p->MASV + "," + ss.str()+ "}";
 				if (p->pNext != NULL) {
 					masvDKLTC += ",";
 				}
 			}
 			fileOut << ds[i]->MAMH << "," << ds[i]->NIEN_KHOA
 				<< "," << ds[i]->MALOPTC << "," << ds[i]->HOC_KY << "," << ds[i]->NHOM << "," << ds[i]->sv_max << ","
-				<< ds[i]->sv_min << "," << ds[i]->ds_sv->totalSv << ",[" << masvDKLTC << "]" << endl;
+				<< ds[i]->sv_min << "," << ds[i]->totalSvDK << ",[" << masvDKLTC << "]" << endl;
 		}
 		else {
 			fileOut << ds[i]->MAMH << "," << ds[i]->NIEN_KHOA << ","
@@ -411,9 +475,8 @@ void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 	fileOut.close();
 }
 void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data);
-void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
+void ReadListLopTinChi(TREE& t) {
 	ifstream fileIn;
-	ReadFileSinhVien(ds_sv_original);
 	fileIn.open("DS_LOP_TIN_CHI.txt", ios::in);
 	if (fileIn.fail())
 	{
@@ -427,8 +490,9 @@ void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
 		char s[1];
 		Lop_Tin_Chi* data = new Lop_Tin_Chi;
 		/*fileOut << endl << ds[i]->MALOPTC << "," << ds[i]->MAMH << ","
-			<< ds[i]->NIEN_KHOA << "," << ds[i]->HOC_KY << "," << ds[i]->NHOM  << "," << ds[i]->sv_max << "," << ds[i]->sv_min
-			<< ",[" << "MSV123" << "," << "MSV234" << "]" << "\n";*/
+			<< ds[i]->NIEN_KHOA << "," << ds[i]->HOC_KY << "," << ds[i]->NHOM
+			<< "," << ds[i]->sv_max << "," << ds[i]->sv_min
+			<< ",[" << {MSV123,10}" << "," << "{MSV234,9}" << "]" << "\n";*/
 		fileIn.getline(data->MAMH, MAX_MAMH, ',');
 		fileIn.getline(data->NIEN_KHOA, MAX_NIENKHOA, ',');
 		fileIn >> data->MALOPTC;
@@ -442,35 +506,21 @@ void ReadListLopTinChi(TREE& t, DS_SINH_VIEN& ds_sv_original) {
 		fileIn >> data->sv_min;
 		fileIn.ignore(1);
 
-		DS_SINH_VIEN* ds_sv = new DS_SINH_VIEN;
-		ds_sv->pHead = NULL;
-		ds_sv->pTail = NULL;
-		ds_sv->totalSv = 0;
-		data->ds_sv = ds_sv;
-		int totalSv = 0;
-		fileIn >> totalSv;
+		DS_SV_DANG_KY* ds_dky = new DS_SV_DANG_KY;
+		Init_DS_Dang_Ky(*ds_dky);
+		data->ds_sv_dky = ds_dky;
+		fileIn >> data->totalSvDK;
 
-		if (totalSv > 0) {
-			char** massv = CreateArray(MAX_MASV, totalSv);
-			//char temp[1];
+		if (data->totalSvDK > 0) {
 			fileIn.ignore(2);
-			for (int i = 0; i < totalSv; i++)
+			for (int i = 0; i < data->totalSvDK; i++)
 			{
-				if (i < totalSv - 1) {
-					fileIn.getline(massv[i], MAX_MASV, ',');
-				}
-				else {
-					fileIn.getline(massv[i], MAX_MASV, ']');
-					//fileIn.getline(temp, 1);
-				}
-				for (NODE_SINH_VIEN* p = ds_sv_original.pHead; p != NULL; p = p->pNext) {
-					if (_strcmpi(massv[i], p->data.MASV) == 0) {
-						NODE_SINH_VIEN* temp = new NODE_SINH_VIEN;
-						temp->data = p->data;
-						InsertAndSortSvIntoDS(*ds_sv, temp);
-						break;
-					}
-				}
+				SV_DANG_KY* p = new SV_DANG_KY;
+				fileIn.ignore(1);
+				fileIn.getline(p->MASV, MAX_MASV, ',');
+				fileIn >> p->DIEM;
+				fileIn.ignore(2);
+				InsertLastDSDKY(*ds_dky, p);
 			}
 		}
 		fileIn.ignore(1);
@@ -534,15 +584,11 @@ void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv)
 	if (_strcmpi(ds_sv.pHead->data.MASV, massv) == 0)
 	{
 		RemoveFirst(ds_sv);
-		cout << "Xoa thanh cong vi tri dau tien" << endl;
-		system("pause");
 		return;
 	}
 	if (_strcmpi(ds_sv.pTail->data.MASV, massv) == 0)
 	{
 		RemoveLast(ds_sv);
-		cout << "Xoa thanh cong vi tri cuoi cung trong ds" << endl;
-		system("pause");
 		return;
 	}
 	bool exists = false;
@@ -649,7 +695,7 @@ void InitTree(TREE& tree) {
 void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data) {
 	if (tree == NULL) {
 		NODE_LOP_TIN_CHI* p = new NODE_LOP_TIN_CHI;
-		p->data.ds_sv = data->ds_sv;
+		p->data.ds_sv_dky = data->ds_sv_dky;
 		p->data.HOC_KY = data->HOC_KY;
 		p->data.MALOPTC = data->MALOPTC;
 		strcpy_s(p->data.MAMH, MAX_MAMH, data->MAMH);
@@ -657,6 +703,7 @@ void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data) {
 		strcpy_s(p->data.NIEN_KHOA, MAX_NIENKHOA, data->NIEN_KHOA);
 		p->data.sv_max = data->sv_max;
 		p->data.sv_min = data->sv_min;
+		p->data.totalSvDK = data->totalSvDK;
 		p->pLeft = NULL;
 		p->pRight = NULL;
 		tree = p;
@@ -691,7 +738,7 @@ void InsertLopTCIntoTree(TREE& tree) {
 	cout << "Nhap sl sinh vien max: "; cin >> p->sv_max;
 	cout << "Nhap sl sinh vien min: "; cin >> p->sv_min;
 	cout << "Nhap nhom:"; cin >> p->NHOM;
-	p->ds_sv = NULL;
+	p->ds_sv_dky = NULL;
 	InsertNodeIntoTree(tree, p);
 }
 void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
@@ -719,36 +766,6 @@ void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop
 			dsSV[i] = &p->data;
 			i++;
 		}
-	}
-}
-void ShowDSLopTinChi(Lop_Tin_Chi* ds[], int n) {
-	int total = 0;
-	for (int i = 0; i < n; i++)
-	{
-		cout << "\t====== LOP TIN CHI THU " << ++total << " ======" << endl;
-
-		cout << "\nMa lop tin chi: " << ds[i]->MALOPTC << endl;
-		cout << "Ma mon hoc: " << ds[i]->MAMH << endl;
-		cout << "Nien khoa: " << ds[i]->NIEN_KHOA << endl;
-		cout << "Hoc ky: " << ds[i]->HOC_KY << endl;
-		cout << "Nhom: " << ds[i]->NHOM << endl;
-		cout << "So luong sinh vien toi da: " << ds[i]->sv_max << endl;
-		cout << "So luong sinh vien it nhat: " << ds[i]->sv_min << endl;
-		if (ds[i]->ds_sv != NULL) {
-			int k = 0;
-			cout << "So luong sinh vien dang ky: " << ds[i]->ds_sv->totalSv << endl;
-			for (NODE_SINH_VIEN* p = ds[i]->ds_sv->pHead; p != NULL; p = p->pNext)
-			{
-				cout << "\t====== SINH VIEN THU " << ++k << " ======" << endl;
-				cout << "Ten sinh vien:" << p->data.HO << " " << p->data.TEN << endl;
-				cout << "Ma lop: " << p->data.MALOP << endl;
-				cout << "Ma sinh vien: " << p->data.MASV << endl;
-				cout << "Nam nhap hoc: " << p->data.NAMNHAPHOC << endl;
-				cout << "Phai: " << p->data.PHAI << endl;
-				cout << "Sdt: " << p->data.SDT << endl;
-			}
-		}
-
 	}
 }
 void Node_The_Mang(TREE& t, TREE& x) {
@@ -818,30 +835,6 @@ Lop_Tin_Chi* InputUpdateTree() {
 	// p->ds_sv = NULL; TODO:
 	return p;
 }
-void ShowDSSVDangKyLTC(Lop_Tin_Chi* ds[], int n) {
-	char nienKhoa[MAX_NIENKHOA];
-	char maMonHoc[MAX_MAMH];
-	int nhom, hocKy;
-	bool exist = true;
-	cout << "\nNhap nien khoa:"; cin.getline(nienKhoa, MAX_NIENKHOA);
-	cout << "Nhap ma mon hoc:";  cin.getline(maMonHoc, MAX_MAMH);
-	cout << "Nhap nhom:"; cin >> nhom;
-	cout << "Nhap hoc ky:"; cin >> hocKy;
-
-	for (int i = 0; i < n; i++) {
-		if (ds[i]->HOC_KY == hocKy && ds[i]->NHOM == nhom
-			&& _strcmpi(ds[i]->NIEN_KHOA, nienKhoa) == 0
-			&& _strcmpi(ds[i]->MAMH, maMonHoc) == 0) {
-			if (ds[i]->ds_sv == NULL) {
-				exist = false;
-				break;
-			}
-			for (NODE_SINH_VIEN* p = ds[i]->ds_sv->pHead; p != NULL; p = p->pNext) {
-				cout << "Ho ten:" << p->data.HO << " " << p->data.TEN << endl;
-			}
-		}
-	}
-}
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data) {
 	bool exist = false;
 	int i = 0;
@@ -908,12 +901,11 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc)
 }
 // END MON HOC
 
-// BEGIN DS DANG KY
+// BEGIN DS SINH VIEN DANG KY
 void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dk)
 {
 	ds_dk.pHead = NULL;
 	ds_dk.pTail = NULL;
-	ds_dk.n = 0;
 }
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk)
 {
@@ -928,7 +920,6 @@ void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk)
 		ds_dk.pTail = dk;
 		dk->pNext = NULL;
 	}
-	ds_dk.n++;
 }
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk) {
 	for (SV_DANG_KY* p = ds_dk.pHead; p != NULL; p = p->pNext) {
@@ -936,6 +927,8 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk) {
 		cout << "Diem:" << p->DIEM << endl;
 	}
 }
+// END DS SINH VIEN DANG KY
+
 void ShowSingleLTC(Lop_Tin_Chi* ltc, int index) {
 	cout << setw(3) << index + 1 << char(179) << setw(10) << ltc->MALOPTC
 		<< char(179) << setw(11) << ltc->MAMH << char(179)
@@ -943,8 +936,9 @@ void ShowSingleLTC(Lop_Tin_Chi* ltc, int index) {
 		<< ltc->NIEN_KHOA << char(179)
 		<< setw(7) << ltc->sv_max << char(179)
 		<< setw(7) << ltc->sv_min << char(179)
-		<< setw(7) << ltc->sv_max - ltc->ds_sv->totalSv << char(179);
-}void ShowSingleSV(SINH_VIEN* sv, int index) {
+		<< setw(7) << ltc->sv_max - ltc->totalSvDK << char(179);
+}
+void ShowSingleSV(SINH_VIEN* sv, int index) {
 	cout << setw(3) << index + 1 << char(179) << setw(15) << sv->MALOP << char(179)
 		<< setw(13) << sv->MASV << char(179)
 		<< setw(20) << sv->HO << char(179) << setw(15) << sv->TEN << char(179)
@@ -956,16 +950,16 @@ void ShowSingleMonHoc(MON_HOC* mh, int index) {
 		<< setw(15) << mh->STCLT << char(179) << setw(15) << mh->STCTH << char(179);
 }
 // END DS DANG KY
-void CommonShowSvList(AppContext context, char* maLop = NULL) {
-	int total = maLop ? countTotalSvByLop(context.ds_sv_original, maLop) : context.ds_sv_original.totalSv;
+int CommonShowSvList(AppContext context, char* maLop = NULL) {
+	int total = maLop ? countTotalSvByLop(context.ds_sv, maLop) : context.ds_sv.totalSv;
 	SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
 	if (maLop != NULL) {
-		ConvertLinkedListSVBylop(context.ds_sv_original, ds_sv, maLop);
+		ConvertLinkedListSVBylop(context.ds_sv, ds_sv, maLop);// TODO: bug occur here. Need to check and fix
 	}
 	else {
-		ConvertLinkedListSV(context.ds_sv_original, ds_sv);
+		ConvertLinkedListSV(context.ds_sv, ds_sv);
 	}
-	InDanhSachSinhVien(ds_sv, total, 40, 10);
+	return InDanhSachSinhVien(context.ds_sv, ds_sv, total, 40, 10);
 }
 
 void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
@@ -1083,7 +1077,7 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 		}
 		key = inputKey();
 	} while (key != key_esc);
-	clrscr(30, 10, 90, 10, ' ');
+	clrscr(40, 10, 90, 10, ' ');
 }
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y) {
 	cout << setfill(' ');
@@ -1205,7 +1199,7 @@ void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y) {
 	clrscr(30, 10, 90, 10, ' ');
 
 }
-void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
+int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y) {
 	cout << setfill(' ');
 
 	SetColor(color_black | colorbk_white);
@@ -1229,14 +1223,32 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 	do {
 		switch (key)
 		{
-		case 1060: {
+		case key_F2: {
+			// Todo: implement remove current student at current position
+			/*gotoXY(40, 2);
+			cout << ds_sv[posActive]->MASV;*/
+			ConfirmRemove();
+			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
+			if (key == key_Enter && ActionQuit.posStatus == 0) {
+				// TODO: implement remove student action
+				RemoveSvByMSSV(ctx_ds_sv, ds_sv[posActive]->MASV);
 
-			//todo ::
 
-
-			goto paint;
+				clrscr(40, 5, 90, 20, ' '); // xoa tu vi tri form confirm remove
+				return key;
+			}
+			else {
+				//menuCurrent = &MenuFeatures;
+				//clrscr(50, 5, 40, 14, ' ');
+				clrscr(40, 5, 90, 20, ' '); // xoa tu vi tri form confirm remove
+			}
+			//goto paint;
+			break;
 		}
-
+		case key_F3: {
+			// TODO: init form update
+			break;
+		}
 		case key_Up: {
 			if (posActive > 0) {
 
@@ -1321,5 +1333,6 @@ void InDanhSachSinhVien(SINH_VIEN* ds_sv[], int n, int x, int y) {
 		key = inputKey();
 	} while (key != key_esc);
 	clrscr(40, 10, 90, 20, ' ');
+	return key;
 }
 #endif // !STRUCTURE_CPP
