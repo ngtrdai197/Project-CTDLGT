@@ -42,8 +42,6 @@ void clrscr(int x, int y, int col, int row, CHAR ch, int color) {
 	WriteBlockChar(charater, row, col, x, y);
 }
 
-
-
 void ReadBlockChar(CHAR_INFO*& Arraych,
 	SHORT row, SHORT col,
 	SHORT x, SHORT y)

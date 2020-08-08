@@ -122,7 +122,7 @@ static string propertySinhVien[7] = {
 	"Ma Sinh Vien", "Ma Lop", "Ho SV", "Ten SV", "Phai", "So Dien Thoai", "Nam Nhap Hoc"
 };
 static string propertyMonHoc[4] = {
-	"Ma Mon Hoc", "Ten Mon Hoc", "TC Thuc Hanh", "TC Ly Thuyet"};
+	"Ma Mon Hoc", "Ten Mon Hoc", "TC Ly Thuyet" , "TC Thuc Hanh" };
 
 static string nameAction = "";
 
@@ -191,18 +191,19 @@ static MenuContent ActionQuit = {
 
 
 struct AppContext {
-	AppContext() {
-		tree = NULL;
-		nLTC = 0;
-		ds_mh.n = 0;
-		ds_sv.totalSv = 0;
-	}
 	TREE tree;
 	DS_SINH_VIEN ds_sv;
 	Lop_Tin_Chi* ds[100];
 	int nLTC;
 	DS_MON_HOC ds_mh;
 	DS_SV_DANG_KY ds_sv_dky;
+
+	AppContext() {
+		tree = NULL;
+		nLTC = 0;
+		ds_mh.n = 0;
+		ds_sv.totalSv = 0;
+	};
 };
 
 
@@ -257,7 +258,7 @@ void RemoveFirst(DS_SINH_VIEN& ds_sv);
 void RemoveLast(DS_SINH_VIEN& ds_sv);
 void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv);
 NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv);
-bool UpdateSinhVien(DS_SINH_VIEN& ds_sv);
+void UpdateSinhVien(DS_SINH_VIEN& ds_sv, SINH_VIEN* sv);
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv);
 void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]);
 void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop);
@@ -279,7 +280,10 @@ bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
 // MON HOC
 void Insert_MonHoc(DS_MON_HOC& ds_mon_hoc);
 void RemoveMonHoc(DS_MON_HOC& ds_mon_hoc, char* maMH);
+void UpdateMonHoc(DS_MON_HOC& ds_mon_hoc, MON_HOC mh);
+void SortMonHocMyNameMH(DS_MON_HOC& ds_mh);
 void Show_DS_MonHoc(DS_MON_HOC dsMonHoc);
+char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
 // END MON HOC
 
 // BEGIN DS DANG KY
@@ -287,12 +291,22 @@ void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_sv_dk, SV_DANG_KY* sv_dky);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 
-int CommonShowSvList(AppContext context, char* maLop);
+int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 // END DS DANG KY
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
-int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv,SINH_VIEN* ds_sv[], int n, int x, int y);
-void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y);
+int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
+int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 
+
+// BEGIN FORM
+void HideCursor(bool isHide);
+char InputBox(string& str, int x, int y, int width,
+	int maxText, bool isDraw, bool isText, bool isPhone, bool isFloat);
+char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n);
+char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
+
+
+// END FORM
 
 
 #endif // !STRUCTURE_H

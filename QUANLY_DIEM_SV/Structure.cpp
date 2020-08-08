@@ -200,6 +200,105 @@ void DrawListMenu(MenuContent& menucontent, int color = color_darkwhite) {
 		DrawEachButtonOfAction(menucontent.menus[i], color); // +3
 	}
 }
+void HideCursor(bool isHide)
+{
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO info;
+	info.dwSize = 100;
+	info.bVisible = !isHide;
+	SetConsoleCursorInfo(consoleHandle, &info);
+}
+char InputBox(string& str, int x, int y, int width,
+	int maxText, bool isDraw = false, bool isText = true, bool isPhone = false, bool isFloat = false) {
+	string text = str;
+	SetColor(color_darkwhite);
+	rectagle(x, y, width, 2);
+
+
+	char key = -1;
+	gotoXY(x + 1, y + 1);
+	cout << text;
+
+	if (isDraw) return -1;
+
+	HideCursor(false);
+
+	do {
+		key = inputKey();
+		if (isPhone && key > 47 && key < 58 && text.length() < maxText) {
+			text += key;
+			cout << key;
+		}
+		else if (isText ?
+			(((
+				(key > 47 && key < 58) || (key > 64 && key < 91)
+				|| (key > 96 && key < 123)) || key == 45 || key == 32)
+				&& text.length() < maxText && key != key_Down
+				&& key != key_Up && key != key_Right && key != key_Left)
+			: ((key > 47 && key < 58) && text.length() < maxText)) {
+			text += key;
+			cout << key;
+		}
+		else if (isFloat && ((key > 47 && key < 58) || key == 46) && text.length() < maxText
+			&& text.length() < maxText && key != key_Down
+			&& key != key_Up && key != key_Right && key != key_Left
+			) {
+			text += key;
+			cout << key;
+		}
+		else if (key == key_bkspace)
+		{
+			if (text.length() <= 0) continue;
+
+			cout << "\b \b";
+			text.erase(text.length() - 1, 1);
+		}
+
+	} while (key != key_esc && key != key_tab && key != key_Enter);
+
+	HideCursor(true);
+	str = text;
+	return key;
+}
+char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		// n - 1 => nam sinh
+		if (n == 7) {
+			gotoXY(50, y + (i * offset + 1));
+			cout << propertySinhVien[i];
+		}
+		else if (n == 1) {
+			gotoXY(45, y + (i * offset + 1));
+			cout << "Nhap ma lop: ";
+		}
+		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
+	}
+
+	int indexCurrent = isUpdate ? 1 : 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false,
+			((n == 7 && indexCurrent < n - 1 && indexCurrent != n - 2) || n == 1) ? true : false,
+			(n == 7 && indexCurrent == n - 2) ? true : false);
+		if (key == key_tab && n == 7) {
+			if (indexCurrent == 6 && isUpdate) { indexCurrent = 1; }
+			else indexCurrent = (indexCurrent + 1) % n;
+		}
+		else if (key == key_esc && n == 1) {
+			return key;
+		}
+		else if (key == key_esc && isUpdate) return key;
+
+	} while (key != key_Enter);
+	return key;
+}
 void ConfirmRemove() {
 	rectagle(50, 5, 40, 13);
 	gotoXY(55, 8);
@@ -456,7 +555,7 @@ void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 			for (SV_DANG_KY* p = ds[i]->ds_sv_dky->pHead; p != NULL; p = p->pNext) {
 				std::ostringstream ss; // conver float to string
 				ss << p->DIEM;
-				masvDKLTC = masvDKLTC + "{" + (string)p->MASV + "," + ss.str()+ "}";
+				masvDKLTC = masvDKLTC + "{" + (string)p->MASV + "," + ss.str() + "}";
 				if (p->pNext != NULL) {
 					masvDKLTC += ",";
 				}
@@ -591,23 +690,17 @@ void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv)
 		RemoveLast(ds_sv);
 		return;
 	}
-	bool exists = false;
 	NODE_SINH_VIEN* g = new NODE_SINH_VIEN;
 	for (NODE_SINH_VIEN* k = ds_sv.pHead; k != NULL; k = k->pNext)
 	{
 		if (_strcmpi(k->data.MASV, massv) == 0)
 		{
-			exists = true;
 			g->pNext = k->pNext;
 			delete k;
-			cout << "Xoa thanh cong" << endl;
-			system("pause");
 			return;
 		}
 		g = k;
 	}
-	if (!exists)
-		cout << "\nKhong tim thay sinh vien" << endl;
 }
 NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv)
 {
@@ -643,34 +736,16 @@ NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv)
 	sv->pNext = NULL;
 	return sv;
 }
-bool UpdateSinhVien(DS_SINH_VIEN& ds_sv) {
-	char masv[MAX_MASV];
-	cout << "Nhap ma sv can xoa: "; cin.getline(masv, MAX_MASV);
-	bool exist = CheckExistMSSV(ds_sv, masv);
-	if (!exist) {
-		cout << "Sinh vien khong ton tai. Kiem tra lai!" << endl;
-		return false;
-	}
-	char ho[MAX_HO], ten[MAX_TEN], phai[MAX_PHAI], sdt[MAX_SDT];
-	int namnhaphoc;
-	cout << "Nhap ho sinh vien:"; cin.getline(ho, MAX_HO);
-	cout << "Nhap ten sinh vien:"; cin.getline(ten, MAX_TEN);
-	cout << "Nhap gioi tinh:"; cin.getline(phai, MAX_PHAI);
-	cout << "Nhap so dien thoai sinh vien:"; cin.getline(sdt, MAX_SDT);
-	cout << "Nhap nam nhap hoc:"; cin >> namnhaphoc;
+void UpdateSinhVien(DS_SINH_VIEN& ds_sv, SINH_VIEN* sv) {
+
 	for (NODE_SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
 	{
-		if (_strcmpi(p->data.MASV, masv) == 0) {
-			strcpy_s(p->data.HO, MAX_HO, ho);
-			strcpy_s(p->data.TEN, MAX_TEN, ten);
-			strcpy_s(p->data.PHAI, MAX_PHAI, phai);
-			strcpy_s(p->data.SDT, MAX_SDT, sdt);
-			p->data.NAMNHAPHOC = namnhaphoc;
+		if (_strcmpi(p->data.MASV, sv->MASV) == 0) {
+			p->data = *sv;
 			break;
 		}
 	}
-	UpdateListStudentToFile(ds_sv);
-	return true;
+	//UpdateListStudentToFile(ds_sv);
 }
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv)
 {
@@ -884,10 +959,13 @@ void RemoveMonHoc(DS_MON_HOC& ds_mon_hoc, char* maMH)
 	{
 		if (_strcmpi(ds_mon_hoc.ds[i]->MAMH, maMH) == 0)
 		{
-			ds_mon_hoc.ds[i] = ds_mon_hoc.ds[i + 1];
+			for (int j = i; j < (ds_mon_hoc.n - 1); j++)
+			{
+				ds_mon_hoc.ds[j] = ds_mon_hoc.ds[j + 1];
+			}
 		}
-		ds_mon_hoc.n--;
 	}
+	ds_mon_hoc.n--;
 }
 void Show_DS_MonHoc(DS_MON_HOC dsMonHoc)
 {
@@ -899,6 +977,61 @@ void Show_DS_MonHoc(DS_MON_HOC dsMonHoc)
 		cout << "So tin chi thuc hanh: " << dsMonHoc.ds[i]->STCTH << endl;
 	}
 }
+char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		gotoXY(50, y + (i * offset + 1));
+		cout << propertyMonHoc[i];
+		InputBox(Texts[i], x, y + (i * offset), width,
+			maxText[i], true, i < 2 ? true : false, false, i>1 ? true : false);
+	}
+
+	int indexCurrent = isUpdate ? 1 : 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false,
+			indexCurrent < 2 ? true : false, false, indexCurrent>1 ? true : false);
+		if (key == key_tab) {
+			if (indexCurrent == 3 && isUpdate) { indexCurrent = 1; }
+			else indexCurrent = (indexCurrent + 1) % n;
+		}
+		else if (key == key_esc && isUpdate) return key;
+
+	} while (key != key_Enter);
+	return key;
+}
+void UpdateMonHoc(DS_MON_HOC& ds_mon_hoc, MON_HOC* mh) {
+	for (int i = 0; i < ds_mon_hoc.n; i++)
+	{
+		if (_strcmpi(ds_mon_hoc.ds[i]->MAMH, mh->MAMH) == 0) {
+			strcpy_s(ds_mon_hoc.ds[i]->TENMH, MAX_TENMH, mh->TENMH);
+			ds_mon_hoc.ds[i]->STCLT = mh->STCLT;
+			ds_mon_hoc.ds[i]->STCTH = mh->STCTH;
+			break;
+		}
+	}
+}
+void SortMonHocMyNameMH(DS_MON_HOC& ds_mh) {
+	for (int i = 0; i < ds_mh.n - 1; i++)
+	{
+		for (int j = i+1; j < ds_mh.n; j++)
+		{
+			if (_strcmpi(ds_mh.ds[i]->TENMH, ds_mh.ds[j]->TENMH) > 0) {
+				MON_HOC* temp;
+				temp = ds_mh.ds[i];
+				ds_mh.ds[i] = ds_mh.ds[j];
+				ds_mh.ds[j] = temp;
+			}
+		}
+	}
+}
+
 // END MON HOC
 
 // BEGIN DS SINH VIEN DANG KY
@@ -950,19 +1083,19 @@ void ShowSingleMonHoc(MON_HOC* mh, int index) {
 		<< setw(15) << mh->STCLT << char(179) << setw(15) << mh->STCTH << char(179);
 }
 // END DS DANG KY
-int CommonShowSvList(AppContext context, char* maLop = NULL) {
-	int total = maLop ? countTotalSvByLop(context.ds_sv, maLop) : context.ds_sv.totalSv;
-	SINH_VIEN** ds_sv = CreateArraySV(total, sizeof(SINH_VIEN));
+int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop = NULL) {
+	int total = maLop ? countTotalSvByLop(ds_sv, maLop) : ds_sv.totalSv;
+	SINH_VIEN** sv = CreateArraySV(total, sizeof(SINH_VIEN));
 	if (maLop != NULL) {
-		ConvertLinkedListSVBylop(context.ds_sv, ds_sv, maLop);// TODO: bug occur here. Need to check and fix
+		ConvertLinkedListSVBylop(ds_sv, sv, maLop);// TODO: bug occur here. Need to check and fix
 	}
 	else {
-		ConvertLinkedListSV(context.ds_sv, ds_sv);
+		ConvertLinkedListSV(ds_sv, sv);
 	}
-	return InDanhSachSinhVien(context.ds_sv, ds_sv, total, 40, 10);
+	return InDanhSachSinhVien(ds_sv, sv, total, 40, 10, positionSubMenu);
 }
 
-void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
+int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 	cout << setfill(' ');
 
 	SetColor(color_black | colorbk_white);
@@ -972,27 +1105,89 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 
 	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int perPage = 5;
-	int totalPage = n / perPage;
+	int perPage = 10;
+	int totalPage = ds_mh.n / perPage;
 
-	if (n % perPage != 0) {
+	if (ds_mh.n % perPage != 0) {
 		totalPage += 1;
 	}
 
 	int key = -1;
 
-	perPage = perPage > n ? n : perPage;
+	perPage = perPage > ds_mh.n ? ds_mh.n : perPage;
 	do {
 		switch (key)
 		{
-		case 1060: {
-
-			//todo ::
-
-
+		case key_F2: {
+			// Prevent remove/update actions when show list students pos = 0
+			if (positionSubMenu != 1 || posActive == -1) break;
+			ConfirmRemove();
+			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
+			if (key == key_Enter && ActionQuit.posStatus == 0) {
+				RemoveMonHoc(ds_mh, ds_mh.ds[posActive + posPrint]->MAMH);
+				UpdateFileDSMonHoc(ds_mh);
+				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
+				return -1;
+			}
+			else {
+				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
+				return -1;
+			}
 			goto paint;
+			break;
 		}
+		case key_F3: {
+			if (positionSubMenu != 1 || posActive == -1) break;
+			// TODO: Init form to update student
+			SetColor(color_darkwhite);
+			string textFields[4] = { "" };
+			int maxTexts[4] = { MAX_MAMH - 1, MAX_TENMH - 1, 4, 4 };
+			textFields[0] = ds_mh.ds[posActive + posPrint]->MAMH;
+			textFields[1] = ds_mh.ds[posActive + posPrint]->TENMH;
+			std::ostringstream stcth, stclt;
+			stcth << ds_mh.ds[posActive + posPrint]->STCTH;
+			stclt << ds_mh.ds[posActive + posPrint]->STCLT;
+			textFields[2] = stclt.str();
+			textFields[3] = stcth.str();
+			bool valid = true;
+			int keyFormUpdate = -1;
+			do
+			{
+				SetColor(color_white | colorbk_green);
+				rectagle(45, 4, 65, 25);
+				SetColor(color_white);
+				keyFormUpdate = DrawFormInputMonHoc(70, 5, 30, textFields, maxTexts, 4, true);
+				if (keyFormUpdate == key_Enter) {
+					if (!CheckInputBoxIsNull(textFields, 4)) {
+						// validate data
+						MON_HOC* mh = new MON_HOC;
+						strcpy_s(mh->MAMH, MAX_MAMH, textFields[0].c_str());
+						strcpy_s(mh->TENMH, MAX_TENMH, textFields[1].c_str());
+						mh->STCLT = atoi(textFields[2].c_str());
+						mh->STCTH = atoi(textFields[3].c_str());
+						UpdateMonHoc(ds_mh, mh);
+						// TODO: need to update to file, after process testing done !
+						UpdateFileDSMonHoc(ds_mh);
 
+						gotoXY(60, 36);
+						cout << "Cap nhat mon hoc thanh cong!";
+						Sleep(1500);
+						clrscr(40, 4, 90, 35, ' ');
+						return keyFormUpdate;
+					}
+					else {
+						gotoXY(60, 150);
+						cout << "Du lieu nhap khong duoc de trong!";
+						valid = false;
+					}
+				}
+				else if (keyFormUpdate == key_esc) {
+					clrscr(40, 4, 90, 35, ' ');
+					return key;
+				}
+			} while (valid == true);
+			break;
+		}
 		case key_Up: {
 			if (posActive > 0) {
 
@@ -1018,7 +1213,7 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 			goto paint;
 		}
 		case key_Down: {
-			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
+			if (posActive < perPage - 1 && posActive + posPrint < ds_mh.n - 1) {
 				if (posActive >= 0) {
 					SetColor(color_darkwhite);
 					gotoXY(x, y + posActive + 1);
@@ -1033,7 +1228,7 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 			}
 		}
 		case key_Right: {
-			if (posPrint + perPage < n) {
+			if (posPrint + perPage < ds_mh.n) {
 				posPrint += perPage;
 				++currentPage;
 				posActive = 0;
@@ -1053,7 +1248,7 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 				   gotoXY(x, y + index + 1);
 				   indexitem = index + posPrint;
 
-				   if (indexitem >= n) break;
+				   if (indexitem >= ds_mh.n) break;
 				   ShowSingleMonHoc(ds_mh.ds[indexitem], indexitem);
 			   }
 
@@ -1064,7 +1259,7 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 				   cout << setw(90) << " ";
 			   }
 
-			   gotoXY(x, y + perPage + 1);
+			   gotoXY(x, y + perPage + 2);
 			   cout << currentPage + 1 << "/" << totalPage;
 			   if (posActive >= 0) {
 				   SetColor(color_green);
@@ -1077,7 +1272,8 @@ void InDanhSachMonHoc(DS_MON_HOC ds_mh, int n, int x, int y) {
 		}
 		key = inputKey();
 	} while (key != key_esc);
-	clrscr(40, 10, 90, 10, ' ');
+	clrscr(40, 10, 90, 30, ' ');
+	return key;
 }
 void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y) {
 	cout << setfill(' ');
@@ -1199,7 +1395,7 @@ void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y) {
 	clrscr(30, 10, 90, 10, ' ');
 
 }
-int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y) {
+int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu) {
 	cout << setfill(' ');
 
 	SetColor(color_black | colorbk_white);
@@ -1210,7 +1406,7 @@ int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x,
 
 	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int perPage = 10;
+	int perPage = 20;
 	int totalPage = n / perPage;
 
 	if (n % perPage != 0) {
@@ -1224,29 +1420,84 @@ int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x,
 		switch (key)
 		{
 		case key_F2: {
-			// Todo: implement remove current student at current position
-			/*gotoXY(40, 2);
-			cout << ds_sv[posActive]->MASV;*/
+			// Prevent remove/update actions when show list students pos = 0
+			if (positionSubMenu != 1 || posActive == -1) break;
 			ConfirmRemove();
 			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
 			if (key == key_Enter && ActionQuit.posStatus == 0) {
-				// TODO: implement remove student action
-				RemoveSvByMSSV(ctx_ds_sv, ds_sv[posActive]->MASV);
-
-
-				clrscr(40, 5, 90, 20, ' '); // xoa tu vi tri form confirm remove
-				return key;
+				RemoveSvByMSSV(ctx_ds_sv, ds_sv[posActive + posPrint]->MASV);
+				//UpdateListStudentToFile(ctx_ds_sv);
+				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
+				return -1;
 			}
 			else {
-				//menuCurrent = &MenuFeatures;
-				//clrscr(50, 5, 40, 14, ' ');
-				clrscr(40, 5, 90, 20, ' '); // xoa tu vi tri form confirm remove
+				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
+				return -1;
 			}
-			//goto paint;
 			break;
 		}
 		case key_F3: {
-			// TODO: init form update
+			if (positionSubMenu != 1 || posActive == -1) break;
+			// TODO: Init form to update student
+			SetColor(color_darkwhite);
+			string textFields[7] = { "" };
+			int maxTexts[7] = { MAX_MALOP - 1, MAX_MASV - 1,
+				MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
+			textFields[0] = ds_sv[posActive + posPrint]->MASV;
+			textFields[1] = ds_sv[posActive + posPrint]->MALOP;
+			textFields[2] = ds_sv[posActive + posPrint]->HO;
+			textFields[3] = ds_sv[posActive + posPrint]->TEN;
+			textFields[4] = ds_sv[posActive + posPrint]->PHAI;
+			textFields[5] = ds_sv[posActive + posPrint]->SDT;
+			std::ostringstream ss;
+			ss << ds_sv[posActive + posPrint]->NAMNHAPHOC;
+			textFields[6] = ss.str();
+			bool valid = true;
+			int keyFormUpdate = -1;
+			do
+			{
+				SetColor(color_white | colorbk_green);
+				rectagle(45, 4, 65, 25);
+				SetColor(color_white);
+				keyFormUpdate = DrawFormInputSinhVien(70, 5, 30, textFields, maxTexts, 7, true);
+				if (keyFormUpdate == key_Enter) {
+					if (!CheckInputBoxIsNull(textFields, 7)) {
+						// validate data
+						SINH_VIEN* sv = new SINH_VIEN;
+						strcpy_s(sv->MASV, MAX_MASV, textFields[0].c_str());
+						strcpy_s(sv->MALOP, MAX_MALOP, textFields[1].c_str());
+						strcpy_s(sv->HO, MAX_HO, textFields[2].c_str());
+						strcpy_s(sv->TEN, MAX_TEN, textFields[3].c_str());
+						strcpy_s(sv->PHAI, MAX_PHAI, textFields[4].c_str());
+						strcpy_s(sv->SDT, MAX_SDT, textFields[5].c_str());
+						sv->NAMNHAPHOC = atoi(textFields[6].c_str());
+						bool exist = CheckExistLop(sv->MALOP);
+						if (!exist) {
+							InsertLopIntoDSLop(sv->MALOP);
+						}
+						UpdateSinhVien(ctx_ds_sv, sv);
+						// TODO: need to update to file, after process testing done !
+						UpdateListStudentToFile(ctx_ds_sv);
+
+						gotoXY(60, 36);
+						cout << "Cap nhat sinh vien thanh cong!";
+						Sleep(1500);
+						clrscr(40, 4, 90, 35, ' ');
+						return keyFormUpdate;
+					}
+					else {
+						gotoXY(60, 36);
+						cout << "Du lieu nhap khong duoc de trong!";
+						Sleep(1500);
+						valid = false;
+						clrscr(40, 4, 90, 35, ' '); // TODO: check when re-draw form
+					}
+				}
+				else if (keyFormUpdate == key_esc) {
+					clrscr(40, 4, 90, 35, ' ');
+					return key;
+				}
+			} while (!valid);
 			break;
 		}
 		case key_Up: {
@@ -1332,7 +1583,7 @@ int InDanhSachSinhVien(DS_SINH_VIEN ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x,
 		}
 		key = inputKey();
 	} while (key != key_esc);
-	clrscr(40, 10, 90, 20, ' ');
+	clrscr(40, 10, 90, 30, ' ');
 	return key;
 }
 #endif // !STRUCTURE_CPP

@@ -10,8 +10,15 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(77,
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(92,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(194,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(194,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(490,8): warning C4101: 's': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(614,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(228,56): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(236,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(238,47): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(242,78): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(243,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(589,8): warning C4101: 's': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(707,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1166,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1167,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(50): warning C4715: 'CheckExistMaLTC': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(731): warning C4715: 'TravelTree': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(806): warning C4715: 'TravelTree': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe
