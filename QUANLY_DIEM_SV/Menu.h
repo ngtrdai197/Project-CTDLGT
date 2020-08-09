@@ -246,10 +246,25 @@ void ProcessConrtol(AppContext& context) {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						InDanhSachLopTinChi(context.ds, context.nLTC, 30, 10);
+						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 30, 10, menuCurrent->posStatus);
 						//delete[] context.ds;
 						//context.nLTC = 0;
 					}
+					break;
+				}
+				case 1: {
+					SetColor(color_darkwhite);
+					/*string maLop[1] = { "" };
+					int maxTexts[1] = { MAX_MALOP - 1 };
+					char cloned[MAX_MALOP];
+					bool exist = false;*/
+					int keyRemove = -1;
+					do
+					{
+						context.nLTC = 0;
+						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 30, 10, menuCurrent->posStatus);
+					} while (keyRemove != key_esc);
 					break;
 				}
 				case 2: {
@@ -292,6 +307,10 @@ void ProcessConrtol(AppContext& context) {
 						}
 					}
 
+					break;
+				}
+				case 3: {
+					// Show list sv by conditions
 					break;
 				}
 				default:

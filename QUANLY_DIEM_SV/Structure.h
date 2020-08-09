@@ -121,6 +121,9 @@ static string mainActions[4] = { "CHUC NANG LOP TIN CHI",
 static string propertySinhVien[7] = {
 	"Ma Sinh Vien", "Ma Lop", "Ho SV", "Ten SV", "Phai", "So Dien Thoai", "Nam Nhap Hoc"
 };
+static string propertyLopTinChi[7] = {
+	"Ma LTC", "Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom", "Max SV", "Min Sv"
+};
 static string propertyMonHoc[4] = {
 	"Ma Mon Hoc", "Ten Mon Hoc", "TC Ly Thuyet" , "TC Thuc Hanh" };
 
@@ -165,12 +168,13 @@ static MenuContent MenuSinhVien = {
 };
 
 static MenuContent MenuLopTinChi = {
-	new MenuItem[3] {
+	new MenuItem[4] {
 	{{3,18,20,2},"In danh sach TC"},
 	{{3,21,20,2},"Xoa or Sua (TC)"},
 	{{3,24,20,2},"Them Lop TC"},
+	{{3,27,20,2},"In danh sach SV"},
 	},
-	 3
+	 4
 };
 static MenuContent MenuDiem = {
 	new MenuItem[2] {
@@ -259,6 +263,7 @@ void RemoveLast(DS_SINH_VIEN& ds_sv);
 void RemoveSvByMSSV(DS_SINH_VIEN& ds_sv, char* massv);
 NODE_SINH_VIEN* Input_Sinh_Vien(DS_SINH_VIEN ds_sv);
 void UpdateSinhVien(DS_SINH_VIEN& ds_sv, SINH_VIEN* sv);
+void SortSinhVienByMSSV(SINH_VIEN* sv[], int n);
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv);
 void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]);
 void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop);
@@ -293,7 +298,7 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 
 int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 // END DS DANG KY
-void InDanhSachLopTinChi(Lop_Tin_Chi* ltc[], int n, int x, int y);
+int InDanhSachLopTinChi(DS_MON_HOC ds_mh,TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu);
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 
