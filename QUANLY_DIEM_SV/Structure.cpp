@@ -952,11 +952,15 @@ char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], in
 			gotoXY(50, y + (i * offset + 1));
 			cout << propertyLopTinChi[i];
 		}
-		// TODO: implement form to search lop tin chi by conditions
-		/*else if (n == 1) {
+		else if (n == 4)// In ds sv theo dieu kien Lop tin chi 
+		{
+			gotoXY(50, y + (i * offset + 1));
+			cout << propertyLopTinChiByConditions[i];
+		}
+		else if (n == 1) {
 			gotoXY(45, y + (i * offset + 1));
 			cout << "Nhap ma lop: ";
-		}*/
+		}
 		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
 	}
 
@@ -980,6 +984,46 @@ char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], in
 
 	} while (key != key_Enter);
 	return key;
+}
+char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n) {
+
+	int offset = 3;
+
+	for (int i = 0; i < n; i++)
+	{
+		gotoXY(50, y + (i * offset + 1));
+		cout << propertyLopTinChiByConditions[i];
+		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
+	}
+
+	int indexCurrent = 0;
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[indexCurrent], x, y + (indexCurrent * offset),
+			width, maxText[indexCurrent], false, 
+			(indexCurrent < 2) ? true : false, false, false); // <2 => ma mon hoc, nien khoa =) text
+		if (key == key_tab) {
+			indexCurrent = (indexCurrent + 1) % n;
+		}
+		else if (key == key_esc) {
+			return key;
+		}
+	} while (key != key_Enter);
+	return key;
+}
+Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions) {
+	for (int i = 0; i < n; i++)
+	{
+		if (_strcmpi(ltc[i]->MAMH, conditions.ma_mon_hoc) == 0
+			&& _strcmpi(ltc[i]->NIEN_KHOA, conditions.nien_khoa) == 0
+			&& ltc[i]->HOC_KY == conditions.hoc_ky && ltc[i]->NHOM == conditions.nhom
+			) {
+			return ltc[i];
+		}
+	}
+	return NULL;
 }
 // ===== END DS LOP TIN CHI =====
 
@@ -1116,6 +1160,7 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk) {
 		cout << "Diem:" << p->DIEM << endl;
 	}
 }
+
 // END DS SINH VIEN DANG KY
 
 void ShowSingleLTC(Lop_Tin_Chi* ltc, int index) {
@@ -1210,7 +1255,7 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 			do
 			{
 				SetColor(color_white | colorbk_green);
-				rectagle(45, 4, 65, 25);
+				rectagle(45, 4, 65, 15);
 				SetColor(color_white);
 				keyFormUpdate = DrawFormInputMonHoc(70, 5, 30, textFields, maxTexts, 4, true);
 				if (keyFormUpdate == key_Enter) {
@@ -1225,7 +1270,7 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 						// TODO: need to update to file, after process testing done !
 						UpdateFileDSMonHoc(ds_mh);
 
-						gotoXY(60, 36);
+						gotoXY(60, 18);
 						cout << "Cap nhat mon hoc thanh cong!";
 						Sleep(1500);
 						valid = true;
@@ -1233,7 +1278,7 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 						return keyFormUpdate;
 					}
 					else {
-						gotoXY(60, 36);
+						gotoXY(60, 18);
 						cout << "Du lieu nhap khong duoc de trong!";
 						Sleep(1500);
 						valid = false;
@@ -1348,7 +1393,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 	int posPrint = 0;
 	int perPage = 5;
 	int totalPage = n / perPage;
-
+	int selected = posActive + posPrint;
 	if (n % perPage != 0) {
 		totalPage += 1;
 	}
@@ -1382,8 +1427,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 			// TODO: Init form to update lop tin chi
 			SetColor(color_darkwhite);
 			string textFields[7] = { "" };
-			int maxTexts[7] = { 3, MAX_MAMH - 1,
-				MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
+			int maxTexts[7] = { 3, MAX_MAMH - 1, MAX_NIENKHOA - 1, 3, 3, 3, 3 };
 			textFields[1] = ltc[posActive + posPrint]->MAMH;
 			textFields[2] = ltc[posActive + posPrint]->NIEN_KHOA;
 
@@ -1418,7 +1462,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 						ltc[posActive + posPrint]->sv_min = atoi(textFields[6].c_str());
 						bool exist = CheckExistMaMH(ds_mh, ltc[posActive + posPrint]->MAMH);
 						if (!exist) {
-							gotoXY(60, 36);
+							gotoXY(60, 27);
 							cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
 							Sleep(1500);
 							valid = false;
@@ -1427,7 +1471,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 							UpdateNodeOfTree(tree, ltc[posActive + posPrint]);
 							UpdateListLopTinChiToFile(ltc, n);
 
-							gotoXY(60, 36);
+							gotoXY(60, 27);
 							cout << "Cap nhat lop tin chi thanh cong!";
 							Sleep(1500);
 							clrscr(40, 4, 90, 35, ' ');
@@ -1619,7 +1663,7 @@ int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x
 						// TODO: need to update to file, after process testing done !
 						UpdateListStudentToFile(ctx_ds_sv);
 
-						gotoXY(60, 36);
+						gotoXY(60, 27);
 						cout << "Cap nhat sinh vien thanh cong!";
 						Sleep(1500);
 						clrscr(40, 4, 90, 35, ' ');
@@ -1627,7 +1671,7 @@ int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x
 						return keyFormUpdate;
 					}
 					else {
-						gotoXY(60, 36);
+						gotoXY(60, 27);
 						cout << "Du lieu nhap khong duoc de trong!";
 						Sleep(1500);
 						valid = false;

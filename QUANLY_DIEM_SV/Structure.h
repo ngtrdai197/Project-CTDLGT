@@ -89,6 +89,14 @@ struct ds_dang_ky
 typedef struct ds_dang_ky DS_SV_DANG_KY;
 // ===== END DS SV DANG KY =====
 
+struct search_sv_dky_ltc {
+	char ma_mon_hoc[MAX_MAMH];
+	char nien_khoa[MAX_NIENKHOA];
+	int hoc_ky;
+	int nhom;
+};
+typedef struct search_sv_dky_ltc Search_SV_DK_LTC;
+
 
 // ===== BEGIN LOP TIN CHI =====
 struct lop_tin_chi
@@ -123,6 +131,9 @@ static string propertySinhVien[7] = {
 };
 static string propertyLopTinChi[7] = {
 	"Ma LTC", "Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom", "Max SV", "Min Sv"
+};
+static string propertyLopTinChiByConditions[4] = {
+	"Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom"
 };
 static string propertyMonHoc[4] = {
 	"Ma Mon Hoc", "Ten Mon Hoc", "TC Ly Thuyet" , "TC Thuc Hanh" };
@@ -176,6 +187,7 @@ static MenuContent MenuLopTinChi = {
 	},
 	 4
 };
+
 static MenuContent MenuDiem = {
 	new MenuItem[2] {
 	{{3,18,20,2},"Nhap diem"},
@@ -280,6 +292,9 @@ void RemoveNodeOfTree(TREE& t, int ma);
 void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data);
 Lop_Tin_Chi* InputUpdateTree();
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
+char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
+char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n);
+Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
 // ===== END DS LOP TIN CHI =====
 
 // MON HOC
@@ -298,7 +313,7 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 
 int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 // END DS DANG KY
-int InDanhSachLopTinChi(DS_MON_HOC ds_mh,TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu);
+int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu);
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 

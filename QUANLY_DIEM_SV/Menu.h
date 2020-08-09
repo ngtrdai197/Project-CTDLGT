@@ -245,19 +245,14 @@ void ProcessConrtol(AppContext& context) {
 				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
+						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 30, 10, menuCurrent->posStatus);
-						//delete[] context.ds;
-						//context.nLTC = 0;
 					}
 					break;
 				}
 				case 1: {
 					SetColor(color_darkwhite);
-					/*string maLop[1] = { "" };
-					int maxTexts[1] = { MAX_MALOP - 1 };
-					char cloned[MAX_MALOP];
-					bool exist = false;*/
 					int keyRemove = -1;
 					do
 					{
@@ -306,11 +301,71 @@ void ProcessConrtol(AppContext& context) {
 							break;
 						}
 					}
-
 					break;
 				}
 				case 3: {
 					// Show list sv by conditions
+					Search_SV_DK_LTC conditions;
+					string Texts[4] = { "" };
+					int maxTexts[4] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3 };
+
+					SetColor(color_white | colorbk_green);
+					rectagle(45, 4, 65, 15);
+					SetColor(color_white);
+					bool valid = true;
+					do
+					{
+						key = DrawFormInputSearchLTC(70, 5, 30, Texts, maxTexts, 4);
+						if (key == key_Enter) {
+							if (!CheckInputBoxIsNull(Texts, 4)) {
+								strcpy_s(conditions.ma_mon_hoc, MAX_MAMH, Texts[0].c_str());
+								strcpy_s(conditions.nien_khoa, MAX_NIENKHOA, Texts[1].c_str());
+								conditions.hoc_ky = atoi(Texts[2].c_str());
+								conditions.nhom = atoi(Texts[3].c_str());
+								context.nLTC = 0;
+								ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+								Lop_Tin_Chi* single = FindLTCByConditions(context.ds, context.nLTC, conditions);
+								if (single != NULL) {
+									DS_SINH_VIEN ds_sv_dky;
+									Init_DS_Sinh_Vien(ds_sv_dky);
+
+									for (SV_DANG_KY* p = single->ds_sv_dky->pHead; p != NULL; p = p->pNext)
+									{
+										for (NODE_SINH_VIEN* k = context.ds_sv.pHead; k != NULL; k = k->pNext)
+										{
+											if (_strcmpi(p->MASV, k->data.MASV) == 0) {
+												NODE_SINH_VIEN* temp = new NODE_SINH_VIEN;
+												temp->data = k->data;
+												temp->pNext = NULL;
+												InsertAndSortSvIntoDS(ds_sv_dky, temp);
+											}
+										}
+									}
+									clrscr(40, 4, 90, 35, ' ');
+									if (ds_sv_dky.totalSv != 0) {
+										key = CommonShowSvList(ds_sv_dky, menuCurrent->posStatus, NULL);
+										if (key == key_esc) break;
+									}
+								}
+								else {
+									gotoXY(60, 18);
+									cout << "Khong tim thay du lieu!";
+									Sleep(1500);
+									valid = false;
+								}
+							}
+							else {
+								gotoXY(60, 18);
+								cout << "Du lieu nhap khong duoc de trong!";
+								Sleep(1500);
+								valid = false;
+							}
+						}
+						else if (key == key_esc) {
+							clrscr(40, 4, 90, 35, ' ');
+							break;
+						}
+					} while (!valid);
 					break;
 				}
 				default:
