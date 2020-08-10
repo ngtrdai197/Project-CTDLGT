@@ -132,8 +132,14 @@ static string propertySinhVien[7] = {
 static string propertyLopTinChi[7] = {
 	"Ma LTC", "Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom", "Max SV", "Min Sv"
 };
+static string propertyInsertLopTinChi[6] = {
+	"Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom", "Max SV", "Min Sv"
+};
 static string propertyLopTinChiByConditions[4] = {
 	"Ma Mon Hoc", "Nien Khoa", "Hoc Ky", "Nhom"
+};
+static string propertySVDangKyLopTinChiByConditions[2] = {
+	"Nien Khoa", "Hoc Ky"
 };
 static string propertyMonHoc[4] = {
 	"Ma Mon Hoc", "Ten Mon Hoc", "TC Ly Thuyet" , "TC Thuc Hanh" };
@@ -152,13 +158,14 @@ struct MenuContent {
 	int posStatus = 0;
 };
 static MenuContent MenuFeatures = {
-	new MenuItem[4] {
+	new MenuItem[5] {
 	{{3,3,20,2},"Lop Tin Chi"},
 	{{3,6,20,2},"SinhVien"},
 	{{3,9,20,2},"Mon Hoc"},
-	{{3,12,20,2},"Diem"}
+	{{3,12,20,2},"Diem"},
+	{{3,15,20,2},"Dang Ky LTC"}
 	},
-	 4
+	 5
 };
 
 static MenuContent MenuMonHoc = {
@@ -209,7 +216,7 @@ static MenuContent ActionQuit = {
 struct AppContext {
 	TREE tree;
 	DS_SINH_VIEN ds_sv;
-	Lop_Tin_Chi* ds[100];
+	Lop_Tin_Chi** ds;
 	int nLTC;
 	DS_MON_HOC ds_mh;
 	DS_SV_DANG_KY ds_sv_dky;
@@ -264,7 +271,7 @@ void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk);
 void UpdateListSvToLopTC(Lop_Tin_Chi*& ds, int totalLopTc, DS_SINH_VIEN& ds_sv_original, char* masvDKLTC[]);
 void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n);
 void InsertNodeIntoTree(TREE& tree, Lop_Tin_Chi* data);
-void ReadListLopTinChi(TREE& tree);
+void ReadListLopTinChi(TREE& tree, int& nLTC);
 // END HANDLE FILES
 
 // SINH VIEN
@@ -293,8 +300,13 @@ void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data);
 Lop_Tin_Chi* InputUpdateTree();
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
 char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
-char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n);
+char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isStudent);
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
+void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu);
+void Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu);
+Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y);
+int totalLTC_SV_Dky(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky);
+Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
 // ===== END DS LOP TIN CHI =====
 
 // MON HOC

@@ -219,6 +219,11 @@ void ProcessConrtol(AppContext& context) {
 					menuCurrent = &MenuDiem;
 					break;
 				}
+				case 4: {
+					// TODO: Sinh Vien Dang Ky Lop Tin Chi
+					Search_SV_Dky_LTCByConditions(context, menuCurrent->posStatus);
+					break;
+				}
 				default:
 					break;
 				}
@@ -245,9 +250,10 @@ void ProcessConrtol(AppContext& context) {
 				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
+						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 30, 10, menuCurrent->posStatus);
+						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus);
 					}
 					break;
 				}
@@ -256,9 +262,10 @@ void ProcessConrtol(AppContext& context) {
 					int keyRemove = -1;
 					do
 					{
+						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 30, 10, menuCurrent->posStatus);
+						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus);
 					} while (keyRemove != key_esc);
 					break;
 				}
@@ -266,9 +273,10 @@ void ProcessConrtol(AppContext& context) {
 					string Texts[6] = { "" };
 					int maxTexts[6] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3,3,3 };
 					int key = -1;
+					SetColor(color_darkwhite);
 					while (key != key_esc)
 					{
-						key = DrawFormInput(115, 10, 30, Texts, maxTexts, 6);
+						key = DrawFormInputLTC(70, 5, 30, Texts, maxTexts, 6, false);
 						if (key == key_Enter) {
 							if (!CheckInputBoxIsNull(Texts, 6)) {
 								// validate data
@@ -282,90 +290,45 @@ void ProcessConrtol(AppContext& context) {
 								p->MALOPTC = RandomIDLTC(context.tree);
 								p->ds_sv_dky = NULL;
 								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
+									context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
 									if (!exist) {
 										InsertNodeIntoTree(context.tree, p);
+										context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 										context.nLTC = 0;
 										ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 										UpdateListLopTinChiToFile(context.ds, context.nLTC);
-										menuCurrent->posStatus = 0;
+										delete p;
+										for (int i = 0; i < 6; i++)
+										{
+											Texts[i].clear();
+										}
+										gotoXY(60, 36);
+										cout << "Them lop tin chi thanh cong !";
+									}
+									else {
+										gotoXY(60, 36);
+										cout << "Thong tin lop tin chi da ton tai. Kiem tra lai !";
 									}
 								}
-								delete p;
+								else {
+									gotoXY(60, 36);
+									cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
+								}
 							}
 							else {
-								gotoXY(99, 11);
+								gotoXY(60, 36);
 								cout << "Du lieu nhap khong duoc de trong!";
 							}
-							break;
 						}
 					}
+					clrscr(50, 5, 90, 35, ' ');
 					break;
 				}
 				case 3: {
 					// Show list sv by conditions
-					Search_SV_DK_LTC conditions;
-					string Texts[4] = { "" };
-					int maxTexts[4] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3 };
-
-					SetColor(color_white | colorbk_green);
-					rectagle(45, 4, 65, 15);
-					SetColor(color_white);
-					bool valid = true;
-					do
-					{
-						key = DrawFormInputSearchLTC(70, 5, 30, Texts, maxTexts, 4);
-						if (key == key_Enter) {
-							if (!CheckInputBoxIsNull(Texts, 4)) {
-								strcpy_s(conditions.ma_mon_hoc, MAX_MAMH, Texts[0].c_str());
-								strcpy_s(conditions.nien_khoa, MAX_NIENKHOA, Texts[1].c_str());
-								conditions.hoc_ky = atoi(Texts[2].c_str());
-								conditions.nhom = atoi(Texts[3].c_str());
-								context.nLTC = 0;
-								ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-								Lop_Tin_Chi* single = FindLTCByConditions(context.ds, context.nLTC, conditions);
-								if (single != NULL) {
-									DS_SINH_VIEN ds_sv_dky;
-									Init_DS_Sinh_Vien(ds_sv_dky);
-
-									for (SV_DANG_KY* p = single->ds_sv_dky->pHead; p != NULL; p = p->pNext)
-									{
-										for (NODE_SINH_VIEN* k = context.ds_sv.pHead; k != NULL; k = k->pNext)
-										{
-											if (_strcmpi(p->MASV, k->data.MASV) == 0) {
-												NODE_SINH_VIEN* temp = new NODE_SINH_VIEN;
-												temp->data = k->data;
-												temp->pNext = NULL;
-												InsertAndSortSvIntoDS(ds_sv_dky, temp);
-											}
-										}
-									}
-									clrscr(40, 4, 90, 35, ' ');
-									if (ds_sv_dky.totalSv != 0) {
-										key = CommonShowSvList(ds_sv_dky, menuCurrent->posStatus, NULL);
-										if (key == key_esc) break;
-									}
-								}
-								else {
-									gotoXY(60, 18);
-									cout << "Khong tim thay du lieu!";
-									Sleep(1500);
-									valid = false;
-								}
-							}
-							else {
-								gotoXY(60, 18);
-								cout << "Du lieu nhap khong duoc de trong!";
-								Sleep(1500);
-								valid = false;
-							}
-						}
-						else if (key == key_esc) {
-							clrscr(40, 4, 90, 35, ' ');
-							break;
-						}
-					} while (!valid);
+					Search_GV_LTCByConditions(context, menuCurrent->posStatus);
 					break;
 				}
 				default:
