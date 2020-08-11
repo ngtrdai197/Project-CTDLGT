@@ -109,7 +109,7 @@ struct lop_tin_chi
 	int sv_max;
 	int sv_min;
 	int totalSvDK = 0;
-	DS_SV_DANG_KY* ds_sv_dky;
+	DS_SV_DANG_KY ds_sv_dky;
 };
 typedef struct lop_tin_chi Lop_Tin_Chi;
 struct node_lop_tin_chi {
@@ -252,7 +252,7 @@ void DrawListMenu(MenuContent& menucontent, int color);
 void ConfirmRemove();
 void ConfirmQuit();
 int ControlMenu(MenuContent* menuContent, int defaultColor, int activateColor);
-int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu, int defaultColor, int activateColor);
+int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu);
 // ===== END HELPER =====
 
 // HANDLE FILES
@@ -305,10 +305,14 @@ bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
 char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
 char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isStudent);
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
+Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
+Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total, char* masv);
 void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu);
 int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu);
+bool CheckSvExistLTC(Lop_Tin_Chi* ltc, char* masv);
 Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y);
-int totalLTC_SV_Dky(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky);
+int total_LTC_SV_Can_Register(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky);
+int total_LTC_SV_Registered(Lop_Tin_Chi* ltc[], int n, char* masv);
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
 // ===== END DS LOP TIN CHI =====
 
@@ -325,10 +329,10 @@ char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[],
 void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_sv_dk, SV_DANG_KY* sv_dky);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
-
 int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 // END DS DANG KY
-int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu);
+
+int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert);
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 

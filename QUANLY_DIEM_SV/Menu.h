@@ -221,7 +221,7 @@ void ProcessConrtol(AppContext& context) {
 				}
 				case 4: {
 					// TODO: Sinh Vien Dang Ky Lop Tin Chi
-					key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus, color_darkwhite, color_green);
+					key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus);
 					if (key == key_esc) {
 						menuCurrent->posStatus;
 						break;
@@ -256,7 +256,7 @@ void ProcessConrtol(AppContext& context) {
 						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus);
+						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
 					}
 					break;
 				}
@@ -268,7 +268,7 @@ void ProcessConrtol(AppContext& context) {
 						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus);
+						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
 					} while (keyRemove != key_esc);
 					break;
 				}
@@ -291,7 +291,7 @@ void ProcessConrtol(AppContext& context) {
 								p->sv_max = stoi(Texts[4]);
 								p->sv_min = stoi(Texts[5]);
 								p->MALOPTC = RandomIDLTC(context.tree);
-								p->ds_sv_dky = NULL;
+								p->ds_sv_dky.pHead = NULL;
 								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
 									context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);

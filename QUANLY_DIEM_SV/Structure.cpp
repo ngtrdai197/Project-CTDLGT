@@ -316,7 +316,6 @@ int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, in
 	int key = -1;
 	DrawListMenu(*menuContent, defaultColor);
 	DrawEachButtonOfAction(menuContent->menus[pos], activateColor);
-
 	do
 	{
 		key = inputKey();
@@ -349,42 +348,10 @@ int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, in
 	} while (key != key_esc && key != key_Enter);
 	return key;
 }
-int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu, int defaultColor, int activateColor) {
-	int pos = 0;
+int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu) {
 	int key = -1;
 	key = Search_SV_Dky_LTCByConditions(context, positionSubmenu);
 	if (key == key_esc) return key;
-	do
-	{
-		//key = inputKey();
-		switch (key)
-		{
-		case key_Up: {
-			/*if (pos == 0) {
-				pos = menuContent->n;
-			}
-			pos -= 1;*/
-			goto paint;
-		}
-		case key_tab:
-		case key_Down: {
-			/*if (pos == menuContent->n - 1) {
-				pos = -1;
-			}
-			pos += 1;*/
-			goto paint;
-		}
-		case key_esc: {
-			return key;
-		};
-		default:
-			break;
-		paint: {
-			//menuContent->posStatus = pos;
-			}
-		}
-
-	} while (key != key_esc && key != key_Enter);
 	return key;
 }
 // ===== END HELPER =====
@@ -587,10 +554,9 @@ void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 	fileOut << n << endl;
 	for (int i = 0; i < n; i++)
 	{
-		if (ds[i]->ds_sv_dky != NULL && ds[i]->totalSvDK != 0) {
-
+		if (ds[i]->ds_sv_dky.pHead != NULL && ds[i]->totalSvDK != 0) {
 			string masvDKLTC = "";
-			for (SV_DANG_KY* p = ds[i]->ds_sv_dky->pHead; p != NULL; p = p->pNext) {
+			for (SV_DANG_KY* p = ds[i]->ds_sv_dky.pHead; p != NULL; p = p->pNext) {
 				std::ostringstream ss; // conver float to string
 				ss << p->DIEM;
 				masvDKLTC = masvDKLTC + "{" + (string)p->MASV + "," + ss.str() + "}";
@@ -643,9 +609,7 @@ void ReadListLopTinChi(TREE& t, int& nLTC) {
 		fileIn >> data->sv_min;
 		fileIn.ignore(1);
 
-		DS_SV_DANG_KY* ds_dky = new DS_SV_DANG_KY;
-		Init_DS_Dang_Ky(*ds_dky);
-		data->ds_sv_dky = ds_dky;
+		Init_DS_Dang_Ky(data->ds_sv_dky);
 		fileIn >> data->totalSvDK;
 
 		if (data->totalSvDK > 0) {
@@ -657,7 +621,7 @@ void ReadListLopTinChi(TREE& t, int& nLTC) {
 				fileIn.getline(p->MASV, MAX_MASV, ',');
 				fileIn >> p->DIEM;
 				fileIn.ignore(2);
-				InsertLastDSDKY(*ds_dky, p);
+				InsertLastDSDKY(data->ds_sv_dky, p);
 			}
 		}
 		fileIn.ignore(1);
@@ -867,7 +831,8 @@ void InsertLopTCIntoTree(TREE& tree) {
 	cout << "Nhap sl sinh vien max: "; cin >> p->sv_max;
 	cout << "Nhap sl sinh vien min: "; cin >> p->sv_min;
 	cout << "Nhap nhom:"; cin >> p->NHOM;
-	p->ds_sv_dky = NULL;
+	p->ds_sv_dky.pHead = NULL;
+	p->ds_sv_dky.pTail = NULL;
 	InsertNodeIntoTree(tree, p);
 }
 void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
@@ -1069,7 +1034,7 @@ Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y) {
 	}
 	return ltc;
 }
-int totalLTC_SV_Dky(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky) {
+int total_LTC_SV_Can_Register(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky) {
 	int count = 0;
 	for (int i = 0; i < n; i++) {
 		if (_strcmpi(ltc[i]->NIEN_KHOA, nienkhoa) == 0
@@ -1079,8 +1044,20 @@ int totalLTC_SV_Dky(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky) {
 	}
 	return count;
 }
+int total_LTC_SV_Registered(Lop_Tin_Chi* ltc[], int n, char* masv) {
+	int count = 0;
+	for (int i = 0; i < n; i++) {
+		for (SV_DANG_KY* p = ltc[i]->ds_sv_dky.pHead; p != NULL; p = p->pNext)
+		{
+			if ((_strcmpi(p->MASV, masv) == 0)) {
+				count++;
+			}
+		}
+	}
+	return count;
+}
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky) {
-	int result = totalLTC_SV_Dky(ltc, n, nienkhoa, hoc_ky);
+	int result = total_LTC_SV_Can_Register(ltc, n, nienkhoa, hoc_ky);
 	if (result == 0) return NULL;
 	Lop_Tin_Chi** ltcSvDky = CreateArrayLopTinChi(result, sizeof(Lop_Tin_Chi));
 	for (int i = 0; i < n; i++) {
@@ -1088,6 +1065,21 @@ Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, ch
 			&& ltc[i]->HOC_KY == hoc_ky) {
 			ltcSvDky[total] = ltc[i];
 			total++;
+		}
+	}
+	return ltcSvDky;
+}
+Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total, char* masv) {
+	int result = total_LTC_SV_Registered(ltc, n, masv);
+	if (result == 0) return NULL;
+	Lop_Tin_Chi** ltcSvDky = CreateArrayLopTinChi(result, sizeof(Lop_Tin_Chi));
+	for (int i = 0; i < n; i++) {
+		for (SV_DANG_KY* p = ltc[i]->ds_sv_dky.pHead; p != NULL; p = p->pNext)
+		{
+			if ((_strcmpi(p->MASV, masv) == 0)) {
+				ltcSvDky[total] = ltc[i];
+				total++;
+			}
 		}
 	}
 	return ltcSvDky;
@@ -1131,7 +1123,7 @@ void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 					DS_SINH_VIEN ds_sv_dky;
 					Init_DS_Sinh_Vien(ds_sv_dky);
 
-					for (SV_DANG_KY* p = single->ds_sv_dky->pHead; p != NULL; p = p->pNext)
+					for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext)
 					{
 						for (NODE_SINH_VIEN* k = context.ds_sv.pHead; k != NULL; k = k->pNext)
 						{
@@ -1204,14 +1196,26 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 						gotoXY(55, 3);
 						SetColor(color_darkwhite);
 						cout << "============ DANH SACH LOP TIN CHI DANG KY ============";
-						key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTC, total, 40, 5, positionSubmenu);
+						key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTC, total, 40, 5, positionSubmenu, true, true);
 						// TODO: catch key tab => move pointer down list ltc sv registed
-						if (key == key_tab) {
+						if (key == key_tab || key == key_F1) {
 							// TODO: to do stuff
-							gotoXY(53, 28);
+							gotoXY(53, 23);
 							SetColor(color_darkwhite);
+							// TODO: temporary
+							string s = "N15DCCN066";
+							char masv[12];
+							strcpy_s(masv, 12, s.c_str());
 							cout << "============ DANH SACH LOP TIN CHI DA DANG KY ============";
-							key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTC, total, 40, 30, positionSubmenu);
+							do
+							{
+								// END
+								int totalRegitered = 0;
+								Lop_Tin_Chi** arrayLTCRegistered = TimLopTinChiSinhVienDaDangKy(
+									context.ds, context.nLTC,
+									totalRegitered, masv);
+								key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTCRegistered, totalRegitered, 40, 25, positionSubmenu, true, false);
+							} while (key != key_tab);
 						}
 						if (key == key_esc) {
 							// ConfirmQuit(); TODO: confirm to quit registration ltc
@@ -1247,6 +1251,15 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 			return key;
 		}
 	} while (!valid);
+}
+bool CheckSvExistLTC(Lop_Tin_Chi* ltc, char* masv) {
+	for (SV_DANG_KY* p = ltc->ds_sv_dky.pHead; p != NULL; p = p->pNext)
+	{
+		if ((strcpy_s(p->MASV, masv) == 0)) {
+			return true;
+		}
+	}
+	return false;
 }
 // ===== END DS LOP TIN CHI =====
 
@@ -1381,6 +1394,71 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk) {
 	for (SV_DANG_KY* p = ds_dk.pHead; p != NULL; p = p->pNext) {
 		cout << "Ma sv:" << p->MASV << endl;
 		cout << "Diem:" << p->DIEM << endl;
+	}
+}
+bool isEmptyDS_Dang_Ky(DS_SV_DANG_KY ds_dk)
+{
+	if (ds_dk.pHead == NULL && ds_dk.pTail == NULL)
+		return true;
+	return false;
+}
+void Remove_SV_Dang_Dky_First(DS_SV_DANG_KY& ds_dk)
+{
+	SV_DANG_KY* p;
+	if (ds_dk.pHead == NULL)
+		return;
+
+	p = ds_dk.pHead;
+	ds_dk.pHead = p->pNext;
+	delete p;
+}
+void Remove_SV_Dang_Dky_Last(DS_SV_DANG_KY& ds_dk)
+{
+	if (ds_dk.pHead == NULL)
+		return;
+
+	if (ds_dk.pHead->pNext == NULL)
+	{
+		Remove_SV_Dang_Dky_First(ds_dk);
+		return;
+	}
+	for (SV_DANG_KY* k = ds_dk.pHead; k != NULL; k = k->pNext)
+	{
+		if (k->pNext == ds_dk.pTail)
+		{
+			delete ds_dk.pTail;
+			k->pNext = NULL;
+			ds_dk.pTail = k;
+			return;
+		}
+	}
+}
+int RemoveSV_Dang_Ky_ByMSSV(DS_SV_DANG_KY& ds_sv_dky, char* massv)
+{
+	if (isEmptyDS_Dang_Ky(ds_sv_dky))
+	{
+		return -1;
+	}
+	if (_strcmpi(ds_sv_dky.pHead->MASV, massv) == 0)
+	{
+		Remove_SV_Dang_Dky_First(ds_sv_dky);
+		return 1;
+	}
+	if (_strcmpi(ds_sv_dky.pTail->MASV, massv) == 0)
+	{
+		Remove_SV_Dang_Dky_Last(ds_sv_dky);
+		return 1;
+	}
+	SV_DANG_KY* g = new SV_DANG_KY;
+	for (SV_DANG_KY* k = ds_sv_dky.pHead; k != NULL; k = k->pNext)
+	{
+		if (_strcmpi(k->MASV, massv) == 0)
+		{
+			g->pNext = k->pNext;
+			delete k;
+			return 1;
+		}
+		g = k;
 	}
 }
 
@@ -1601,7 +1679,7 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 	clrscr(40, 10, 90, 30, ' ');
 	return key;
 }
-int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu) {
+int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert) {
 	cout << setfill(' ');
 
 	SetColor(color_black | colorbk_white);
@@ -1624,12 +1702,50 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 	int key = -1;
 
 	perPage = perPage > n ? n : perPage;
+	int prePositionSelected = -1;
 	do {
 		switch (key)
 		{
 		case key_tab: {
 			posActive = -1;
 			return key;
+		}
+		case key_F1: {
+			// TODO: Xử lý việc sinh viên đăng ký lớp tín chỉ
+			if (isStudent) {
+				Lop_Tin_Chi* node;
+				node = posActive + posPrint > -1 ? ltc[posActive + posPrint]: NULL;
+				SV_DANG_KY* sv_dk = new SV_DANG_KY;
+				strcpy_s(sv_dk->MASV, MAX_MASV, "N15DCCN066");
+				if (isInsert && node != NULL) {
+					// N15DCCN066 ma sv test
+					bool exist = CheckSvExistLTC(node, sv_dk->MASV);
+					if (!exist) {
+						sv_dk->DIEM = -1;
+						InsertLastDSDKY(node->ds_sv_dky, sv_dk);
+						ltc[posActive + posPrint]->totalSvDK++;
+						//UpdateListLopTinChiToFile(ltc, n);
+						return key;
+					}
+				}
+				else if (!isInsert && node != NULL) {
+					// TODO: remove sv inside ltc
+					int result = RemoveSV_Dang_Ky_ByMSSV(node->ds_sv_dky, sv_dk->MASV);
+					if (result == -1) {
+						gotoXY(55, 35);
+						cout << "Danh sach dang rong. Khong the thuc hien chuc nang nay!";
+					}
+					else {
+						gotoXY(60, 35);
+						cout << "Xoa lop tin chi thanh cong!";
+						node->totalSvDK--;
+						clrscr(40, 25, 100, 15, ' ');
+						return key;
+					}
+					break;
+				}
+			}
+			break;
 		}
 		case key_F2: {
 			// Prevent remove/update actions when show list ltc pos = 0
@@ -1728,6 +1844,14 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 			} while (!valid);
 			break;
 		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				--currentPage;
+				posActive = perPage - 1;
+			}
+			goto paint;
+		}
 		case key_Up: {
 			if (posActive > 0) {
 
@@ -1743,14 +1867,6 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 				ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
 				break;
 			}
-		}
-		case key_Left: {
-			if (posPrint - perPage >= 0) {
-				posPrint -= perPage;
-				--currentPage;
-				posActive = perPage - 1;
-			}
-			goto paint;
 		}
 		case key_Down: {
 			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
