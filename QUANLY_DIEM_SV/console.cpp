@@ -6,7 +6,18 @@
 #endif
 
 static HANDLE whandConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
+void RemoveScrollbar()
+{
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	GetConsoleScreenBufferInfo(handle, &info);
+	COORD new_size =
+	{
+		info.srWindow.Right - info.srWindow.Left + 1,
+		info.srWindow.Bottom - info.srWindow.Top + 1
+	};
+	SetConsoleScreenBufferSize(handle, new_size);
+}
 int gettxtColor()
 {
 	CONSOLE_SCREEN_BUFFER_INFO cisb;

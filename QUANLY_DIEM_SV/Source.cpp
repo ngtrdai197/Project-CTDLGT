@@ -12,6 +12,7 @@ int main()
 	//SetColor(bk_blue | red);
 	//string a = openLogin();
 	//if (a.length() > 0) {
+	RemoveScrollbar();
 	DrawMainLayout("");
 	ProcessConrtol(context);
 	return 0;

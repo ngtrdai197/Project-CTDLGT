@@ -58,8 +58,12 @@
 #define key_F3		1061
 
 
+void RemoveScrollbar();
+
 int gettxtColor();
+
 void SetColor(int color);
+
 void WriteBlockChar(CHAR_INFO* charater,
 	SHORT row, SHORT col,
 	SHORT x, SHORT y);

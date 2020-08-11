@@ -221,8 +221,11 @@ void ProcessConrtol(AppContext& context) {
 				}
 				case 4: {
 					// TODO: Sinh Vien Dang Ky Lop Tin Chi
-					Search_SV_Dky_LTCByConditions(context, menuCurrent->posStatus);
-					break;
+					key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus, color_darkwhite, color_green);
+					if (key == key_esc) {
+						menuCurrent->posStatus;
+						break;
+					}
 				}
 				default:
 					break;
