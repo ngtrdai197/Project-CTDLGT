@@ -8,12 +8,12 @@ int main()
 	ReadListLopTinChi(context.tree, context.nLTC);
 	ReadFileSinhVien(context.ds_sv);
 	Read_File_MonHoc(context.ds_mh);
-	srand(time(NULL));
-	//SetColor(bk_blue | red);
-	//string a = openLogin();
-	//if (a.length() > 0) {
 	RemoveScrollbar();
-	DrawMainLayout("");
-	ProcessConrtol(context);
+	srand(time(NULL));
+	openLogin(context);
+	if (context.currentUser != NULL) {
+		DrawMainLayout("");
+		ProcessConrtol(context);
+	}
 	return 0;
 }

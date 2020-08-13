@@ -4,7 +4,7 @@
 #include "Structure.h"
 
 
-string openLogin() {
+void openLogin(AppContext& context) {
 	rectagle(40, 10, 50, 15);
 	gotoXY(45, 13);
 	cout << "Username";
@@ -18,7 +18,6 @@ string openLogin() {
 	string auth[2];
 	int pos = 0;
 	int key = -1;
-	string masv = "";
 	do {
 		key = inputKey();
 		switch (key)
@@ -51,9 +50,11 @@ string openLogin() {
 			break;
 		}
 		case key_Enter: {
-			if (auth[0] == "sv" && auth[1] == "sv") {
-				masv = auth[0];
-				return masv;
+			char clone[MAX_MASV];
+			strcpy_s(clone, MAX_MASV, auth[0].c_str());
+			if (CheckExistMSSV(context.ds_sv, clone) && auth[1] == "123") {
+				strcpy_s(context.currentUser, MAX_MASV, clone);
+				return;
 			}
 			else {
 				gotoXY(47, 24);
@@ -70,21 +71,18 @@ string openLogin() {
 				else {
 					gotoXY(47 + auth[pos].length(), 20);
 				}
-				if (auth[pos].length() < 20) {
+				if (pos == 0 && auth[pos].length() <= MAX_MASV) {
 					auth[pos] += key;
-					if (pos == 0) {
-						cout << char(key);
-					}
-					else {
-						cout << "*";
-					}
+					cout << char(key);
+				}
+				else if (pos == 1 && auth[pos].length() < 20) {
+					auth[pos] += key;
+					cout << "*";
 				}
 			}
 			break;
 		}
-	} while (key != key_esc || masv.length() > 0);
-	cout << "Thoat";
-	return masv;
+	} while (key != key_esc);
 }
 
 void SetCurrentAction(int actionIndex) {
@@ -256,7 +254,7 @@ void ProcessConrtol(AppContext& context) {
 						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
+						InDanhSachLopTinChi(context, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
 					}
 					break;
 				}
@@ -268,7 +266,7 @@ void ProcessConrtol(AppContext& context) {
 						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 						context.nLTC = 0;
 						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						keyRemove = InDanhSachLopTinChi(context.ds_mh, context.tree, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
+						keyRemove = InDanhSachLopTinChi(context, context.ds, context.nLTC, 40, 10, menuCurrent->posStatus, false, false);
 					} while (keyRemove != key_esc);
 					break;
 				}
@@ -331,7 +329,10 @@ void ProcessConrtol(AppContext& context) {
 				}
 				case 3: {
 					// Show list sv by conditions
-					Search_GV_LTCByConditions(context, menuCurrent->posStatus);
+					do
+					{
+						key = Search_GV_LTCByConditions(context, menuCurrent->posStatus);
+					} while (key != key_esc);
 					break;
 				}
 				default:
@@ -557,22 +558,14 @@ void ProcessConrtol(AppContext& context) {
 }
 void DrawMainLayout(string currentUser) {
 	HideCursor(true); // hide cursor
-	// main actions
 	rectagle(1, 1, 25, 40);
 	// where is place content when have a action
 	rectagle(26, 1, 120, 40);
 	DrawListMenu(MenuFeatures, 4);
-
-	//DrawContentLopTC();
-
-	//DrawContentMonHoc();
 	SetColor(color_darkwhite);
 	ShowGuide();
 	gotoXY(6, 2);
 	SetColor(color_darkwhite | colorbk_darkred);
 	cout << "CHUC NANG CHINH";
 }
-
-
-
 #endif // !MENU_H

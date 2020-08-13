@@ -16,10 +16,10 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(238
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(242,78): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(243,21): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(712,6): warning C4101: 'slsv': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1568,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1569,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1580,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1581,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(50): warning C4715: 'CheckExistMaLTC': not all control paths return a value
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(824): warning C4715: 'TravelTree': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1254): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1463): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1266): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1475): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe

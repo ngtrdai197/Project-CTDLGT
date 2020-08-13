@@ -1096,7 +1096,7 @@ Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC con
 	}
 	return NULL;
 }
-void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
+int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 	Search_SV_DK_LTC conditions;
 	string Texts[4] = { "" };
 	int maxTexts[4] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3 };
@@ -1135,6 +1135,13 @@ void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 							}
 						}
 					}
+					if (ds_sv_dky.totalSv == 0) {
+						gotoXY(60, 18);
+						cout << "Lop chua co sinh vien dang ky!";
+						Sleep(1200);
+						clrscr(40, 4, 90, 35, ' ');
+						return -1;
+					}
 					clrscr(40, 4, 90, 35, ' ');
 					if (ds_sv_dky.totalSv != 0) {
 						key = CommonShowSvList(ds_sv_dky, positionSubmenu, NULL);
@@ -1164,6 +1171,7 @@ void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 			break;
 		}
 	} while (!valid);
+	return key;
 }
 int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 	// Danh sách lớp tín chỉ thõa mãn => Sinh viên đăng ký lớp tín chỉ !
@@ -1196,25 +1204,30 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 						gotoXY(55, 3);
 						SetColor(color_darkwhite);
 						cout << "============ DANH SACH LOP TIN CHI DANG KY ============";
-						key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTC, total, 40, 5, positionSubmenu, true, true);
+						key = InDanhSachLopTinChi(context, arrayLTC, total, 40, 5, positionSubmenu, true, true);
 						// TODO: catch key tab => move pointer down list ltc sv registed
 						if (key == key_tab || key == key_F1) {
 							// TODO: to do stuff
+							// TODO: temporary
+							//N15DCCN066  MSSV73326767
+							string s = "MSSV73326767";
+							char masv[MAX_MASV];
+							strcpy_s(masv, MAX_MASV, s.c_str());
+
 							gotoXY(53, 23);
 							SetColor(color_darkwhite);
-							// TODO: temporary
-							string s = "N15DCCN066";
-							char masv[12];
-							strcpy_s(masv, 12, s.c_str());
 							cout << "============ DANH SACH LOP TIN CHI DA DANG KY ============";
 							do
 							{
 								// END
 								int totalRegitered = 0;
+								context.nLTC = 0;
+								ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+								// TODO: Need to check remove ltc
 								Lop_Tin_Chi** arrayLTCRegistered = TimLopTinChiSinhVienDaDangKy(
 									context.ds, context.nLTC,
-									totalRegitered, masv);
-								key = InDanhSachLopTinChi(context.ds_mh, context.tree, arrayLTCRegistered, totalRegitered, 40, 25, positionSubmenu, true, false);
+									totalRegitered, context.currentUser);
+								key = InDanhSachLopTinChi(context, arrayLTCRegistered, totalRegitered, 40, 25, positionSubmenu, true, false);
 							} while (key != key_tab);
 						}
 						if (key == key_esc) {
@@ -1255,7 +1268,7 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 bool CheckSvExistLTC(Lop_Tin_Chi* ltc, char* masv) {
 	for (SV_DANG_KY* p = ltc->ds_sv_dky.pHead; p != NULL; p = p->pNext)
 	{
-		if ((strcpy_s(p->MASV, masv) == 0)) {
+		if ((_strcmpi(p->MASV, masv) == 0)) {
 			return true;
 		}
 	}
@@ -1679,7 +1692,7 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 	clrscr(40, 10, 90, 30, ' ');
 	return key;
 }
-int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert) {
+int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert) {
 	cout << setfill(' ');
 
 	SetColor(color_black | colorbk_white);
@@ -1702,7 +1715,6 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 	int key = -1;
 
 	perPage = perPage > n ? n : perPage;
-	int prePositionSelected = -1;
 	do {
 		switch (key)
 		{
@@ -1713,24 +1725,33 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 		case key_F1: {
 			// TODO: Xử lý việc sinh viên đăng ký lớp tín chỉ
 			if (isStudent) {
-				Lop_Tin_Chi* node;
-				node = posActive + posPrint > -1 ? ltc[posActive + posPrint]: NULL;
 				SV_DANG_KY* sv_dk = new SV_DANG_KY;
-				strcpy_s(sv_dk->MASV, MAX_MASV, "N15DCCN066");
-				if (isInsert && node != NULL) {
+				//N15DCCN066  MSSV73326767
+
+				//strcpy_s(sv_dk->MASV, MAX_MASV, "MSSV73326767");
+				strcpy_s(sv_dk->MASV, MAX_MASV, context.currentUser);
+				if (isInsert && ltc[posActive + posPrint]) {
 					// N15DCCN066 ma sv test
-					bool exist = CheckSvExistLTC(node, sv_dk->MASV);
+					bool exist = CheckSvExistLTC(ltc[posActive + posPrint], context.currentUser);
 					if (!exist) {
 						sv_dk->DIEM = -1;
-						InsertLastDSDKY(node->ds_sv_dky, sv_dk);
+						InsertLastDSDKY(ltc[posActive + posPrint]->ds_sv_dky, sv_dk);
 						ltc[posActive + posPrint]->totalSvDK++;
-						//UpdateListLopTinChiToFile(ltc, n);
+						UpdateNodeOfTree(context.tree, ltc[posActive + posPrint]);
+						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
+						context.nLTC = 0;
+						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+						UpdateListLopTinChiToFile(context.ds, context.nLTC);
 						return key;
 					}
+					else {
+						gotoXY(55, 35);
+						cout << "Lop da dang ky !";
+					}
 				}
-				else if (!isInsert && node != NULL) {
+				else if (!isInsert && ltc[posActive + posPrint]) {
 					// TODO: remove sv inside ltc
-					int result = RemoveSV_Dang_Ky_ByMSSV(node->ds_sv_dky, sv_dk->MASV);
+					int result = RemoveSV_Dang_Ky_ByMSSV(ltc[posActive + posPrint]->ds_sv_dky, sv_dk->MASV);
 					if (result == -1) {
 						gotoXY(55, 35);
 						cout << "Danh sach dang rong. Khong the thuc hien chuc nang nay!";
@@ -1738,7 +1759,13 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 					else {
 						gotoXY(60, 35);
 						cout << "Xoa lop tin chi thanh cong!";
-						node->totalSvDK--;
+						ltc[posActive + posPrint]->totalSvDK--;
+						UpdateNodeOfTree(context.tree, ltc[posActive + posPrint]);
+						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
+						context.nLTC = 0;
+						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+						UpdateListLopTinChiToFile(context.ds, context.nLTC);
+						Sleep(1000);
 						clrscr(40, 25, 100, 15, ' ');
 						return key;
 					}
@@ -1754,7 +1781,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
 			if (key == key_Enter && ActionQuit.posStatus == 0) {
 				// TODO: need to check in ltc exist student has score
-				RemoveNodeOfTree(tree, ltc[posActive + posPrint]->MALOPTC);
+				RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC);
 				//UpdateListStudentToFile(ctx_ds_sv);
 				clrscr(40, 5, 100, 35, ' '); // xoa tu vi tri form confirm remove
 				return -1;
@@ -1804,7 +1831,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 						p->NHOM = atoi(textFields[4].c_str());
 						p->sv_max = atoi(textFields[5].c_str());
 						p->sv_min = atoi(textFields[6].c_str());
-						bool exist = CheckExistMaMH(ds_mh, p->MAMH);
+						bool exist = CheckExistMaMH(context.ds_mh, p->MAMH);
 						bool existLTC = CheckLopTinChiToInsert(ltc, n, p);
 						if (!exist) {
 							gotoXY(60, 27);
@@ -1819,7 +1846,7 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 							valid = false;
 						}
 						else {
-							UpdateNodeOfTree(tree, p);
+							UpdateNodeOfTree(context.tree, p);
 							UpdateListLopTinChiToFile(ltc, n);
 							delete p;
 							gotoXY(60, 27);
@@ -1844,14 +1871,6 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 			} while (!valid);
 			break;
 		}
-		case key_Left: {
-			if (posPrint - perPage >= 0) {
-				posPrint -= perPage;
-				--currentPage;
-				posActive = perPage - 1;
-			}
-			goto paint;
-		}
 		case key_Up: {
 			if (posActive > 0) {
 
@@ -1867,6 +1886,17 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 				ShowSingleLTC(ltc[posActive + posPrint], posActive + posPrint);
 				break;
 			}
+
+		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				if (n > 0) {
+					--currentPage;
+				}
+				posActive = perPage - 1;
+			}
+			goto paint;
 		}
 		case key_Down: {
 			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
@@ -1927,7 +1957,8 @@ int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n,
 		}
 		key = inputKey();
 	} while (key != key_esc);
-	clrscr(30, 10, 100, 15, ' ');
+	if (isStudent && !isInsert) return key;
+	clrscr(30, 10, 100, 30, ' ');
 	return key;
 }
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu) {

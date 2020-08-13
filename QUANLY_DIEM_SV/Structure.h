@@ -220,14 +220,13 @@ struct AppContext {
 	int nLTC;
 	DS_MON_HOC ds_mh;
 	DS_SV_DANG_KY ds_sv_dky;
-	SINH_VIEN* currentUser;
+	char currentUser[MAX_MASV];
 
 	AppContext() {
 		tree = NULL;
 		nLTC = 0;
 		ds_mh.n = 0;
 		ds_sv.totalSv = 0;
-		currentUser = NULL; // init current user (student)
 	};
 };
 
@@ -307,7 +306,7 @@ char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
 Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total, char* masv);
-void Search_GV_LTCByConditions(AppContext& context, int positionSubmenu);
+int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu);
 int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu);
 bool CheckSvExistLTC(Lop_Tin_Chi* ltc, char* masv);
 Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y);
@@ -332,7 +331,7 @@ void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 // END DS DANG KY
 
-int InDanhSachLopTinChi(DS_MON_HOC ds_mh, TREE& tree, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert);
+int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert);
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 
