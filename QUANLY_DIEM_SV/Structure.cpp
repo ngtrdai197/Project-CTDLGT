@@ -174,6 +174,14 @@ SINH_VIEN** CreateArraySV(int x, int y) {
 	}
 	return sv;
 }
+SV_DIEM** CreateArraySV_DIEM(int x, int y) {
+	SV_DIEM** sv = new SV_DIEM * [y];
+	for (int i = 0; i < y; i++)
+	{
+		sv[i] = new SV_DIEM[x];
+	}
+	return sv;
+}
 
 bool CheckInputBoxIsNull(string str[], int n) {
 	int i = 0;
@@ -447,13 +455,10 @@ void InsertAndSortSvIntoDS(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV)
 	}
 	else
 	{
-
 		ds_sv.pTail->pNext = nodeSV;
 		NODE_SINH_VIEN* trav = ds_sv.pHead, * prev = NULL;
 
 		int cmp = _strcmpi(trav->data.MALOP, nodeSV->data.MALOP);
-
-
 		while (cmp < 0 || (cmp == 0 && _strcmpi(trav->data.MASV, nodeSV->data.MASV) < 0)) {
 			prev = trav;
 			trav = trav->pNext;
@@ -470,8 +475,8 @@ void InsertAndSortSvIntoDS(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV)
 		else {
 			prev->pNext = nodeSV;
 			nodeSV->pNext = trav;
-			ds_sv.pTail->pNext = NULL;
 		}
+		ds_sv.pTail->pNext = NULL;
 	}
 	ds_sv.totalSv++;
 }
@@ -500,6 +505,13 @@ void ReadFileSinhVien(DS_SINH_VIEN& ds_sv)
 	}
 	fileIn.close();
 }
+NODE_SINH_VIEN* GetSinhVien(DS_SINH_VIEN ds_sv, char* masv) {
+	for (NODE_SINH_VIEN* p = ds_sv.pHead; p != NULL; p = p->pNext)
+	{
+		if (_strcmpi(p->data.MASV, masv) == 0) return p;
+	}
+	return NULL;
+}
 
 // DANH SACH DANG KY
 //void InsertLastDSDKY(DS_DANG_KY& ds_dk, DANG_KY* dk);
@@ -525,23 +537,6 @@ void ReadFileDS_DANG_KY(DS_SV_DANG_KY& ds_dk)
 
 // END DANH SACH DANG KY
 
-// TODO:
-//void UpdateListSvToLopTC(Lop_Tin_Chi*& ds, int totalLopTc, DS_SINH_VIEN& ds_sv_original, char* masvDKLTC[]) {
-//	for (int i = 0; i < totalLopTc; i++)
-//	{
-//		DS_SINH_VIEN* ds_sv = new DS_SINH_VIEN;
-//		for (NODE_SINH_VIEN* p = ds_sv_original.pHead; p != NULL; p = p->pNext)
-//		{
-//			for (int i = 0; i < 2; i++)
-//			{
-//				if (_strcmpi(p->data.MASV, masvDKLTC[i]) == 0) {
-//					InsertAndSortSvIntoDS(*ds_sv, p);
-//				}
-//			}
-//		}
-//		ds[i].ds_sv = ds_sv;
-//	}
-//}
 void UpdateListLopTinChiToFile(Lop_Tin_Chi* ds[], int n) {
 	ofstream fileOut;
 	fileOut.open("DS_LOP_TIN_CHI.txt", ios::out | ios::binary);
@@ -1096,7 +1091,7 @@ Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC con
 	}
 	return NULL;
 }
-int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
+int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isScoreFeature) {
 	Search_SV_DK_LTC conditions;
 	string Texts[4] = { "" };
 	int maxTexts[4] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3 };
@@ -1125,14 +1120,10 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 
 					for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext)
 					{
-						for (NODE_SINH_VIEN* k = context.ds_sv.pHead; k != NULL; k = k->pNext)
-						{
-							if (_strcmpi(p->MASV, k->data.MASV) == 0) {
-								NODE_SINH_VIEN* temp = new NODE_SINH_VIEN;
-								temp->data = k->data;
-								temp->pNext = NULL;
-								InsertAndSortSvIntoDS(ds_sv_dky, temp);
-							}
+						NODE_SINH_VIEN* temp = GetSinhVien(context.ds_sv, p->MASV);
+						if (temp != NULL) {
+							temp->pNext = NULL;
+							InsertAndSortSvIntoDS(ds_sv_dky, temp);
 						}
 					}
 					if (ds_sv_dky.totalSv == 0) {
@@ -1143,11 +1134,34 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu) {
 						return -1;
 					}
 					clrscr(40, 4, 90, 35, ' ');
-					if (ds_sv_dky.totalSv != 0) {
+					if (ds_sv_dky.totalSv != 0 && !isScoreFeature) {
 						key = CommonShowSvList(ds_sv_dky, positionSubmenu, NULL);
 						if (key == key_esc) {
 							delete single;
 							delete[]context.ds;
+							break;
+						}
+					}
+					else if (ds_sv_dky.totalSv != 0 && isScoreFeature) {
+						// TODO: Display / Update score of students
+						SV_DIEM** ds_sv_diem = CreateArraySV_DIEM(ds_sv_dky.totalSv, sizeof(SV_DIEM));
+						int idx = 0;
+						for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext) {
+							NODE_SINH_VIEN* sv_tmp = GetSinhVien(context.ds_sv, p->MASV);
+							strcpy_s(ds_sv_diem[idx]->masv, MAX_MASV, sv_tmp->data.MASV);
+							strcpy_s(ds_sv_diem[idx]->ho, MAX_HO, sv_tmp->data.HO);
+							strcpy_s(ds_sv_diem[idx]->ten, MAX_TEN, sv_tmp->data.TEN);
+							ds_sv_diem[idx]->diem = p->DIEM;
+							idx++;
+							delete sv_tmp;
+						}
+						//key = ShowListStudentAndScore(ds_sv_dky);
+						do
+						{
+							key = InDanhSachSinhVien_Diem(ds_sv_diem, idx, 45, 10);
+						} while (key != key_esc);
+						if (key == key_esc) {
+							// TODO: Add confirm to quit form
 							break;
 						}
 					}
@@ -1207,13 +1221,6 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 						key = InDanhSachLopTinChi(context, arrayLTC, total, 40, 5, positionSubmenu, true, true);
 						// TODO: catch key tab => move pointer down list ltc sv registed
 						if (key == key_tab || key == key_F1) {
-							// TODO: to do stuff
-							// TODO: temporary
-							//N15DCCN066  MSSV73326767
-							string s = "MSSV73326767";
-							char masv[MAX_MASV];
-							strcpy_s(masv, MAX_MASV, s.c_str());
-
 							gotoXY(53, 23);
 							SetColor(color_darkwhite);
 							cout << "============ DANH SACH LOP TIN CHI DA DANG KY ============";
@@ -1492,6 +1499,11 @@ void ShowSingleSV(SINH_VIEN* sv, int index) {
 		<< setw(20) << sv->HO << char(179) << setw(15) << sv->TEN << char(179)
 		<< setw(5) << sv->PHAI << char(179) << setw(11) << sv->SDT << char(179);
 }
+void ShowSingleSV_Diem(SV_DIEM* sv_diem, int index) {
+	cout << setw(3) << index + 1 << char(179) << setw(15) << sv_diem->masv << char(179)
+		<< setw(20) << sv_diem->ho << char(179) << setw(15) << sv_diem->ten << char(179)
+		<< setw(5) << sv_diem->diem << char(179);
+}
 void ShowSingleMonHoc(MON_HOC* mh, int index) {
 	cout << setw(3) << index + 1 << char(179) << setw(15) << mh->MAMH << char(179)
 		<< setw(30) << mh->TENMH << char(179)
@@ -1510,6 +1522,11 @@ int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop = NUL
 	}
 	return InDanhSachSinhVien(ds_sv, sv, total, 40, 10, positionSubMenu);
 }
+//int ShowListStudentAndScore(DS_SINH_VIEN& ds_sv) {
+//	SINH_VIEN** sv = CreateArraySV(ds_sv.totalSv, sizeof(SINH_VIEN));
+//	ConvertLinkedListSV(ds_sv, sv);
+//	return InDanhSachSinhVien_Diem(ds_sv, sv, ds_sv.totalSv, 45, 10);
+//}
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 	cout << setfill(' ');
 
@@ -2143,6 +2160,165 @@ int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x
 				   SetColor(color_green);
 				   gotoXY(x, y + posActive + 1);
 				   ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
+			   }
+			   break;
+		}
+		}
+		key = inputKey();
+	} while (key != key_esc);
+	clrscr(40, 10, 90, 30, ' ');
+	return key;
+}
+int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y) {
+	cout << setfill(' ');
+
+	SetColor(color_black | colorbk_white);
+	gotoXY(x, y);
+	cout << setw(3) << "STT" << char(179) << setw(15) << "Ma Sinh Vien" << char(179)
+		<< setw(20) << "Ho" << char(179) << setw(15) << "Ten" << char(179) << setw(5) << "Diem" << char(179);
+
+	int currentPage = 0, posActive = -1;
+	int posPrint = 0;
+	int perPage = 5;
+	int totalPage = n / perPage;
+
+	if (n % perPage != 0) {
+		totalPage += 1;
+	}
+
+	int key = -1;
+
+	perPage = perPage > n ? n : perPage;
+	do {
+		switch (key)
+		{
+		case key_F3: {
+			if (posActive == -1) break;
+			// TODO: Init form to update student
+			SetColor(color_darkwhite);
+			string textFields[1] = { "" };
+			int maxTexts[1] = { 4 };
+			textFields[0] = ds_sv_diem[posActive + posPrint]->diem;
+			std::ostringstream ss;
+			ss << ds_sv_diem[posActive + posPrint]->diem;
+			textFields[0] = ss.str();
+			bool valid = true;
+			int keyFormUpdate = -1;
+			do
+			{
+				SetColor(color_white | colorbk_green);
+				rectagle(60, 10, 30, 7);
+				SetColor(color_white);
+				keyFormUpdate = DrawFormInputDiem(75, 10, 10, textFields, maxTexts);
+				if (keyFormUpdate == key_Enter) {
+					if (!CheckInputBoxIsNull(textFields, 1)) {
+						// validate data
+						ds_sv_diem[posActive + posPrint]->diem = atoi(textFields[0].c_str());
+						//UpdateSinhVien(ctx_ds_sv, sv);
+						// TODO: need to update to file, after process testing done !
+						//UpdateListStudentToFile(ctx_ds_sv);
+
+						gotoXY(62, 16);
+						cout << "Cap nhat diem thanh cong!";
+						Sleep(1500);
+						clrscr(40, 10, 90, 30, ' ');
+						valid = true;
+						return keyFormUpdate;
+					}
+					else {
+						SetColor(color_red);
+						gotoXY(62, 16);
+						cout << "Diem khong duoc de trong!";
+						Sleep(1500);
+						valid = false;
+					}
+					// TODO: check score enter invalid => >-1    <10
+				}
+				else if (keyFormUpdate == key_esc) {
+					clrscr(40, 10, 90, 30, ' ');
+					return key;
+				}
+			} while (!valid);
+			break;
+			break;
+		}
+		case key_Up: {
+			if (posActive > 0) {
+
+				SetColor(color_darkwhite);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV_Diem(ds_sv_diem[posActive + posPrint], posActive + posPrint);
+
+				--posActive;
+
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV_Diem(ds_sv_diem[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Left: {
+			if (posPrint - perPage >= 0) {
+				posPrint -= perPage;
+				--currentPage;
+				posActive = perPage - 1;
+			}
+			goto paint;
+		}
+		case key_Down: {
+			if (posActive < perPage - 1 && posActive + posPrint < n - 1) {
+				if (posActive >= 0) {
+					SetColor(color_darkwhite);
+					gotoXY(x, y + posActive + 1);
+					ShowSingleSV_Diem(ds_sv_diem[posActive + posPrint], posActive + posPrint);
+				}
+				++posActive;
+
+				SetColor(color_green);
+				gotoXY(x, y + posActive + 1);
+				ShowSingleSV_Diem(ds_sv_diem[posActive + posPrint], posActive + posPrint);
+				break;
+			}
+		}
+		case key_Right: {
+			if (posPrint + perPage < n) {
+				posPrint += perPage;
+				++currentPage;
+				posActive = 0;
+			}
+			goto paint;
+		}
+		default: {
+			goto paint;
+		}
+		   paint: {
+			   int index = 0;
+			   int indexitem;
+
+			   SetColor(color_darkwhite);
+			   for (; index < perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+
+				   if (indexitem >= n) break;
+				   ShowSingleSV_Diem(ds_sv_diem[indexitem], indexitem);
+			   }
+
+			   for (; index <= perPage; index++)
+			   {
+				   gotoXY(x, y + index + 1);
+				   indexitem = index + posPrint;
+				   cout << setw(90) << " ";
+			   }
+
+			   gotoXY(x, y + perPage + 3);
+			   cout << "Page " << currentPage + 1 << "/" << totalPage;
+			   if (posActive >= 0) {
+				   SetColor(color_green);
+				   gotoXY(x, y + posActive + 1);
+				   ShowSingleSV_Diem(ds_sv_diem[posActive + posPrint], posActive + posPrint);
 			   }
 			   break;
 		}

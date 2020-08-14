@@ -97,6 +97,13 @@ struct search_sv_dky_ltc {
 };
 typedef struct search_sv_dky_ltc Search_SV_DK_LTC;
 
+struct sinh_vien_diem {
+	char masv[MAX_MASV];
+	char ho[MAX_HO];
+	char ten[MAX_TEN];
+	float diem;
+};
+typedef struct sinh_vien_diem SV_DIEM;
 
 // ===== BEGIN LOP TIN CHI =====
 struct lop_tin_chi
@@ -195,14 +202,6 @@ static MenuContent MenuLopTinChi = {
 	 4
 };
 
-static MenuContent MenuDiem = {
-	new MenuItem[2] {
-	{{3,18,20,2},"Nhap diem"},
-	{{3,21,20,2},"Xem diem"},
-	},
-	 2
-};
-
 static MenuContent ActionQuit = {
 	new MenuItem[2] {
 		{{55, 12, 10, 2},"Ok"},
@@ -211,15 +210,12 @@ static MenuContent ActionQuit = {
 	 2
 };
 
-
-
 struct AppContext {
 	TREE tree;
 	DS_SINH_VIEN ds_sv;
 	Lop_Tin_Chi** ds;
 	int nLTC;
 	DS_MON_HOC ds_mh;
-	DS_SV_DANG_KY ds_sv_dky;
 	char currentUser[MAX_MASV];
 
 	AppContext() {
@@ -227,6 +223,7 @@ struct AppContext {
 		nLTC = 0;
 		ds_mh.n = 0;
 		ds_sv.totalSv = 0;
+		ds = NULL;
 	};
 };
 
@@ -245,6 +242,7 @@ void InsertLopIntoDSLop(string lop);
 char** CreateArray(int x, int y);
 int countTotalSvByLop(DS_SINH_VIEN ds_sv, char* maLop);
 SINH_VIEN** CreateArraySV(int x, int y);
+SV_DIEM** CreateArraySV_DIEM(int x, int y);
 bool CheckInputBoxIsNull(string str[], int n);
 void DrawEachButtonOfAction(MenuItem& item, int color);
 void DrawListMenu(MenuContent& menucontent, int color);
@@ -262,6 +260,7 @@ void InsertLastSv(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV);
 void InsertFirstSv(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV);
 void InsertAndSortSvIntoDS(DS_SINH_VIEN& ds_sv, NODE_SINH_VIEN* nodeSV);
 void ReadFileSinhVien(DS_SINH_VIEN& ds_sv);
+NODE_SINH_VIEN* GetSinhVien(DS_SINH_VIEN ds_sv, char* masv);
 
 // DANH SACH DANG KY
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_dk, SV_DANG_KY* dk);
@@ -306,7 +305,7 @@ char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
 Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total, char* masv);
-int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu);
+int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isScoreFeature);
 int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu);
 bool CheckSvExistLTC(Lop_Tin_Chi* ltc, char* masv);
 Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y);
@@ -329,20 +328,21 @@ void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_sv_dk, SV_DANG_KY* sv_dky);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
 int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
+void ShowSingleSV_Diem(SINH_VIEN* sv, int index);
 // END DS DANG KY
 
 int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert);
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
-
-
+int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y);
+int ShowListStudentAndScore(DS_SINH_VIEN& ds_sv);
 // BEGIN FORM
 void HideCursor(bool isHide);
 char InputBox(string& str, int x, int y, int width,
 	int maxText, bool isDraw, bool isText, bool isPhone, bool isFloat);
 char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n);
 char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
-
+char DrawFormInputDiem(int x, int y, int width, string Texts[], int maxText[]);
 
 // END FORM
 

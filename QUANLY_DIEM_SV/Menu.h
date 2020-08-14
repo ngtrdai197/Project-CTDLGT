@@ -5,15 +5,15 @@
 
 
 void openLogin(AppContext& context) {
-	rectagle(40, 10, 50, 15);
-	gotoXY(45, 13);
+	rectagle(50, 10, 50, 15);
+	gotoXY(55, 13);
 	cout << "Username";
-	rectagle(45, 14, 25, 2); // width of input
+	rectagle(55, 14, 25, 2); // width of input
 
-	gotoXY(45, 18);
+	gotoXY(55, 18);
 	cout << "Password";
-	rectagle(45, 19, 25, 2);
-	gotoXY(47, 15);
+	rectagle(55, 19, 25, 2);
+	gotoXY(57, 15);
 
 	string auth[2];
 	int pos = 0;
@@ -24,21 +24,21 @@ void openLogin(AppContext& context) {
 		{
 		case key_Up: {
 			pos = 0;
-			gotoXY(47 + auth[pos].length(), 15);
+			gotoXY(57 + auth[pos].length(), 15);
 			break;
 		}
 		case key_Down: {
 			pos = 1;
-			gotoXY(47 + auth[pos].length(), 20);
+			gotoXY(57 + auth[pos].length(), 20);
 			break;
 		};
 		case key_tab: {
 			pos = (pos + 1) % 2;
 			if (pos == 0) {
-				gotoXY(47 + auth[pos].length(), 15);
+				gotoXY(57 + auth[pos].length(), 15);
 			}
 			else {
-				gotoXY(47 + auth[pos].length(), 20);
+				gotoXY(57 + auth[pos].length(), 20);
 			}
 			break;
 		}
@@ -57,19 +57,19 @@ void openLogin(AppContext& context) {
 				return;
 			}
 			else {
-				gotoXY(47, 24);
+				gotoXY(57, 24);
 				cout << "Thong tin dang nhap khong dung!";
-				gotoXY(47 + auth[pos].length(), pos == 0 ? 15 : 20);
+				gotoXY(57 + auth[pos].length(), pos == 0 ? 15 : 20);
 				break;
 			}
 		}
 		default:
 			if (key > 31 && key < 127) {
 				if (pos == 0) {
-					gotoXY(47 + auth[pos].length(), 15);
+					gotoXY(57 + auth[pos].length(), 15);
 				}
 				else {
-					gotoXY(47 + auth[pos].length(), 20);
+					gotoXY(57 + auth[pos].length(), 20);
 				}
 				if (pos == 0 && auth[pos].length() <= MAX_MASV) {
 					auth[pos] += key;
@@ -83,21 +83,6 @@ void openLogin(AppContext& context) {
 			break;
 		}
 	} while (key != key_esc);
-}
-
-void SetCurrentAction(int actionIndex) {
-	int location = 80;
-	for (int i = mainActions[actionIndex].length() - 1; mainActions[actionIndex].length() < 0; i--)
-	{
-		cout << 1;
-		gotoXY(location + mainActions[actionIndex].length(), 2);
-		cout << "\b \b";
-		mainActions->erase(mainActions[actionIndex].length() - 1, 1);
-	}
-	nameAction = "";
-	nameAction = mainActions[actionIndex];
-	gotoXY(80, 2);
-	cout << nameAction;
 }
 
 void ShowGuide() {
@@ -188,6 +173,20 @@ char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n
 	} while (key != key_esc && key != key_Enter);
 	return key;
 }
+char DrawFormInputDiem(int x, int y, int width, string Texts[], int maxText[]) {
+
+	SetColor(color_black | colorbk_green);
+	gotoXY(63, y + 2);
+	cout << "Diem SV: ";
+	InputBox(Texts[0], x, y + 1, width, maxText[0], true, false, false, true);
+	int key = -1;
+
+	do
+	{
+		key = InputBox(Texts[0], x, y + 1, width, maxText[0], false, false, false, true);
+	} while (key != key_esc && key != key_Enter);
+	return key;
+}
 
 void ProcessConrtol(AppContext& context) {
 
@@ -214,7 +213,11 @@ void ProcessConrtol(AppContext& context) {
 					break;
 				}
 				case 3: {
-					menuCurrent = &MenuDiem;
+					// Display/Update Score of students
+					do
+					{
+						key = Search_GV_LTCByConditions(context, menuCurrent->posStatus, true);
+					} while (key != key_esc);
 					break;
 				}
 				case 4: {
@@ -331,7 +334,7 @@ void ProcessConrtol(AppContext& context) {
 					// Show list sv by conditions
 					do
 					{
-						key = Search_GV_LTCByConditions(context, menuCurrent->posStatus);
+						key = Search_GV_LTCByConditions(context, menuCurrent->posStatus, false);
 					} while (key != key_esc);
 					break;
 				}
@@ -541,17 +544,6 @@ void ProcessConrtol(AppContext& context) {
 					break;
 				}
 				}
-			}
-		}
-		else if (menuCurrent == &MenuDiem) {
-			if (key == key_esc) {
-				menuCurrent = &MenuFeatures;
-				clrscr(3, 18, 20, 3 * menuCurrent->n, ' ');
-			}
-			else switch (menuCurrent->posStatus)
-			{
-			default:
-				break;
 			}
 		}
 	} while (true);
