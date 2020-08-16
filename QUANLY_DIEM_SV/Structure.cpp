@@ -307,18 +307,13 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 	} while (key != key_Enter);
 	return key;
 }
-void ConfirmRemove() {
+void ConfirmDialog(string title) {
 	rectagle(50, 5, 40, 13);
-	gotoXY(55, 8);
-	cout << "Xac nhan xoa ban ghi";
-	DrawListMenu(ActionQuit);
+	gotoXY(58, 8);
+	cout << title;
+	DrawListMenu(ActionConfirm);
 }
-void ConfirmQuit() {
-	rectagle(50, 5, 40, 13);
-	gotoXY(55, 8);
-	cout << "Ban co muon thoat chuong trinh";
-	DrawListMenu(ActionQuit);
-}
+
 int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, int activateColor = color_green) {
 	int pos = menuContent->posStatus;
 	int key = -1;
@@ -925,19 +920,34 @@ Lop_Tin_Chi* InputUpdateTree() {
 	return p;
 }
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data) {
-	bool exist = false;
 	int i = 0;
 	while (i < n)
 	{
 		if (_strcmpi(ds[i]->MAMH, data->MAMH) == 0
 			&& _strcmpi(ds[i]->NIEN_KHOA, data->NIEN_KHOA) == 0
 			&& ds[i]->HOC_KY == data->HOC_KY && ds[i]->NHOM == data->NHOM) {
-			exist = true;
-			break;
+			return true;
 		}
 		++i;
 	}
-	return exist;
+	return false;
+}
+bool CheckLopTinChiToUpdate(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data) {
+	int i = 0;
+	while (i < n)
+	{
+		if (ds[i]->MALOPTC == data->MALOPTC) {
+			i++;
+			continue;
+		}
+		if (_strcmpi(ds[i]->MAMH, data->MAMH) == 0
+			&& _strcmpi(ds[i]->NIEN_KHOA, data->NIEN_KHOA) == 0
+			&& ds[i]->HOC_KY == data->HOC_KY && ds[i]->NHOM == data->NHOM) {
+			return true;
+		}
+		++i;
+	}
+	return false;
 }
 char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate) {
 
@@ -1079,6 +1089,14 @@ Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total
 	}
 	return ltcSvDky;
 }
+
+template<class _T>
+_T* CloneObject(_T* obj) {
+	_T* t = new _T;
+	*t = *obj;
+	return t;
+}
+
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions) {
 	for (int i = 0; i < n; i++)
 	{
@@ -1101,7 +1119,6 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 	SetColor(color_white);
 	bool valid = true;
 	int key = -1;
-	context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 	do
 	{
 		key = DrawFormInputSearchLTC(70, 5, 30, Texts, maxTexts, 4, false);
@@ -1111,6 +1128,7 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 				strcpy_s(conditions.nien_khoa, MAX_NIENKHOA, Texts[1].c_str());
 				conditions.hoc_ky = atoi(Texts[2].c_str());
 				conditions.nhom = atoi(Texts[3].c_str());
+				context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 				context.nLTC = 0;
 				ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 				Lop_Tin_Chi* single = FindLTCByConditions(context.ds, context.nLTC, conditions);
@@ -1121,9 +1139,11 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 					for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext)
 					{
 						NODE_SINH_VIEN* temp = GetSinhVien(context.ds_sv, p->MASV);
-						if (temp != NULL) {
-							temp->pNext = NULL;
-							InsertAndSortSvIntoDS(ds_sv_dky, temp);
+						NODE_SINH_VIEN* cloned = CloneObject(temp);
+
+						if (cloned != NULL) {
+							cloned->pNext = NULL;
+							InsertAndSortSvIntoDS(ds_sv_dky, cloned);
 						}
 					}
 					if (ds_sv_dky.totalSv == 0) {
@@ -1148,17 +1168,32 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 						int idx = 0;
 						for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext) {
 							NODE_SINH_VIEN* sv_tmp = GetSinhVien(context.ds_sv, p->MASV);
-							strcpy_s(ds_sv_diem[idx]->masv, MAX_MASV, sv_tmp->data.MASV);
-							strcpy_s(ds_sv_diem[idx]->ho, MAX_HO, sv_tmp->data.HO);
-							strcpy_s(ds_sv_diem[idx]->ten, MAX_TEN, sv_tmp->data.TEN);
-							ds_sv_diem[idx]->diem = p->DIEM;
-							idx++;
-							delete sv_tmp;
+							if (sv_tmp != NULL) {
+								strcpy_s(ds_sv_diem[idx]->masv, MAX_MASV, sv_tmp->data.MASV);
+								strcpy_s(ds_sv_diem[idx]->ho, MAX_HO, sv_tmp->data.HO);
+								strcpy_s(ds_sv_diem[idx]->ten, MAX_TEN, sv_tmp->data.TEN);
+								ds_sv_diem[idx]->diem = p->DIEM;
+								idx++;
+							}
 						}
-						//key = ShowListStudentAndScore(ds_sv_dky);
 						do
 						{
 							key = InDanhSachSinhVien_Diem(ds_sv_diem, idx, 45, 10);
+							if (key == key_Enter) {
+								// TODO: update score to ltc
+								for (SV_DANG_KY* p = single->ds_sv_dky.pHead; p != NULL; p = p->pNext) {
+									for (int i = 0; i < idx; i++) {
+										if (_strcmpi(p->MASV, ds_sv_diem[i]->masv) == 0) {
+											p->DIEM = ds_sv_diem[i]->diem;
+											break;
+										}
+									}
+								}
+								UpdateNodeOfTree(context.tree, single);
+								context.nLTC = 0;
+								ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+								UpdateListLopTinChiToFile(context.ds, context.nLTC);
+							}
 						} while (key != key_esc);
 						if (key == key_esc) {
 							// TODO: Add confirm to quit form
@@ -1170,6 +1205,7 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 					gotoXY(60, 18);
 					cout << "Khong tim thay du lieu!";
 					Sleep(1500);
+					delete single;
 					valid = false;
 				}
 			}
@@ -1553,9 +1589,9 @@ int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu) {
 		case key_F2: {
 			// Prevent remove/update actions when show list students pos = 0
 			if (positionSubMenu != 1 || posActive == -1) break;
-			ConfirmRemove();
-			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
-			if (key == key_Enter && ActionQuit.posStatus == 0) {
+			ConfirmDialog("Ban xac nhan xoa mon hoc ?");
+			key = ControlMenu(&ActionConfirm, color_darkwhite, color_green);
+			if (key == key_Enter && ActionConfirm.posStatus == 0) {
 				RemoveMonHoc(ds_mh, ds_mh.ds[posActive + posPrint]->MAMH);
 				UpdateFileDSMonHoc(ds_mh);
 				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
@@ -1794,12 +1830,12 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 		case key_F2: {
 			// Prevent remove/update actions when show list ltc pos = 0
 			if (positionSubMenu != 1 || posActive == -1) break;
-			ConfirmRemove();
-			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
-			if (key == key_Enter && ActionQuit.posStatus == 0) {
-				// TODO: need to check in ltc exist student has score
+			ConfirmDialog("Ban xac nhan xoa LTC ?");
+			key = ControlMenu(&ActionConfirm, color_darkwhite, color_green);
+			if (key == key_Enter && ActionConfirm.posStatus == 0) {
+				// TODO: need to check in ltc exist student has score, if exist => can't remove !
 				RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC);
-				//UpdateListStudentToFile(ctx_ds_sv);
+				// UpdateListLopTinChiToFile()
 				clrscr(40, 5, 100, 35, ' '); // xoa tu vi tri form confirm remove
 				return -1;
 			}
@@ -1849,30 +1885,32 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 						p->sv_max = atoi(textFields[5].c_str());
 						p->sv_min = atoi(textFields[6].c_str());
 						bool exist = CheckExistMaMH(context.ds_mh, p->MAMH);
-						bool existLTC = CheckLopTinChiToInsert(ltc, n, p);
 						if (!exist) {
 							gotoXY(60, 27);
 							cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
 							Sleep(1500);
 							valid = false;
 						}
-						else if (existLTC) {
-							gotoXY(60, 27);
-							cout << "Thong tin cap nhat da ton tai. Kiem tra lai !";
-							Sleep(1500);
-							valid = false;
-						}
 						else {
-							UpdateNodeOfTree(context.tree, p);
-							UpdateListLopTinChiToFile(ltc, n);
-							delete p;
-							gotoXY(60, 27);
-							cout << "Cap nhat lop tin chi thanh cong!";
-							Sleep(1500);
-							clrscr(40, 4, 100, 35, ' ');
-							valid = true;
-							return keyFormUpdate;
+							if (CheckLopTinChiToUpdate(ltc, n, p)) {
+								gotoXY(60, 27);
+								cout << "Thong tin cap nhat da ton tai. Kiem tra lai !";
+								Sleep(1500);
+								valid = false;
+							}
+							else {
+								UpdateNodeOfTree(context.tree, p);
+								UpdateListLopTinChiToFile(ltc, n);
+								delete p;
+								gotoXY(60, 27);
+								cout << "Cap nhat lop tin chi thanh cong!";
+								Sleep(1500);
+								clrscr(40, 4, 100, 35, ' ');
+								valid = true;
+								return keyFormUpdate;
+							}
 						}
+
 					}
 					else {
 						gotoXY(60, 36);
@@ -2005,9 +2043,9 @@ int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x
 		case key_F2: {
 			// Prevent remove/update actions when show list students pos = 0
 			if (positionSubMenu != 1 || posActive == -1) break;
-			ConfirmRemove();
-			key = ControlMenu(&ActionQuit, color_darkwhite, color_green);
-			if (key == key_Enter && ActionQuit.posStatus == 0) {
+			ConfirmDialog("Ban xac nhan xoa SV ?");
+			key = ControlMenu(&ActionConfirm, color_darkwhite, color_green);
+			if (key == key_Enter && ActionConfirm.posStatus == 0) {
 				RemoveSvByMSSV(ctx_ds_sv, ds_sv[posActive + posPrint]->MASV);
 				//UpdateListStudentToFile(ctx_ds_sv);
 				clrscr(40, 5, 90, 30, ' '); // xoa tu vi tri form confirm remove
@@ -2059,7 +2097,6 @@ int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x
 							InsertLopIntoDSLop(sv->MALOP);
 						}
 						UpdateSinhVien(ctx_ds_sv, sv);
-						// TODO: need to update to file, after process testing done !
 						UpdateListStudentToFile(ctx_ds_sv);
 
 						gotoXY(60, 27);
@@ -2208,16 +2245,10 @@ int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y) {
 			{
 				SetColor(color_white | colorbk_green);
 				rectagle(60, 10, 30, 7);
-				SetColor(color_white);
 				keyFormUpdate = DrawFormInputDiem(75, 10, 10, textFields, maxTexts);
 				if (keyFormUpdate == key_Enter) {
 					if (!CheckInputBoxIsNull(textFields, 1)) {
-						// validate data
 						ds_sv_diem[posActive + posPrint]->diem = atoi(textFields[0].c_str());
-						//UpdateSinhVien(ctx_ds_sv, sv);
-						// TODO: need to update to file, after process testing done !
-						//UpdateListStudentToFile(ctx_ds_sv);
-
 						gotoXY(62, 16);
 						cout << "Cap nhat diem thanh cong!";
 						Sleep(1500);

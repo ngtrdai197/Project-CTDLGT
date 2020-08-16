@@ -10,10 +10,10 @@ int main()
 	Read_File_MonHoc(context.ds_mh);
 	RemoveScrollbar();
 	srand(time(NULL));
-	//openLogin(context);
-	//if (context.currentUser != NULL) {
-		DrawMainLayout("");
+	int isLogged = openLogin(context);
+	if (isLogged == 1) {
+		DrawMainLayout(context.currentUser);
 		ProcessConrtol(context);
-	//}
+	}
 	return 0;
 }

@@ -1,4 +1,21 @@
-﻿  Structure.cpp
+﻿  Source.cpp
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(5,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(7,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(8,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(27,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(32,38): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(38,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(41,39): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(62,55): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(69,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(72,40): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(518,27): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Menu.h(519,27): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Source.cpp(12,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Structure.cpp
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(5,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
@@ -15,17 +32,18 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(244
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(246,47): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(250,78): warning C4018: '<': signed/unsigned mismatch
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(251,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(707,6): warning C4101: 'slsv': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1598,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1599,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2201,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(702,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1634,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1635,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2238,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
           with
           [
               _Elem=char
           ]
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2216,52): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2251,52): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  Generating Code...
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(50): warning C4715: 'CheckExistMaLTC': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(819): warning C4715: 'TravelTree': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1274): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1483): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(814): warning C4715: 'TravelTree': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1310): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1519): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe

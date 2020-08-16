@@ -4,7 +4,7 @@
 #include "Structure.h"
 
 
-void openLogin(AppContext& context) {
+int openLogin(AppContext& context) {
 	rectagle(50, 10, 50, 15);
 	gotoXY(55, 13);
 	cout << "Username";
@@ -53,8 +53,8 @@ void openLogin(AppContext& context) {
 			char clone[MAX_MASV];
 			strcpy_s(clone, MAX_MASV, auth[0].c_str());
 			if (CheckExistMSSV(context.ds_sv, clone) && auth[1] == "123") {
-				strcpy_s(context.currentUser, MAX_MASV, clone);
-				return;
+				strcpy_s(context.currentUser, MAX_MASV, GetSinhVien(context.ds_sv, clone)->data.MASV);
+				return 1;
 			}
 			else {
 				gotoXY(57, 24);
@@ -83,6 +83,7 @@ void openLogin(AppContext& context) {
 			break;
 		}
 	} while (key != key_esc);
+	return -1;
 }
 
 void ShowGuide() {
@@ -213,7 +214,7 @@ void ProcessConrtol(AppContext& context) {
 					break;
 				}
 				case 3: {
-					// Display/Update Score of students
+					// Display / Update Score of students
 					do
 					{
 						key = Search_GV_LTCByConditions(context, menuCurrent->posStatus, true);
@@ -232,8 +233,8 @@ void ProcessConrtol(AppContext& context) {
 					break;
 				}
 			else if (key == key_esc) {
-				menuCurrent = &ActionQuit;
-				ConfirmQuit();
+				menuCurrent = &ActionConfirm;
+				ConfirmDialog("Xac nhan thoat chuong trinh ?");
 				key = ControlMenu(menuCurrent, color_darkwhite, color_green);
 				if (key == key_Enter && menuCurrent->posStatus == 0) {
 					return;
@@ -559,5 +560,10 @@ void DrawMainLayout(string currentUser) {
 	gotoXY(6, 2);
 	SetColor(color_darkwhite | colorbk_darkred);
 	cout << "CHUC NANG CHINH";
+
+	// show current user
+	gotoXY(110, 2);
+	SetColor(color_darkwhite);
+	cout << "Ma sv: " << currentUser;
 }
 #endif // !MENU_H

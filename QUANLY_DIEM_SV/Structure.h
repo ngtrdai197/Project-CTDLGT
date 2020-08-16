@@ -202,10 +202,10 @@ static MenuContent MenuLopTinChi = {
 	 4
 };
 
-static MenuContent ActionQuit = {
+static MenuContent ActionConfirm = {
 	new MenuItem[2] {
-		{{55, 12, 10, 2},"Ok"},
-	{{68, 12, 10, 2},"Cancel"},
+		{{58, 12, 10, 2},"Ok"},
+	{{71, 12, 10, 2},"Cancel"},
 	},
 	 2
 };
@@ -246,8 +246,7 @@ SV_DIEM** CreateArraySV_DIEM(int x, int y);
 bool CheckInputBoxIsNull(string str[], int n);
 void DrawEachButtonOfAction(MenuItem& item, int color);
 void DrawListMenu(MenuContent& menucontent, int color);
-void ConfirmRemove();
-void ConfirmQuit();
+void ConfirmDialog(string title);
 int ControlMenu(MenuContent* menuContent, int defaultColor, int activateColor);
 int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu);
 // ===== END HELPER =====
@@ -300,6 +299,7 @@ void RemoveNodeOfTree(TREE& t, int ma);
 void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data);
 Lop_Tin_Chi* InputUpdateTree();
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
+bool CheckLopTinChiToUpdate(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);
 char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
 char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText[], int n, bool isStudent);
 Lop_Tin_Chi* FindLTCByConditions(Lop_Tin_Chi* ltc[], int n, Search_SV_DK_LTC conditions);
