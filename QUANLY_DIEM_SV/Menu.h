@@ -52,6 +52,10 @@ int openLogin(AppContext& context) {
 		case key_Enter: {
 			char clone[MAX_MASV];
 			strcpy_s(clone, MAX_MASV, auth[0].c_str());
+			if (auth[0] == "GV" && auth[1] == "123") {
+				strcpy_s(context.currentUser, MAX_MASV, "Giang Vien");
+				return 0;
+			}
 			if (CheckExistMSSV(context.ds_sv, clone) && auth[1] == "123") {
 				strcpy_s(context.currentUser, MAX_MASV, GetSinhVien(context.ds_sv, clone)->data.MASV);
 				return 1;
@@ -189,7 +193,7 @@ char DrawFormInputDiem(int x, int y, int width, string Texts[], int maxText[]) {
 	return key;
 }
 
-void ProcessConrtol(AppContext& context) {
+void ProcessControlGV(AppContext& context) {
 
 	MenuContent* menuCurrent = &MenuFeatures;
 
@@ -310,21 +314,29 @@ void ProcessConrtol(AppContext& context) {
 											Texts[i].clear();
 										}
 										gotoXY(60, 36);
-										cout << "Them lop tin chi thanh cong !";
+										string a = "Them lop tin chi thanh cong !";
+										cout << a;
+										ClearMessage(60, 36, a.length());
 									}
 									else {
 										gotoXY(60, 36);
-										cout << "Thong tin lop tin chi da ton tai. Kiem tra lai !";
+										string a = "Thong tin lop tin chi da ton tai. Kiem tra lai !";
+										cout << a;
+										ClearMessage(60, 36, a.length());
 									}
 								}
 								else {
 									gotoXY(60, 36);
 									cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
+									Sleep(1000);
+									clrscr(60, 36, 90, 2, ' ');
 								}
 							}
 							else {
 								gotoXY(60, 36);
-								cout << "Du lieu nhap khong duoc de trong!";
+								string a = "Du lieu nhap khong duoc de trong!";
+								cout << a;
+								ClearMessage(60, 36, a.length());
 							}
 						}
 					}
@@ -418,7 +430,9 @@ void ProcessConrtol(AppContext& context) {
 									strcpy_s(sv->data.MASV, MAX_MASV, textFields[0].c_str());
 									if (CheckExistMSSV(context.ds_sv, sv->data.MASV)) {
 										gotoXY(60, 36);
-										cout << "Ma sinh vien da ton tai. Kiem tra lai !";
+										string a = "Ma sinh vien da ton tai. Kiem tra lai !";
+										cout << a;
+										ClearMessage(60, 36, a.length());
 									}
 									else {
 										strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
@@ -436,7 +450,9 @@ void ProcessConrtol(AppContext& context) {
 										UpdateListStudentToFile(context.ds_sv);
 
 										gotoXY(60, 36);
-										cout << "Ghi sinh vien thanh cong!";
+										string a = "Ghi sinh vien thanh cong!";
+										cout << a;
+										ClearMessage(60, 36, a.length());
 										for (int i = 0; i < 7; i++)
 										{
 											textFields[i].clear();
@@ -445,9 +461,9 @@ void ProcessConrtol(AppContext& context) {
 								}
 								else {
 									gotoXY(60, 36);
-									cout << "Du lieu nhap khong duoc de trong!";
-									/*Sleep(3000);
-									clrscr(60, 36, 40, 3, ' ');*/
+									string a = "Du lieu nhap khong duoc de trong!";
+									cout << a;
+									ClearMessage(60, 36, a.length());
 								}
 							}
 						} while (masv_null == false);
@@ -511,7 +527,9 @@ void ProcessConrtol(AppContext& context) {
 									strcpy_s(mh->MAMH, MAX_MAMH, textFields[0].c_str());
 									if (CheckExistMaMH(context.ds_mh, mh->MAMH)) {
 										gotoXY(60, 25);
-										cout << "Ma mon hoc da ton tai. Kiem tra lai !";
+										string a = "Ma mon hoc da ton tai. Kiem tra lai !";
+										cout << a;
+										ClearMessage(60, 25, a.length());
 									}
 									else {
 										strcpy_s(mh->TENMH, MAX_TENMH, textFields[1].c_str());
@@ -522,7 +540,9 @@ void ProcessConrtol(AppContext& context) {
 										UpdateFileDSMonHoc(context.ds_mh);
 
 										gotoXY(60, 25);
-										cout << "Ghi mon hoc thanh cong!";
+										string a = "Ghi mon hoc thanh cong!";
+										cout << a;
+										ClearMessage(60, 25, a.length());
 										for (int i = 0; i < 4; i++)
 										{
 											textFields[i].clear();
@@ -531,9 +551,9 @@ void ProcessConrtol(AppContext& context) {
 								}
 								else {
 									gotoXY(60, 25);
-									cout << "Du lieu nhap khong duoc de trong!";
-									/*Sleep(3000);
-									clrscr(60, 36, 40, 3, ' ');*/
+									string a = "Du lieu nhap khong duoc de trong!";
+									cout << a;
+									ClearMessage(60, 25, a.length());
 								}
 							}
 						} while (mamh_null == false);
@@ -549,12 +569,54 @@ void ProcessConrtol(AppContext& context) {
 		}
 	} while (true);
 }
-void DrawMainLayout(string currentUser) {
+void ProcessControl_SV(AppContext& context) {
+
+	MenuContent* menuCurrent = &MenuFeatureSv;
+
+	do {
+		int key = ControlMenu(menuCurrent, color_darkwhite, color_green);
+
+		if (menuCurrent == &MenuFeatureSv) {
+			if (key == key_Enter)
+				switch (menuCurrent->posStatus)
+				{
+				case 0://menu lop  tin chi
+				{
+					key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus);
+					if (key == key_esc) {
+						menuCurrent->posStatus;
+						break;
+					}
+				}
+				default:
+					break;
+				}
+			else if (key == key_esc) {
+				menuCurrent = &ActionConfirm;
+				ConfirmDialog("Xac nhan thoat chuong trinh ?");
+				key = ControlMenu(menuCurrent, color_darkwhite, color_green);
+				if (key == key_Enter && menuCurrent->posStatus == 0) {
+					return;
+				}
+				else {
+					menuCurrent = &MenuFeatureSv;
+					clrscr(50, 5, 40, 14, ' ');
+				}
+			}
+		}
+	} while (true);
+}
+void DrawMainLayout(string currentUser, bool isStudent) {
 	HideCursor(true); // hide cursor
 	rectagle(1, 1, 25, 40);
 	// where is place content when have a action
 	rectagle(26, 1, 120, 40);
-	DrawListMenu(MenuFeatures, 4);
+	if (!isStudent) {
+		DrawListMenu(MenuFeatures, 4);
+	}
+	else {
+		DrawListMenu(MenuFeatureSv, 1);
+	}
 	SetColor(color_darkwhite);
 	ShowGuide();
 	gotoXY(6, 2);
@@ -562,7 +624,7 @@ void DrawMainLayout(string currentUser) {
 	cout << "CHUC NANG CHINH";
 
 	// show current user
-	gotoXY(110, 2);
+	gotoXY(115, 2);
 	SetColor(color_darkwhite);
 	cout << "Ma sv: " << currentUser;
 }

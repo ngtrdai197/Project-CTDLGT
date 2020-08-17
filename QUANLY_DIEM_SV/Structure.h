@@ -154,7 +154,6 @@ static string propertyMonHoc[4] = {
 static string nameAction = "";
 
 
-
 struct MenuItem {
 	RECT rect;
 	std::string name;
@@ -165,14 +164,19 @@ struct MenuContent {
 	int posStatus = 0;
 };
 static MenuContent MenuFeatures = {
-	new MenuItem[5] {
+	new MenuItem[4] {
 	{{3,3,20,2},"Lop Tin Chi"},
 	{{3,6,20,2},"SinhVien"},
 	{{3,9,20,2},"Mon Hoc"},
 	{{3,12,20,2},"Diem"},
-	{{3,15,20,2},"Dang Ky LTC"}
 	},
-	 5
+	 4
+};
+static MenuContent MenuFeatureSv = {
+	new MenuItem[1]  {
+	{{3,3,20,2},"Dang Ky LTC"}
+	},
+	1
 };
 
 static MenuContent MenuMonHoc = {
@@ -249,6 +253,7 @@ void DrawListMenu(MenuContent& menucontent, int color);
 void ConfirmDialog(string title);
 int ControlMenu(MenuContent* menuContent, int defaultColor, int activateColor);
 int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu);
+void ClearMessage(int x, int y, int length);
 // ===== END HELPER =====
 
 // HANDLE FILES
@@ -335,7 +340,6 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
 int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y);
-int ShowListStudentAndScore(DS_SINH_VIEN& ds_sv);
 // BEGIN FORM
 void HideCursor(bool isHide);
 char InputBox(string& str, int x, int y, int width,

@@ -10,10 +10,14 @@ int main()
 	Read_File_MonHoc(context.ds_mh);
 	RemoveScrollbar();
 	srand(time(NULL));
-	int isLogged = openLogin(context);
-	if (isLogged == 1) {
-		DrawMainLayout(context.currentUser);
-		ProcessConrtol(context);
+	int permission = openLogin(context);
+	if (permission == -1) return 0;
+	DrawMainLayout(context.currentUser, permission);
+	if (!permission) {
+		ProcessControlGV(context);
+	}
+	else {
+		ProcessControl_SV(context);
 	}
 	return 0;
 }
