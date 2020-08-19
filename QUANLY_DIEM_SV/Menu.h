@@ -302,21 +302,30 @@ void ProcessControlGV(AppContext& context) {
 									context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
+
 									if (!exist) {
-										InsertNodeIntoTree(context.tree, p);
-										context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
-										context.nLTC = 0;
-										ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-										UpdateListLopTinChiToFile(context.ds, context.nLTC);
-										delete p;
-										for (int i = 0; i < 6; i++)
-										{
-											Texts[i].clear();
+										if (p->sv_min <= 0 || p->sv_min > p->sv_max) {
+											gotoXY(60, 36);
+											string a = "SV min > 0, va < SV max. Kiem tra lai!";
+											cout << a;
+											ClearMessage(60, 36, a.length());
 										}
-										gotoXY(60, 36);
-										string a = "Them lop tin chi thanh cong !";
-										cout << a;
-										ClearMessage(60, 36, a.length());
+										else {
+											InsertNodeIntoTree(context.tree, p);
+											context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
+											context.nLTC = 0;
+											ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+											UpdateListLopTinChiToFile(context.ds, context.nLTC);
+											delete p;
+											for (int i = 0; i < 6; i++)
+											{
+												Texts[i].clear();
+											}
+											gotoXY(60, 36);
+											string a = "Them lop tin chi thanh cong !";
+											cout << a;
+											ClearMessage(60, 36, a.length());
+										}
 									}
 									else {
 										gotoXY(60, 36);

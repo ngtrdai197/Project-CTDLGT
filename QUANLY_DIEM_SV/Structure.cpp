@@ -1786,24 +1786,32 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 				SV_DANG_KY* sv_dk = new SV_DANG_KY;
 				strcpy_s(sv_dk->MASV, MAX_MASV, context.currentUser);
 				if (isInsert && ltc[posActive + posPrint]) {
-					bool exist = CheckSvExistLTC(ltc[posActive + posPrint], context.currentUser);
-					// TODO: sinh vien ko the dang ky LTC co chung monhoc, nien khoa, hoc ky, nhom => khac 1 tronng 4 
-					if (!exist) {
-						sv_dk->DIEM = -1;
-						InsertLastDSDKY(ltc[posActive + posPrint]->ds_sv_dky, sv_dk);
-						ltc[posActive + posPrint]->totalSvDK++;
-						UpdateNodeOfTree(context.tree, ltc[posActive + posPrint]);
-						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
-						context.nLTC = 0;
-						ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-						UpdateListLopTinChiToFile(context.ds, context.nLTC);
-						return key;
-					}
-					else {
+					if (ltc[posActive + posPrint]->sv_max == ltc[posActive + posPrint]->totalSvDK) {
 						gotoXY(55, 39);
-						cout << "Lop tin chi da duoc dang ky!";
+						cout << "Lop tin chi da full. Khong the dang ky!";
 						Sleep(1000);
 						clrscr(55, 39, 90, 2, ' ');
+					}
+					else {
+						bool exist = CheckSvExistLTC(ltc[posActive + posPrint], context.currentUser);
+						// TODO: sinh vien ko the dang ky LTC co chung monhoc, nien khoa, hoc ky, nhom => khac 1 tronng 4 
+						if (!exist) {
+							sv_dk->DIEM = -1;
+							InsertLastDSDKY(ltc[posActive + posPrint]->ds_sv_dky, sv_dk);
+							ltc[posActive + posPrint]->totalSvDK++;
+							UpdateNodeOfTree(context.tree, ltc[posActive + posPrint]);
+							context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
+							context.nLTC = 0;
+							ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+							UpdateListLopTinChiToFile(context.ds, context.nLTC);
+							return key;
+						}
+						else {
+							gotoXY(55, 39);
+							cout << "Lop tin chi da duoc dang ky!";
+							Sleep(1000);
+							clrscr(55, 39, 90, 2, ' ');
+						}
 					}
 				}
 				else if (!isInsert) {
@@ -1920,6 +1928,12 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 							if (CheckLopTinChiToUpdate(ltc, n, p)) {
 								gotoXY(60, 27);
 								cout << "Thong tin cap nhat da ton tai. Kiem tra lai !";
+								Sleep(1500);
+								valid = false;
+							}
+							else if (p->sv_min <= 0 || p->sv_min > p->sv_max) {
+								gotoXY(60, 27);
+								cout << "SV min > 0, va < SV max. Kiem tra lai!";
 								Sleep(1500);
 								valid = false;
 							}

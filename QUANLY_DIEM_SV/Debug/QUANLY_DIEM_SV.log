@@ -18,12 +18,12 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(259
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(710,6): warning C4101: 'slsv': unreferenced local variable
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1639,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1640,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2263,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2277,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
           with
           [
               _Elem=char
           ]
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2276,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2290,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(50): warning C4715: 'CheckExistMaLTC': not all control paths return a value
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(822): warning C4715: 'TravelTree': not all control paths return a value
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1312): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
