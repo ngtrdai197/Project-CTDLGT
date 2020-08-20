@@ -252,7 +252,7 @@ void DrawEachButtonOfAction(MenuItem& item, int color);
 void DrawListMenu(MenuContent& menucontent, int color);
 void ConfirmDialog(string title);
 int ControlMenu(MenuContent* menuContent, int defaultColor, int activateColor);
-int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu);
+int ControlSinhVienDkyLTC(AppContext& context, int positionSubmenu);
 void ClearMessage(int x, int y, int length);
 // ===== END HELPER =====
 
@@ -300,7 +300,7 @@ NODE_LOP_TIN_CHI* TravelTree(TREE t, int maLop);
 void InsertLopTCIntoTree(TREE& tree);
 void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n);
 void Node_The_Mang(TREE& t, TREE& x);
-void RemoveNodeOfTree(TREE& t, int ma);
+void RemoveNodeOfTree(TREE& t, int ma, int& nLTC);
 void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data);
 Lop_Tin_Chi* InputUpdateTree();
 bool CheckLopTinChiToInsert(Lop_Tin_Chi* ds[], int n, Lop_Tin_Chi* data);

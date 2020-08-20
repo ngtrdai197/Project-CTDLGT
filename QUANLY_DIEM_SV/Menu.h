@@ -225,14 +225,14 @@ void ProcessControlGV(AppContext& context) {
 					} while (key != key_esc);
 					break;
 				}
-				case 4: {
-					// TODO: Sinh Vien Dang Ky Lop Tin Chi
-					key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus);
-					if (key == key_esc) {
-						menuCurrent->posStatus;
-						break;
-					}
-				}
+				//case 4: {
+				//	// TODO: Sinh Vien Dang Ky Lop Tin Chi
+				//	key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus);
+				//	if (key == key_esc) {
+				//		menuCurrent->posStatus;
+				//		break;
+				//	}
+				//}
 				default:
 					break;
 				}
@@ -283,8 +283,9 @@ void ProcessControlGV(AppContext& context) {
 					int maxTexts[6] = { MAX_MAMH - 1, MAX_NIENKHOA - 1,3,3,3,3 };
 					int key = -1;
 					SetColor(color_darkwhite);
-					while (key != key_esc)
+					do
 					{
+
 						key = DrawFormInputLTC(70, 5, 30, Texts, maxTexts, 6, false);
 						if (key == key_Enter) {
 							if (!CheckInputBoxIsNull(Texts, 6)) {
@@ -300,6 +301,7 @@ void ProcessControlGV(AppContext& context) {
 								p->ds_sv_dky.pHead = NULL;
 								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
 									context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
+									context.nLTC = 0;
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
 
@@ -348,7 +350,7 @@ void ProcessControlGV(AppContext& context) {
 								ClearMessage(60, 36, a.length());
 							}
 						}
-					}
+					} while (key != key_esc);
 					clrscr(50, 5, 90, 35, ' ');
 					break;
 				}

@@ -359,7 +359,7 @@ int ControlMenu(MenuContent* menuContent, int defaultColor = color_darkwhite, in
 	} while (key != key_esc && key != key_Enter);
 	return key;
 }
-int ControlSinhVienDkyLTC(AppContext context, int positionSubmenu) {
+int ControlSinhVienDkyLTC(AppContext& context, int positionSubmenu) {
 	int key = -1;
 	key = Search_SV_Dky_LTCByConditions(context, positionSubmenu);
 	if (key == key_esc) return key;
@@ -870,13 +870,13 @@ void Node_The_Mang(TREE& t, TREE& x) {
 		x = x->pRight;
 	}
 }
-void RemoveNodeOfTree(TREE& t, int ma) {
+void RemoveNodeOfTree(TREE& t, int ma, int& nLTC) {
 	if (t == NULL) return;
 	if (t->data.MALOPTC > ma) {
-		RemoveNodeOfTree(t->pLeft, ma);
+		RemoveNodeOfTree(t->pLeft, ma, nLTC);
 	}
 	else if (t->data.MALOPTC < ma) {
-		RemoveNodeOfTree(t->pRight, ma);
+		RemoveNodeOfTree(t->pRight, ma, nLTC);
 	}
 	else {
 		NODE_LOP_TIN_CHI* p = t;
@@ -1867,8 +1867,12 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 			key = ControlMenu(&ActionConfirm, color_darkwhite, color_green);
 			if (key == key_Enter && ActionConfirm.posStatus == 0) {
 				// TODO: need to check in ltc exist student has score, if exist => can't remove !
-				RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC);
-				// UpdateListLopTinChiToFile()
+				RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC, n);
+				n--;
+				context.ds = CreateArrayLopTinChi(n, sizeof(Lop_Tin_Chi));
+				context.nLTC = 0;
+				ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+				UpdateListLopTinChiToFile(context.ds, context.nLTC);
 				clrscr(40, 5, 100, 35, ' '); // xoa tu vi tri form confirm remove
 				return -1;
 			}
