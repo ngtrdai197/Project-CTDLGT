@@ -291,6 +291,7 @@ void SortSinhVienByMSSV(SINH_VIEN* sv[], int n);
 void Show_DS_Sinh_Vien(DS_SINH_VIEN ds_sv);
 void ConvertLinkedListSV(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[]);
 void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop);
+bool CheckSinhVienExistLTC(Lop_Tin_Chi* ds[], int n, char* maSv);
 //  END SINH VIEN
 
 // ===== BEGIN DS LOP TIN CHI =====
@@ -323,7 +324,8 @@ Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, ch
 void Insert_MonHoc(DS_MON_HOC& ds_mon_hoc);
 void RemoveMonHoc(DS_MON_HOC& ds_mon_hoc, char* maMH);
 void UpdateMonHoc(DS_MON_HOC& ds_mon_hoc, MON_HOC mh);
-void SortMonHocMyNameMH(DS_MON_HOC& ds_mh);
+void SortMonHocByNameMH(DS_MON_HOC& ds_mh);
+bool CheckMonHocExistLTC(Lop_Tin_Chi* ds_ltc[], int nLTC, char* mamh);
 void Show_DS_MonHoc(DS_MON_HOC dsMonHoc);
 char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
 // END MON HOC
@@ -332,13 +334,13 @@ char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[],
 void Init_DS_Dang_Ky(DS_SV_DANG_KY& ds_dangky);
 void InsertLastDSDKY(DS_SV_DANG_KY& ds_sv_dk, SV_DANG_KY* sv_dky);
 void Show_DS_Dang_Ky(DS_SV_DANG_KY ds_dk);
-int CommonShowSvList(DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
+int CommonShowSvList(AppContext context, DS_SINH_VIEN& ds_sv, int positionSubMenu, char* maLop);
 void ShowSingleSV_Diem(SINH_VIEN* sv, int index);
 // END DS DANG KY
 
 int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, int y, int positionSubMenu, bool isStudent, bool isInsert);
-int InDanhSachSinhVien(DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
-int InDanhSachMonHoc(DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
+int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* ds_sv[], int n, int x, int y, int positionSubMenu);
+int InDanhSachMonHoc(AppContext context, DS_MON_HOC& ds_mh, int x, int y, int positionSubMenu);
 int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y);
 // BEGIN FORM
 void HideCursor(bool isHide);

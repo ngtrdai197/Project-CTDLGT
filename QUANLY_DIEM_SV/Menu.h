@@ -225,14 +225,6 @@ void ProcessControlGV(AppContext& context) {
 					} while (key != key_esc);
 					break;
 				}
-				//case 4: {
-				//	// TODO: Sinh Vien Dang Ky Lop Tin Chi
-				//	key = ControlSinhVienDkyLTC(context, menuCurrent->posStatus);
-				//	if (key == key_esc) {
-				//		menuCurrent->posStatus;
-				//		break;
-				//	}
-				//}
 				default:
 					break;
 				}
@@ -269,6 +261,8 @@ void ProcessControlGV(AppContext& context) {
 				case 1: {
 					SetColor(color_darkwhite);
 					int keyRemove = -1;
+					gotoXY(40, 3);
+					cout << "F2: Xoa LTC - F3: Sua LTC - ESC: Thoat";
 					do
 					{
 						context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
@@ -285,7 +279,6 @@ void ProcessControlGV(AppContext& context) {
 					SetColor(color_darkwhite);
 					do
 					{
-
 						key = DrawFormInputLTC(70, 5, 30, Texts, maxTexts, 6, false);
 						if (key == key_Enter) {
 							if (!CheckInputBoxIsNull(Texts, 6)) {
@@ -338,9 +331,9 @@ void ProcessControlGV(AppContext& context) {
 								}
 								else {
 									gotoXY(60, 36);
-									cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
-									Sleep(1000);
-									clrscr(60, 36, 90, 2, ' ');
+									string a = "Ma mon hoc khong ton tai. Kiem tra lai !";
+									cout << a;
+									ClearMessage(60, 36, a.length());
 								}
 							}
 							else {
@@ -396,7 +389,7 @@ void ProcessControlGV(AppContext& context) {
 							}
 							else {
 								if (key == key_Enter) {
-									CommonShowSvList(context.ds_sv, menuCurrent->posStatus, cloned);
+									CommonShowSvList(context, context.ds_sv, menuCurrent->posStatus, cloned);
 									maLop[0].clear();
 								}
 							}
@@ -408,14 +401,12 @@ void ProcessControlGV(AppContext& context) {
 				}
 				case 1: {
 					SetColor(color_darkwhite);
-					/*string maLop[1] = { "" };
-					int maxTexts[1] = { MAX_MALOP - 1 };
-					char cloned[MAX_MALOP];
-					bool exist = false;*/
 					int keyRemove = -1;
+					gotoXY(40, 3);
+					cout << "F2: Xoa SV - F3: Sua SV - ESC: Thoat";
 					do
 					{
-						keyRemove = CommonShowSvList(context.ds_sv, menuCurrent->posStatus, NULL);
+						keyRemove = CommonShowSvList(context, context.ds_sv, menuCurrent->posStatus, NULL);
 					} while (keyRemove != key_esc);
 					break;
 				}
@@ -426,6 +417,8 @@ void ProcessControlGV(AppContext& context) {
 						string textFields[7] = { "" };
 						int maxTexts[7] = { MAX_MALOP - 1, MAX_MASV - 1,
 							MAX_HO - 1,MAX_TEN - 1, MAX_PHAI - 1,MAX_SDT - 1,4 };
+						gotoXY(60, 3);
+						cout << "Nhap MASV rong de ket thuc nhap!";
 						do
 						{
 							int key = -1;
@@ -478,7 +471,7 @@ void ProcessControlGV(AppContext& context) {
 								}
 							}
 						} while (masv_null == false);
-						clrscr(50, 5, 90, 35, ' ');
+						clrscr(50, 3, 90, 35, ' ');
 						break;
 					}
 				}
@@ -499,8 +492,8 @@ void ProcessControlGV(AppContext& context) {
 				case 0: {
 					if (key == key_Enter) {
 						SetColor(color_darkwhite);
-						SortMonHocMyNameMH(context.ds_mh);
-						InDanhSachMonHoc(context.ds_mh, 40, 10, menuCurrent->posStatus);
+						SortMonHocByNameMH(context.ds_mh);
+						InDanhSachMonHoc(context, context.ds_mh, 40, 10, menuCurrent->posStatus);
 					}
 					break;
 				case 1: {
@@ -508,10 +501,12 @@ void ProcessControlGV(AppContext& context) {
 						// TODO: implement remove/update feature of the subject
 						int keyRemove = -1;
 						SetColor(color_darkwhite);
+						gotoXY(40, 3);
+						cout << "F2: Xoa MH - F3: Sua MH - ESC: Thoat";
 						do
 						{
-							SortMonHocMyNameMH(context.ds_mh);
-							keyRemove = InDanhSachMonHoc(context.ds_mh, 40, 10, menuCurrent->posStatus);
+							SortMonHocByNameMH(context.ds_mh);
+							keyRemove = InDanhSachMonHoc(context, context.ds_mh, 40, 10, menuCurrent->posStatus);
 						} while (keyRemove != key_esc);
 						break;
 					}
@@ -523,6 +518,8 @@ void ProcessControlGV(AppContext& context) {
 
 						string textFields[4] = { "" };
 						int maxTexts[4] = { MAX_MAMH - 1, MAX_TENMH - 1, 4, 4 };
+						gotoXY(60, 3);
+						cout << "Nhap Ma MH rong de ket thuc nhap!";
 						do
 						{
 							int key = -1;
@@ -568,7 +565,7 @@ void ProcessControlGV(AppContext& context) {
 								}
 							}
 						} while (mamh_null == false);
-						clrscr(50, 5, 90, 35, ' ');
+						clrscr(50, 3, 90, 35, ' ');
 						break;
 					}
 				}
