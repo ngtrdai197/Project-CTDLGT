@@ -227,8 +227,9 @@ void HideCursor(bool isHide)
 char InputBox(string& str, int x, int y, int width,
 	int maxText, bool isDraw = false, bool isText = true, bool isPhone = false, bool isFloat = false) {
 	string text = str;
-	SetColor(color_darkwhite);
+	SetColor(color_darkwhite | colorbk_green);
 	rectagle(x, y, width, 2);
+	SetColor(color_black | colorbk_green);
 
 
 	char key = -1;
@@ -252,6 +253,7 @@ char InputBox(string& str, int x, int y, int width,
 				&& text.length() < maxText && key != key_Down
 				&& key != key_Up && key != key_Right && key != key_Left)
 			: ((key > 47 && key < 58) && text.length() < maxText)) {
+			key = toupper(key);
 			text += key;
 			cout << key;
 		}
@@ -259,6 +261,45 @@ char InputBox(string& str, int x, int y, int width,
 			&& text.length() < maxText && key != key_Down
 			&& key != key_Up && key != key_Right && key != key_Left
 			) {
+			text += key;
+			cout << key;
+		}
+		else if (key == key_bkspace)
+		{
+			if (text.length() <= 0) continue;
+
+			cout << "\b \b";
+			text.erase(text.length() - 1, 1);
+		}
+
+	} while (key != key_esc && key != key_tab && key != key_Enter);
+
+	HideCursor(true);
+	str = text;
+	return key;
+}
+char InputBoxNormal(string& str, int x, int y, int width, int maxText, bool isDraw) {
+	string text = str;
+	SetColor(color_darkwhite);
+	rectagle(x, y, width, 2);
+
+	char key = -1;
+	gotoXY(x + 1, y + 1);
+	cout << text;
+
+	if (isDraw) return -1;
+
+	HideCursor(false);
+
+	do {
+		key = inputKey();
+		if (
+			(((
+				(key > 47 && key < 58) || (key > 64 && key < 91)
+				|| (key > 96 && key < 123)) || key == 45 || key == 32)
+				&& text.length() < maxText && key != key_Down
+				&& key != key_Up && key != key_Right && key != key_Left)) {
+			key = toupper(key);
 			text += key;
 			cout << key;
 		}
@@ -285,6 +326,7 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 		// n - 1 => nam sinh
 		if (n == 7) {
 			gotoXY(50, y + (i * offset + 1));
+			SetColor(color_black | colorbk_green);
 			cout << propertySinhVien[i];
 		}
 		else if (n == 1) {
@@ -312,6 +354,20 @@ char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[
 		}
 		else if (key == key_esc && isUpdate) return key;
 
+	} while (key != key_Enter);
+	return key;
+}
+char DrawFormInputLop(int x, int y, int width, string& text, int maxText) {
+	gotoXY(45, y + 2);
+	cout << "Nhap ma lop: ";
+
+	InputBoxNormal(text, x, y + 1, width, maxText, true);
+	int key = -1;
+
+	do
+	{
+		key = InputBoxNormal(text, x, y + 1, width, maxText, false);
+		if (key == key_esc)	return key;
 	} while (key != key_Enter);
 	return key;
 }
@@ -966,15 +1022,18 @@ char DrawFormInputLTC(int x, int y, int width, string Texts[], int maxText[], in
 		// show to update
 		if (n == 7) {
 			gotoXY(50, y + (i * offset + 1));
+			SetColor(color_black | colorbk_green);
 			cout << propertyLopTinChi[i];
 		}
 		else if (n == 4)// In ds sv theo dieu kien Lop tin chi 
 		{
 			gotoXY(50, y + (i * offset + 1));
+			SetColor(color_black | colorbk_green);
 			cout << propertyLopTinChiByConditions[i];
 		}
 		else if (n == 6) { // show to insert
 			gotoXY(50, y + (i * offset + 1));
+			SetColor(color_black | colorbk_green);
 			cout << propertyInsertLopTinChi[i];
 		}
 		InputBox(Texts[i], x, y + (i * offset), width, maxText[i], true, i < n - 1 ? true : false);
@@ -1010,6 +1069,8 @@ char DrawFormInputSearchLTC(int x, int y, int width, string Texts[], int maxText
 	for (int i = 0; i < n; i++)
 	{
 		gotoXY(50, y + (i * offset + 1));
+		SetColor(color_black | colorbk_green);
+
 		// giang vien => 4 form, sinh vien search-dang ky lop => 2 form input
 		if (isStudent) {
 			cout << propertySVDangKyLopTinChiByConditions[i];
@@ -1097,6 +1158,14 @@ Lop_Tin_Chi** TimLopTinChiSinhVienDaDangKy(Lop_Tin_Chi* ltc[], int n, int& total
 	}
 	return ltcSvDky;
 }
+bool CheckLTCExistStudentHasScore(Lop_Tin_Chi* ltc) {
+	if (ltc->ds_sv_dky.pHead == NULL) return false;
+	for (SV_DANG_KY* p = ltc->ds_sv_dky.pHead; p != NULL; p = p->pNext)
+	{
+		if (p->DIEM != -1) return true;
+	}
+	return false;
+}
 
 template<class _T>
 _T* CloneObject(_T* obj) {
@@ -1157,8 +1226,9 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 					}
 					if (ds_sv_dky.totalSv == 0) {
 						gotoXY(60, 18);
+						SetColor(color_red);
 						cout << "Lop chua co sinh vien dang ky!";
-						Sleep(1200);
+						Sleep(1500);
 						clrscr(40, 4, 90, 35, ' ');
 						return -1;
 					}
@@ -1216,8 +1286,10 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 				}
 				else {
 					gotoXY(60, 18);
+					SetColor(color_red);
 					string a = "Khong tim thay du lieu!";
 					cout << a;
+					SetColor(color_red | colorbk_green);
 					ClearMessage(60, 18, a.length());
 					delete single;
 					valid = false;
@@ -1225,8 +1297,10 @@ int Search_GV_LTCByConditions(AppContext& context, int positionSubmenu, bool isS
 			}
 			else {
 				gotoXY(60, 18);
+				SetColor(color_red);
 				string a = "Du lieu nhap khong duoc de trong!";
 				cout << a;
+				SetColor(color_red | colorbk_green);
 				ClearMessage(60, 18, a.length());
 				valid = false;
 			}
@@ -1301,15 +1375,21 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 				}
 				else {
 					gotoXY(63, 13);
-					cout << "Khong tim thay du lieu!";
-					Sleep(1500);
+					SetColor(color_red);
+					string a = "Khong tim thay du lieu!";
+					cout << a;
+					SetColor(colorbk_green);
+					ClearMessage(63, 13, a.length());
 					valid = false;
 				}
 			}
 			else {
 				gotoXY(63, 13);
-				cout << "Du lieu nhap khong duoc de trong!";
-				Sleep(1500);
+				SetColor(color_red);
+				string a = "Du lieu nhap khong duoc de trong!";
+				cout << a;
+				SetColor(colorbk_green);
+				ClearMessage(63, 13, a.length());
 				valid = false;
 			}
 		}
@@ -1387,6 +1467,7 @@ char DrawFormInputMonHoc(int x, int y, int width, string Texts[], int maxText[],
 	for (int i = 0; i < n; i++)
 	{
 		gotoXY(50, y + (i * offset + 1));
+		SetColor(color_black | colorbk_green);
 		cout << propertyMonHoc[i];
 		InputBox(Texts[i], x, y + (i * offset), width,
 			maxText[i], true, i < 2 ? true : false, false, i>1 ? true : false);
@@ -1906,12 +1987,21 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 			key = ControlMenu(&ActionConfirm, color_darkwhite, color_green);
 			if (key == key_Enter && ActionConfirm.posStatus == 0) {
 				// TODO: need to check in ltc exist student has score, if exist => can't remove !
-				RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC, n);
-				n--;
-				context.ds = CreateArrayLopTinChi(n, sizeof(Lop_Tin_Chi));
-				context.nLTC = 0;
-				ConvertTreeToArray(context.tree, context.ds, context.nLTC);
-				UpdateListLopTinChiToFile(context.ds, context.nLTC);
+				bool hasStudent = CheckLTCExistStudentHasScore(ltc[posActive + posPrint]);
+				if (hasStudent) {
+					gotoXY(60, 35);
+					SetColor(color_red | colorbk_black);
+					cout << "Xoa that bai. Lop tin chi dang ton tai SV co diem !";
+					Sleep(1500);
+				}
+				else {
+					RemoveNodeOfTree(context.tree, ltc[posActive + posPrint]->MALOPTC, n);
+					n--;
+					context.ds = CreateArrayLopTinChi(n, sizeof(Lop_Tin_Chi));
+					context.nLTC = 0;
+					ConvertTreeToArray(context.tree, context.ds, context.nLTC);
+					UpdateListLopTinChiToFile(context.ds, context.nLTC);
+				}
 				clrscr(40, 5, 100, 35, ' '); // xoa tu vi tri form confirm remove
 				return -1;
 			}
@@ -1946,9 +2036,9 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 			do
 			{
 				SetColor(color_white | colorbk_green);
-				rectagle(45, 4, 65, 25);
+				rectagle(45, 5, 65, 25);
 				SetColor(color_white);
-				keyFormUpdate = DrawFormInputLTC(70, 5, 30, textFields, maxTexts, 7, true);
+				keyFormUpdate = DrawFormInputLTC(70, 6, 30, textFields, maxTexts, 7, true);
 				if (keyFormUpdate == key_Enter) {
 					if (!CheckInputBoxIsNull(textFields, 7)) {
 						// validate data
@@ -1956,26 +2046,36 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 						p->MALOPTC = atoi(textFields[0].c_str());
 						strcpy_s(p->MAMH, MAX_MAMH, textFields[1].c_str());
 						strcpy_s(p->NIEN_KHOA, MAX_NIENKHOA, textFields[2].c_str());
+						// BEGIN validate nien khoa
+						string delimiter = "-";
+						string firstYear = textFields[2].substr(0, textFields[2].find(delimiter));
+						string lastYear = textFields[2].substr(textFields[2].find(delimiter) + 1, textFields[2].length() - 1);
+						int aaa = atoi(firstYear.c_str());
+						int bbb = atoi(lastYear.c_str());
+						// END validate nien khoa
 						p->HOC_KY = atoi(textFields[3].c_str());
 						p->NHOM = atoi(textFields[4].c_str());
 						p->sv_max = atoi(textFields[5].c_str());
 						p->sv_min = atoi(textFields[6].c_str());
 						bool exist = CheckExistMaMH(context.ds_mh, p->MAMH);
 						if (!exist) {
-							gotoXY(60, 27);
+							gotoXY(60, 28);
+							SetColor(color_red);
 							cout << "Ma mon hoc khong ton tai. Kiem tra lai !";
 							Sleep(1500);
 							valid = false;
 						}
 						else {
 							if (CheckLopTinChiToUpdate(ltc, n, p)) {
-								gotoXY(60, 27);
+								gotoXY(60, 28);
+								SetColor(color_red);
 								cout << "Thong tin cap nhat da ton tai. Kiem tra lai !";
 								Sleep(1500);
 								valid = false;
 							}
 							else if (p->sv_min <= 0 || p->sv_min > p->sv_max) {
-								gotoXY(60, 27);
+								gotoXY(60, 28);
+								SetColor(color_red);
 								cout << "SV min > 0, va < SV max. Kiem tra lai!";
 								Sleep(1500);
 								valid = false;
@@ -1987,7 +2087,8 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 								ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 								UpdateListLopTinChiToFile(ltc, n);
 								delete p;
-								gotoXY(60, 27);
+								gotoXY(60, 28);
+								SetColor(color_red);
 								cout << "Cap nhat lop tin chi thanh cong!";
 								Sleep(1500);
 								clrscr(40, 4, 100, 35, ' ');
@@ -1998,7 +2099,8 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 
 					}
 					else {
-						gotoXY(60, 36);
+						gotoXY(60, 28);
+						SetColor(color_red);
 						cout << "Du lieu nhap khong duoc de trong!";
 						Sleep(1500);
 						valid = false;
@@ -2112,7 +2214,7 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 
 	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int perPage = 20;
+	int perPage = 10;
 	int totalPage = n / perPage;
 
 	if (n % perPage != 0) {
@@ -2141,7 +2243,8 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 					UpdateListStudentToFile(ctx_ds_sv);
 				}
 				else {
-					gotoXY(50, 35);
+					gotoXY(60, 35);
+					SetColor(color_red | colorbk_black);
 					cout << "Xoa that bai. Sinh vien dang nam trong LTC";
 					Sleep(1500);
 				}
@@ -2175,36 +2278,58 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 			do
 			{
 				SetColor(color_white | colorbk_green);
-				rectagle(45, 4, 65, 25);
+				rectagle(45, 5, 65, 25);
 				SetColor(color_white);
-				keyFormUpdate = DrawFormInputSinhVien(70, 5, 30, textFields, maxTexts, 7, true);
+				keyFormUpdate = DrawFormInputSinhVien(70, 6, 30, textFields, maxTexts, 7, true);
+				bool shouldUpdate = true;
 				if (keyFormUpdate == key_Enter) {
 					if (!CheckInputBoxIsNull(textFields, 7)) {
-						// validate data
-						SINH_VIEN* sv = new SINH_VIEN;
-						strcpy_s(sv->MASV, MAX_MASV, textFields[0].c_str());
-						strcpy_s(sv->MALOP, MAX_MALOP, textFields[1].c_str());
-						strcpy_s(sv->HO, MAX_HO, textFields[2].c_str());
-						strcpy_s(sv->TEN, MAX_TEN, textFields[3].c_str());
-						strcpy_s(sv->PHAI, MAX_PHAI, textFields[4].c_str());
-						strcpy_s(sv->SDT, MAX_SDT, textFields[5].c_str());
-						sv->NAMNHAPHOC = atoi(textFields[6].c_str());
-						bool exist = CheckExistLop(sv->MALOP);
-						if (!exist) {
-							InsertLopIntoDSLop(sv->MALOP);
+						if (textFields[4] != "NAM" && textFields[4] != "NU") {
+							gotoXY(60, 28);
+							SetColor(color_red | colorbk_black);
+							cout << "Gioi tinh phai la: \"NAM\" or \"NU\" !";
+							Sleep(1500);
+							valid = false;
+							shouldUpdate = false;
 						}
-						UpdateSinhVien(ctx_ds_sv, sv);
-						UpdateListStudentToFile(ctx_ds_sv);
+						if (atoi(textFields[6].c_str()) < 2000 && atoi(textFields[6].c_str()) <= 2050) {
+							gotoXY(60, 28);
+							SetColor(color_red | colorbk_black);
+							cout << "Nam nhap hoc >= 2000 va <= 2050";
+							Sleep(1500);
+							valid = false;
+							shouldUpdate = false;
+						}
+						if (shouldUpdate) {
+							// validate data
+							SINH_VIEN* sv = new SINH_VIEN;
+							strcpy_s(sv->MASV, MAX_MASV, textFields[0].c_str());
+							strcpy_s(sv->MALOP, MAX_MALOP, textFields[1].c_str());
+							strcpy_s(sv->HO, MAX_HO, textFields[2].c_str());
+							strcpy_s(sv->TEN, MAX_TEN, textFields[3].c_str());
+							strcpy_s(sv->PHAI, MAX_PHAI, textFields[4].c_str());
+							strcpy_s(sv->SDT, MAX_SDT, textFields[5].c_str());
+							sv->NAMNHAPHOC = atoi(textFields[6].c_str());
+							bool exist = CheckExistLop(sv->MALOP);
+							if (!exist) {
+								InsertLopIntoDSLop(sv->MALOP);
+							}
+							UpdateSinhVien(ctx_ds_sv, sv);
+							UpdateListStudentToFile(ctx_ds_sv);
 
-						gotoXY(60, 27);
-						cout << "Cap nhat sinh vien thanh cong!";
-						Sleep(1500);
-						clrscr(40, 4, 90, 35, ' ');
-						valid = true;
-						return keyFormUpdate;
+							gotoXY(60, 28);
+							SetColor(color_red | colorbk_black);
+							cout << "Cap nhat sinh vien thanh cong!";
+							Sleep(1500);
+							clrscr(40, 4, 90, 35, ' ');
+							valid = true;
+							return keyFormUpdate;
+						}
+
 					}
 					else {
-						gotoXY(60, 27);
+						gotoXY(60, 28);
+						SetColor(color_red | colorbk_black);
 						cout << "Du lieu nhap khong duoc de trong!";
 						Sleep(1500);
 						valid = false;
@@ -2223,10 +2348,7 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 				SetColor(color_darkwhite);
 				gotoXY(x, y + posActive + 1);
 				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
-
 				--posActive;
-
-
 				SetColor(color_green);
 				gotoXY(x, y + posActive + 1);
 				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
@@ -2237,7 +2359,7 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 			if (posPrint - perPage >= 0) {
 				posPrint -= perPage;
 				--currentPage;
-				posActive = perPage - 1;
+				posActive = 0;
 			}
 			goto paint;
 		}
@@ -2255,6 +2377,10 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 				ShowSingleSV(ds_sv[posActive + posPrint], posActive + posPrint);
 				break;
 			}
+			else if (posActive + posPrint == n - 1) {
+				break;
+			}
+
 		}
 		case key_Right: {
 			if (posPrint + perPage < n) {
@@ -2313,7 +2439,7 @@ int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y) {
 
 	int currentPage = 0, posActive = -1;
 	int posPrint = 0;
-	int perPage = 5;
+	int perPage = 10;
 	int totalPage = n / perPage;
 
 	if (n % perPage != 0) {
@@ -2349,6 +2475,7 @@ int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y) {
 						if (score > -2 && score <= 10) {
 							ds_sv_diem[posActive + posPrint]->diem = score;
 							gotoXY(62, 16);
+							SetColor(color_red);
 							cout << "Cap nhat diem thanh cong!";
 							Sleep(1500);
 							clrscr(40, 10, 90, 30, ' ');
@@ -2357,14 +2484,15 @@ int InDanhSachSinhVien_Diem(SV_DIEM* ds_sv_diem[], int n, int x, int y) {
 						}
 						else {
 							gotoXY(62, 16);
+							SetColor(color_red);
 							cout << "Diem khong hop le!";
 							Sleep(1500);
 							valid = false;
 						}
 					}
 					else {
-						SetColor(color_red);
 						gotoXY(62, 16);
+						SetColor(color_red);
 						cout << "Diem khong duoc de trong!";
 						Sleep(1500);
 						valid = false;

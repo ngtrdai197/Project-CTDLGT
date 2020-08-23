@@ -166,7 +166,7 @@ struct MenuContent {
 static MenuContent MenuFeatures = {
 	new MenuItem[4] {
 	{{3,3,20,2},"Lop Tin Chi"},
-	{{3,6,20,2},"SinhVien"},
+	{{3,6,20,2},"Sinh Vien"},
 	{{3,9,20,2},"Mon Hoc"},
 	{{3,12,20,2},"Diem"},
 	},
@@ -318,6 +318,7 @@ Lop_Tin_Chi** CreateArrayLopTinChi(int x, int y);
 int total_LTC_SV_Can_Register(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc_ky);
 int total_LTC_SV_Registered(Lop_Tin_Chi* ltc[], int n, char* masv);
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
+bool CheckLTCExistStudentHasScore(Lop_Tin_Chi* ltc);
 // ===== END DS LOP TIN CHI =====
 
 // MON HOC
@@ -349,7 +350,8 @@ char InputBox(string& str, int x, int y, int width,
 char DrawFormInput(int x, int y, int width, string Texts[], int maxText[], int n);
 char DrawFormInputSinhVien(int x, int y, int width, string Texts[], int maxText[], int n, bool isUpdate);
 char DrawFormInputDiem(int x, int y, int width, string Texts[], int maxText[]);
-
+char DrawFormInputLop(int x, int y, int width, string& text, int maxText);
+char InputBoxNormal(string& str, int x, int y, int width, int maxText, bool isDraw = false);
 // END FORM
 
 
