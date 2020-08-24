@@ -319,6 +319,8 @@ int total_LTC_SV_Can_Register(Lop_Tin_Chi* ltc[], int n, char* nienkhoa, int hoc
 int total_LTC_SV_Registered(Lop_Tin_Chi* ltc[], int n, char* masv);
 Lop_Tin_Chi** FindLTCSVDKYByConditions(Lop_Tin_Chi* ltc[], int n, int& total, char* nienkhoa, int hoc_ky);
 bool CheckLTCExistStudentHasScore(Lop_Tin_Chi* ltc);
+bool CheckNienKhoa_InValid(string nienkhoa);
+
 // ===== END DS LOP TIN CHI =====
 
 // MON HOC

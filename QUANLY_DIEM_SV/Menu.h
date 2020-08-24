@@ -22,6 +22,20 @@ int openLogin(AppContext& context) {
 		key = inputKey();
 		switch (key)
 		{
+		case key_esc: {
+			/*MenuContent* menuCurrent = &MenuFeatures;
+			menuCurrent = &ActionConfirm;
+			SetColor(colorbk_green);
+			ConfirmDialog("Xac nhan dang xuat ?");
+			key = ControlMenu(menuCurrent, 7, 12);
+			if (key == key_Enter && menuCurrent->posStatus == 0) {
+				return -1;
+			}
+			else {
+				return -2;
+			}*/
+			break;
+		}
 		case key_Up: {
 			pos = 0;
 			gotoXY(57 + auth[pos].length(), 15);
@@ -194,7 +208,7 @@ char DrawFormInputDiem(int x, int y, int width, string Texts[], int maxText[]) {
 	return key;
 }
 
-void ProcessControlGV(AppContext& context) {
+int ProcessControlGV(AppContext& context) {
 
 	MenuContent* menuCurrent = &MenuFeatures;
 
@@ -231,10 +245,10 @@ void ProcessControlGV(AppContext& context) {
 				}
 			else if (key == key_esc) {
 				menuCurrent = &ActionConfirm;
-				ConfirmDialog("Xac nhan thoat chuong trinh ?");
+				ConfirmDialog("Xac nhan dang xuat ?");
 				key = ControlMenu(menuCurrent, 7, 12);
 				if (key == key_Enter && menuCurrent->posStatus == 0) {
-					return;
+					return key;
 				}
 				else {
 					menuCurrent = &MenuFeatures;
@@ -307,6 +321,13 @@ void ProcessControlGV(AppContext& context) {
 											gotoXY(60, 25);
 											SetColor(color_red);
 											string a = "SV min > 0, va < SV max. Kiem tra lai!";
+											cout << a;
+											Sleep(1500);
+										}
+										else if (CheckNienKhoa_InValid(Texts[1])) {
+											gotoXY(50, 25);
+											SetColor(color_red);
+											string a = "Nien khoa khong hop le (>= 2000 & <=2050). Ex: 2015-2020";
 											cout << a;
 											Sleep(1500);
 										}
@@ -385,7 +406,7 @@ void ProcessControlGV(AppContext& context) {
 						bool exist = false;
 						do
 						{
-							SetColor(color_darkwhite| colorbk_black);
+							SetColor(color_darkwhite | colorbk_black);
 							key = DrawFormInputLop(60, 5, 30, maLop, MAX_MALOP - 1);
 							if (key == key_esc) break;
 							strcpy_s(cloned, MAX_MALOP, maLop.c_str());
@@ -451,39 +472,46 @@ void ProcessControlGV(AppContext& context) {
 										SetColor(color_red | colorbk_green);
 										ClearMessage(60, 31, a.length());
 									}
+									else if (textFields[4] != "NAM" && textFields[4] != "NU") {
+										gotoXY(60, 31);
+										SetColor(color_red);
+										string a = "Gioi tinh phai la: \"Nam\" or \"Nu\"";
+										cout << a;
+										SetColor(color_red | colorbk_green);
+										ClearMessage(60, 31, a.length());
+										continue;
+									}
+									else if (atoi(textFields[6].c_str()) < 2000 && atoi(textFields[6].c_str()) <= 2050) {
+										gotoXY(60, 31);
+										SetColor(color_red | colorbk_black);
+										string a = "Nam nhap hoc >= 2000 va <= 2050";
+										cout << a;
+										SetColor(color_red | colorbk_green);
+										ClearMessage(60, 31, a.length());
+									}
 									else {
-										if (textFields[4] == "NAM" || textFields[4] == "NU") {
-											strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
-											strcpy_s(sv->data.HO, MAX_HO, textFields[2].c_str());
-											strcpy_s(sv->data.TEN, MAX_TEN, textFields[3].c_str());
-											strcpy_s(sv->data.PHAI, MAX_PHAI, textFields[4].c_str());
-											strcpy_s(sv->data.SDT, MAX_SDT, textFields[5].c_str());
-											sv->data.NAMNHAPHOC = atoi(textFields[6].c_str());
-											sv->pNext = NULL;
-											bool exist = CheckExistLop(sv->data.MALOP);
-											if (!exist) {
-												InsertLopIntoDSLop(sv->data.MALOP);
-											}
-											InsertAndSortSvIntoDS(context.ds_sv, sv);
-											UpdateListStudentToFile(context.ds_sv);
-
-											gotoXY(60, 31);
-											SetColor(color_red);
-											string a = "Ghi sinh vien thanh cong!";
-											cout << a;
-											ClearMessage(60, 31, a.length());
-											for (int i = 0; i < 7; i++)
-											{
-												textFields[i].clear();
-											}
+										strcpy_s(sv->data.MALOP, MAX_MALOP, textFields[1].c_str());
+										strcpy_s(sv->data.HO, MAX_HO, textFields[2].c_str());
+										strcpy_s(sv->data.TEN, MAX_TEN, textFields[3].c_str());
+										strcpy_s(sv->data.PHAI, MAX_PHAI, textFields[4].c_str());
+										strcpy_s(sv->data.SDT, MAX_SDT, textFields[5].c_str());
+										sv->data.NAMNHAPHOC = atoi(textFields[6].c_str());
+										sv->pNext = NULL;
+										bool exist = CheckExistLop(sv->data.MALOP);
+										if (!exist) {
+											InsertLopIntoDSLop(sv->data.MALOP);
 										}
-										else {
-											gotoXY(60, 31);
-											SetColor(color_red);
-											string a = "Gioi tinh phai la: \"Nam\" or \"Nu\"";
-											cout << a;
-											SetColor(color_red | colorbk_green);
-											ClearMessage(60, 31, a.length());
+										InsertAndSortSvIntoDS(context.ds_sv, sv);
+										UpdateListStudentToFile(context.ds_sv);
+
+										gotoXY(60, 31);
+										SetColor(color_red);
+										string a = "Ghi sinh vien thanh cong!";
+										cout << a;
+										ClearMessage(60, 31, a.length());
+										for (int i = 0; i < 7; i++)
+										{
+											textFields[i].clear();
 										}
 									}
 								}
@@ -609,7 +637,7 @@ void ProcessControlGV(AppContext& context) {
 		}
 	} while (true);
 }
-void ProcessControl_SV(AppContext& context) {
+int ProcessControl_SV(AppContext& context) {
 
 	MenuContent* menuCurrent = &MenuFeatureSv;
 
@@ -633,10 +661,10 @@ void ProcessControl_SV(AppContext& context) {
 				}
 			else if (key == key_esc) {
 				menuCurrent = &ActionConfirm;
-				ConfirmDialog("Xac nhan thoat chuong trinh ?");
+				ConfirmDialog("Xac nhan dang xuat ?");
 				key = ControlMenu(menuCurrent, 7, 12);
 				if (key == key_Enter && menuCurrent->posStatus == 0) {
-					return;
+					return key;
 				}
 				else {
 					menuCurrent = &MenuFeatureSv;
