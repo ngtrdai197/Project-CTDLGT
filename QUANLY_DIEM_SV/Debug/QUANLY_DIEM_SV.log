@@ -22,29 +22,28 @@ C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(6,10)
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(7,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(8,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(61,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(77,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(92,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(210,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(210,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(245,56): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(253,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(255,47): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(260,78): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(261,21): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(300,22): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(763,6): warning C4101: 'slsv': unreferenced local variable
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1778,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1779,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2495,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(57,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(73,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(88,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(206,84): warning C4244: 'argument': conversion from 'LONG' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(206,87): warning C4267: 'argument': conversion from 'size_t' to 'short', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(241,56): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(249,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(251,47): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(256,78): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(257,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(296,22): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(759,6): warning C4101: 'slsv': unreferenced local variable
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1775,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1776,23): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2502,52): warning C4244: 'argument': conversion from 'float' to 'const _Elem', possible loss of data
           with
           [
               _Elem=char
           ]
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2508,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(2515,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   Generating Code...
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(50): warning C4715: 'CheckExistMaLTC': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(875): warning C4715: 'TravelTree': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1412): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
-C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1638): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(871): warning C4715: 'TravelTree': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1409): warning C4715: 'Search_SV_Dky_LTCByConditions': not all control paths return a value
+C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\QUANLY_DIEM_SV\Structure.cpp(1635): warning C4715: 'RemoveSV_Dang_Ky_ByMSSV': not all control paths return a value
   QUANLY_DIEM_SV.vcxproj -> C:\Users\Nguyen Dai\source\repos\QUANLY_DIEM_SV\Debug\QUANLY_DIEM_SV.exe

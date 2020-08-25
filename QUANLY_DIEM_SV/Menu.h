@@ -308,13 +308,13 @@ int ProcessControlGV(AppContext& context) {
 								p->NHOM = stoi(Texts[3]);
 								p->sv_max = stoi(Texts[4]);
 								p->sv_min = stoi(Texts[5]);
-								p->MALOPTC = RandomIDLTC(context.tree);
 								p->ds_sv_dky.pHead = NULL;
 								if (CheckExistMaMH(context.ds_mh, p->MAMH)) {
 									context.ds = CreateArrayLopTinChi(context.nLTC, sizeof(Lop_Tin_Chi));
 									context.nLTC = 0;
 									ConvertTreeToArray(context.tree, context.ds, context.nLTC);
 									bool exist = CheckLopTinChiToInsert(context.ds, context.nLTC, p);
+									p->MALOPTC = RandomIDLTC(context.ds, context.nLTC);
 
 									if (!exist) {
 										if (p->sv_min <= 0 || p->sv_min > p->sv_max) {

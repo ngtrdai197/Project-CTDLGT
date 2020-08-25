@@ -235,11 +235,11 @@ struct AppContext {
 // ===== BEGIN HELPER =====
 bool CheckExistMSSV(DS_SINH_VIEN ds_sv, char* massv);
 bool CheckExistMaMH(DS_MON_HOC ds_mh, char* maMH);
-bool CheckExistMaLTC(TREE tree, int maLopTc);
+bool CheckExistMaLTC(Lop_Tin_Chi* ltc[], int n, int maLopTc);
 void Trim(string& str);
 string RandomID(DS_SINH_VIEN ds_sv);
 string RandomIDMH(DS_MON_HOC ds_mon_hoc);
-int RandomIDLTC(TREE tree);
+int RandomIDLTC(Lop_Tin_Chi* ltc[], int n);
 bool IsNumber(char* s);
 bool CheckExistLop(char* malop);
 void InsertLopIntoDSLop(string lop);

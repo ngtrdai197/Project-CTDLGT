@@ -36,17 +36,13 @@ bool CheckExistMaMH(DS_MON_HOC ds_mh, char* maMH)
 	}
 	return exist;
 }
-bool CheckExistMaLTC(TREE tree, int maLopTc) {
-	if (tree == NULL)return false;
-	if (tree->data.MALOPTC == maLopTc) {
-		return false;
+bool CheckExistMaLTC(Lop_Tin_Chi* ltc[], int n, int maLopTc) {
+	if (n == 0) return false;
+	for (int i = 0; i < n; i++)
+	{
+		if (ltc[i]->MALOPTC == maLopTc) return true;
 	}
-	else if (tree->data.MALOPTC > maLopTc) {
-		CheckExistMaLTC(tree->pRight, maLopTc);
-	}
-	else if (tree->data.MALOPTC < maLopTc) {
-		CheckExistMaLTC(tree->pLeft, maLopTc);
-	}
+	return false;
 }
 void Trim(string& str) {
 	cout << str;
@@ -96,12 +92,12 @@ string RandomIDMH(DS_MON_HOC ds_mon_hoc)
 	} while (CheckExistMaMH(ds_mon_hoc, cloned));
 	return randomId;
 }
-int RandomIDLTC(TREE tree) {
+int RandomIDLTC(Lop_Tin_Chi* ltc[], int n) {
 	int maLopTc;
 	do
 	{
-		maLopTc = rand() % (999 - 100 + 1) + 100;
-	} while (CheckExistMaLTC(tree, maLopTc));
+		maLopTc = (rand() % 1000) + 1;
+	} while (CheckExistMaLTC(ltc, n, maLopTc));
 	return maLopTc;
 }
 bool IsNumber(char* s)
@@ -873,19 +869,19 @@ NODE_LOP_TIN_CHI* TravelTree(TREE t, int maLop) {
 		return t;
 	}
 }
-void InsertLopTCIntoTree(TREE& tree) {
-	Lop_Tin_Chi* p = new Lop_Tin_Chi;
-	p->MALOPTC = RandomIDLTC(tree);
-	cout << "\nNhap ma mon hoc: "; cin.getline(p->MAMH, MAX_MAMH);
-	cout << "Nhap nien khoa: "; cin.getline(p->NIEN_KHOA, MAX_NIENKHOA);
-	cout << "Nhap hoc ky: "; cin >> p->HOC_KY;
-	cout << "Nhap sl sinh vien max: "; cin >> p->sv_max;
-	cout << "Nhap sl sinh vien min: "; cin >> p->sv_min;
-	cout << "Nhap nhom:"; cin >> p->NHOM;
-	p->ds_sv_dky.pHead = NULL;
-	p->ds_sv_dky.pTail = NULL;
-	InsertNodeIntoTree(tree, p);
-}
+//void InsertLopTCIntoTree(TREE& tree) {
+//	Lop_Tin_Chi* p = new Lop_Tin_Chi;
+//	p->MALOPTC = RandomIDLTC(tree);
+//	cout << "\nNhap ma mon hoc: "; cin.getline(p->MAMH, MAX_MAMH);
+//	cout << "Nhap nien khoa: "; cin.getline(p->NIEN_KHOA, MAX_NIENKHOA);
+//	cout << "Nhap hoc ky: "; cin >> p->HOC_KY;
+//	cout << "Nhap sl sinh vien max: "; cin >> p->sv_max;
+//	cout << "Nhap sl sinh vien min: "; cin >> p->sv_min;
+//	cout << "Nhap nhom:"; cin >> p->NHOM;
+//	p->ds_sv_dky.pHead = NULL;
+//	p->ds_sv_dky.pTail = NULL;
+//	InsertNodeIntoTree(tree, p);
+//}
 void ConvertTreeToArray(TREE t, Lop_Tin_Chi* ds[], int& n) {
 	if (t != NULL) {
 		ConvertTreeToArray(t->pLeft, ds, n);
@@ -913,14 +909,14 @@ void ConvertLinkedListSVBylop(DS_SINH_VIEN ds_sv, SINH_VIEN* dsSV[], char* maLop
 		}
 	}
 }
-void Node_The_Mang(TREE& t, TREE& x) {
-	if (t->pLeft != NULL) {
-		Node_The_Mang(t->pLeft, x);
+void Node_The_Mang(TREE& x, TREE& y) {
+	if (y->pLeft != NULL) {
+		Node_The_Mang(x, y->pLeft);
 	}
 	else {
-		t->data = x->data;
-		t = x;
-		x = x->pRight;
+		x->data = y->data;
+		x = y;
+		y = y->pRight;
 	}
 }
 void RemoveNodeOfTree(TREE& t, int ma, int& nLTC) {
@@ -932,7 +928,7 @@ void RemoveNodeOfTree(TREE& t, int ma, int& nLTC) {
 		RemoveNodeOfTree(t->pRight, ma, nLTC);
 	}
 	else {
-		NODE_LOP_TIN_CHI* p = t;
+		NODE_LOP_TIN_CHI* x = t;
 		if (t->pLeft == NULL) {
 			t = t->pRight;
 		}
@@ -941,9 +937,10 @@ void RemoveNodeOfTree(TREE& t, int ma, int& nLTC) {
 		}
 		else {
 			// trai nhat cay con phai
-			Node_The_Mang(t->pRight, p);
+			NODE_LOP_TIN_CHI* y = t->pRight;
+			Node_The_Mang(x, y);
 		}
-		delete p;
+		delete x;
 	}
 }
 void UpdateNodeOfTree(TREE& t, Lop_Tin_Chi* data) {
@@ -1349,7 +1346,7 @@ int Search_SV_Dky_LTCByConditions(AppContext& context, int positionSubmenu) {
 					{
 						SetColor(color_darkwhite);
 						gotoXY(40, 3);
-						cout << "F1: Dang ky LTC - Tab: Di chuyen LTC dang ky - Da dang ky";
+						cout << "F1: Dang ky/Huy LTC - Tab: Di chuyen LTC dang ky - Da dang ky";
 
 						gotoXY(55, 5);
 						cout << "============ DANH SACH LOP TIN CHI DANG KY ============";
@@ -2222,7 +2219,7 @@ int InDanhSachLopTinChi(AppContext& context, Lop_Tin_Chi* ltc[], int n, int x, i
 			   }
 
 			   gotoXY(x, y + perPage + 1);
-			   cout << currentPage + 1 << "/" << totalPage;
+			   cout << "Page: " << (totalPage ? currentPage + 1 : currentPage) << "/" << totalPage;
 			   if (posActive >= 0) {
 				   SetColor(color_green);
 				   gotoXY(x, y + posActive + 1);
@@ -2318,6 +2315,8 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 				bool shouldUpdate = true;
 				if (keyFormUpdate == key_Enter) {
 					if (!CheckInputBoxIsNull(textFields, 7)) {
+						char maLop_Check[MAX_MALOP];
+						strcpy_s(maLop_Check, MAX_MALOP, textFields[1].c_str());
 						if (textFields[4] != "NAM" && textFields[4] != "NU") {
 							gotoXY(60, 28);
 							SetColor(color_red | colorbk_black);
@@ -2330,6 +2329,14 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 							gotoXY(60, 28);
 							SetColor(color_red | colorbk_black);
 							cout << "Nam nhap hoc >= 2000 va <= 2050";
+							Sleep(1500);
+							valid = false;
+							shouldUpdate = false;
+						}
+						if (!CheckExistLop(maLop_Check)) {
+							gotoXY(60, 28);
+							SetColor(color_red | colorbk_black);
+							cout << "Ma lop khong ton tai !";
 							Sleep(1500);
 							valid = false;
 							shouldUpdate = false;
@@ -2449,7 +2456,7 @@ int InDanhSachSinhVien(AppContext context, DS_SINH_VIEN& ctx_ds_sv, SINH_VIEN* d
 			   }
 
 			   gotoXY(x, y + perPage + 3);
-			   cout << "Page " << currentPage + 1 << "/" << totalPage;
+			   cout << "Page " << (totalPage ? currentPage + 1 : currentPage) << "/" << totalPage;
 			   if (posActive >= 0) {
 				   SetColor(color_green);
 				   gotoXY(x, y + posActive + 1);
